@@ -22,14 +22,6 @@ disk.check('/', function(err, sysinfo) {
 
 var minHourlyRate = 5; // TODO Compare this to cost of running on a cloud, as an upper bound, and mining a crypto, as a lower bound
 
-// TODO Listen for job-posting events emitted by the smart contracts:
-// 	    - JobFactory
-//          - JobDescriptionPosted
-//          - UntrainedModelAndTrainingDatasetShared
-//          - TrainedModelShared
-//          - JobApproved
-//      - AuctionFactory
-//          - AuctionEnded
 const auctionFactoryABIPathname = 'VickreyAuction-copyABI.json';
 let auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8')).abi;
 
@@ -37,21 +29,11 @@ jobFactoryContract.events.JobDescriptionPosted()
     .on('data', function(event) {
         let job = event.returnValues;
 
-        // FIXME Need to approve the transfer to bid
+        // TODO 1 Automatically approve the transfer
         // morphwareToken.approve(vickreyAuction.address,12,{from:accounts[1]});
-
-
-
-        // TEST
-        // console.log(job);
-        // console.log(typeof job.trainingDatasetSize);
-        // console.log(typeof job.workerReward);
-        // console.log(typeof job.estimatedTrainingTime);
-        // console.log(job.auctionAddress);
 
         if (parseInt(job.trainingDatasetSize) <= maxDiskSpace) {
             if ((parseInt(job.workerReward) / (parseInt(job.estimatedTrainingTime) / 60)) >= minHourlyRate) {
-                // TODO Bid on the job
                 let auctionFactory = new web3.eth.Contract(auctionFactoryAbi,job.auctionAddress);
                 // TODO Replace `bidAmount` with some notion of utility, based on number of CUDA cores
                 var bidAmount = 11;
@@ -66,19 +48,80 @@ jobFactoryContract.events.JobDescriptionPosted()
                 ).send(
                     {from:account1Address, gas:'3000000'}
                 ).on('receipt', function(receipt) {
-                    // TODO
                     // TEST
-                    console.log('bid sent')
-                    console.log(receipt);
-                    
+                    console.log('\nBid sent')
+                    console.log('\n',receipt);
+
+                    // TODO Wait until `.biddingDeadline` and then call `reveal`
+                    var biddingDeadline = auctionFactory.auctions(job.jobPoster,parseInt(job.id)).biddingDeadline;
+                    var currentTimestamp = Math.floor(new Date().getTime() / 1000);
+                    setTimeout((function() {
+                        // TEST
+                        console.log('\nCalling reveal()');
+                        auctionFactory.methods.reveal(
+                            job.jobPoster,
+                            parseInt(job.id),
+                            [bidAmount],
+                            [fakeBid],
+                            [secret]
+                        ).send(
+                            {from:account1Address, gas:'3000000'}
+                        ).on('receipt', function(receipt) {
+                            // TODO Wait until `.revealDeadline` and then call `auctionEnd`
+                            var revealDeadline = auctionFactory.auctions(job.jobPoster,parseInt(job.id)).revealDeadline;
+                            setTimeout((function() {
+                                // TEST
+                                console.log('\nCalling auctionEnd()')
+                                auctionFactory.methods.auctionEnd(
+                                    job.jobPoster,
+                                    parseInt(job.id)
+                                ).send(
+                                    {from:account1Address, gas:'3000000'}
+                                ).on('receipt', function(receipt) {
+                                    // TEST
+                                    console.log('\nAuction ended');
+                                    console.log('\n',receipt);
+                                });
+                            }),revealDeadline - currentTimestamp);
+                        });
+                    }),biddingDeadline - currentTimestamp);
                 }).on('error', console.error);
             } else {
+                // TODO 9 Handle this condition / error
                 console.log('Missed inner if-block');
             }
         } else {
+            // TODO 9 Handle this condition / error
             console.log('Missed outer if-block');
         }
     }).on('error', console.error);
+
+
+// TODO Listen for job-posting events emitted by the smart contracts:
+// 	    - JobFactory
+//          x JobDescriptionPosted
+//          o UntrainedModelAndTrainingDatasetShared
+//          o TrainedModelShared
+//          o JobApproved
+//      - AuctionFactory
+//          o AuctionEnded
+
+// AuctionEnded( 
+// jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared()
+//     .on('data', function(event) {
+//         let job = event.returnValues;
+
+
+
+// TODO vickreyAuction.withdraw({from:accounts[1]});
+
+// TODO vickreyAuction.payout(accounts[4],0);
+
+
+
+
+
+
 
 
 
