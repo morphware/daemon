@@ -17,14 +17,15 @@ class URI:
 class C:
 
     def __init__(self):
-        self.endpoint = URI()
+        self.endpoint = URI().endpoint
 
-    def get_gpu_instance_prices(self,provider,service):
-        uri = self.endpoint
-                +f'/providers/{provider}'
-                +f'/services/{service}'
-                +f'/regions/{region}'
-                +f'/products'
+    def get_gpu_instance_prices(self,provider,service,region):
+        """uri = self.endpoint\
+                +f'/providers/{provider}'\
+                +f'/services/{service}'\
+                +f'/regions/{region}'\
+                +f'/products'"""
+        uri = 'http://localhost:8000/api/v1/providers/amazon/services/compute/regions/us-east-1/products'
         metadata = json.loads(requests.get(uri).text)
         l = []
         for instanceType in metadata['products']:
@@ -36,4 +37,4 @@ class C:
 if __name__ == '__main__':
     from pprint import pprint
     c = C()
-    c.get_gpu_instance_prices('amazon','compute')
+    c.get_gpu_instance_prices('amazon','compute','us-east-1')
