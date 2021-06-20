@@ -1,121 +1,154 @@
 #!/usr/bin/env node
+
 const fs   = require('fs');
 const path = require('path');
 const Web3 = require('web3');
 const disk = require('diskusage');
 
-const provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
-let web3 = new Web3(provider);
 
-// TODO Un-hardcode these three
-const account1Address = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0';
-const jobFactoryContractAddress = '0xC89Ce4735882C9F0f0FE26686c53074E09B0D550';
-const jobFactoryABIPathname = 'JobFactory-copyABI.json';
+var provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
+var web3 = new Web3(provider);
 
-let jobFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(jobFactoryABIPathname),'utf-8')).abi;
-let jobFactoryContract = new web3.eth.Contract(jobFactoryAbi,jobFactoryContractAddress);
+var workerAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0';
+var jobFactoryContractAddress = '0xC89Ce4735882C9F0f0FE26686c53074E09B0D550';
+var jobFactoryABIPathname = 'JobFactory-copyABI.json';
 
-var maxDiskSpace;
-disk.check('/', function(err, sysinfo) {
-    maxDiskSpace = sysinfo.free;
-});
+var jobFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(jobFactoryABIPathname),'utf-8')).abi;
+var jobFactoryContract = new web3.eth.Contract(jobFactoryAbi,jobFactoryContractAddress);
 
 var minHourlyRate = 5; // TODO Compare this to cost of running on a cloud, as an upper bound, and mining a crypto, as a lower bound
 
-const auctionFactoryABIPathname = 'VickreyAuction-copyABI.json';
-let auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8')).abi;
+var auctionFactoryABIPathname = 'VickreyAuction-copyABI.json';
+var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8')).abi;
 
-jobFactoryContract.events.JobDescriptionPosted()
-    .on('data', function(event) {
-        let job = event.returnValues;
+/*
+TODO Listen for job-posting events emitted by the smart contracts:
+     - JobFactory
+         1. JobDescriptionPosted
+         3. UntrainedModelAndTrainingDatasetShared
+         4. TrainedModelShared
+         5. JobApproved
+     - AuctionFactory
+         2. AuctionEnded
+*/
 
-        // TODO 1 Automatically approve the transfer
-        // morphwareToken.approve(vickreyAuction.address,12,{from:accounts[1]});
+(async function procJobDescriptionPosted(){
+    // (A) This should listen for an event,
+    //     if it is not working on a job right now,
+    //     or if GPU utilization is not too high.
+    //
+    //     For the sake of simplicity, this is assumed to be true.
+    try {
+        console.log('\ninside try') // XXX
 
-        if (parseInt(job.trainingDatasetSize) <= maxDiskSpace) {
-            if ((parseInt(job.workerReward) / (parseInt(job.estimatedTrainingTime) / 60)) >= minHourlyRate) {
-                let auctionFactory = new web3.eth.Contract(auctionFactoryAbi,job.auctionAddress);
-                // TODO Replace `bidAmount` with some notion of utility, based on number of CUDA cores
-                var bidAmount = 11;
-                var fakeBid = false;
-                // TODO Replace `secret`
-                var secret = '0x6d6168616d000000000000000000000000000000000000000000000000000000';
-                auctionFactory.methods.bid(
-                    job.jobPoster,
-                    parseInt(job.id),
-                    web3.utils.keccak256(web3.utils.encodePacked(bidAmount,fakeBid,secret)),
-                    bidAmount,
-                ).send(
-                    {from:account1Address, gas:'3000000'}
-                ).on('receipt', function(receipt) {
-                    // TEST
-                    console.log('\nBid sent')
-                    console.log('\n',receipt);
+        // jobFactoryContract.once('JobDescriptionPosted', async function(error, event) {
+        await jobFactoryContract.events.JobDescriptionPosted(
+            async function(error, event) {
 
-                    // TODO Wait until `.biddingDeadline` and then call `reveal`
-                    var biddingDeadline = auctionFactory.auctions(job.jobPoster,parseInt(job.id)).biddingDeadline;
-                    var currentTimestamp = Math.floor(new Date().getTime() / 1000);
-                    setTimeout((function() {
-                        // TEST
-                        console.log('\nCalling reveal()');
-                        auctionFactory.methods.reveal(
+                // let event = await jobFactoryContract.events.JobDescriptionPosted()
+                var job = event.returnValues;
+
+                var maxDiskSpace;
+                disk.check('/', function(err, sysinfo) {
+                    maxDiskSpace = sysinfo.free;
+                });
+
+                if (parseInt(job.trainingDatasetSize) <= maxDiskSpace) {
+                    if ((parseInt(job.workerReward) / (parseInt(job.estimatedTrainingTime) / 60)) >= minHourlyRate) {
+
+                        var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,job.auctionAddress);
+
+                        var bidAmount = 11;
+                        var fakeBid = false;
+                        var secret = '0x6d6168616d000000000000000000000000000000000000000000000000000000';
+
+
+                        await auctionFactory.methods.bid(
                             job.jobPoster,
                             parseInt(job.id),
-                            [bidAmount],
-                            [fakeBid],
-                            [secret]
+                            web3.utils.keccak256(web3.utils.encodePacked(bidAmount,fakeBid,secret)),
+                            bidAmount
                         ).send(
-                            {from:account1Address, gas:'3000000'}
-                        ).on('receipt', function(receipt) {
-                            // TODO Wait until `.revealDeadline` and then call `auctionEnd`
-                            var revealDeadline = auctionFactory.auctions(job.jobPoster,parseInt(job.id)).revealDeadline;
-                            setTimeout((function() {
-                                // TEST
-                                console.log('\nCalling auctionEnd()')
-                                auctionFactory.methods.auctionEnd(
-                                    job.jobPoster,
-                                    parseInt(job.id)
-                                ).send(
-                                    {from:account1Address, gas:'3000000'}
-                                ).on('receipt', function(receipt) {
-                                    // TEST
-                                    console.log('\nAuction ended');
-                                    console.log('\n',receipt);
-                                });
-                            }),revealDeadline - currentTimestamp);
-                        });
-                    }),biddingDeadline - currentTimestamp);
-                }).on('error', console.error);
-            } else {
-                // TODO 9 Handle this condition / error
-                console.log('Missed inner if-block');
+                            {from:workerAddress, gas:'3000000'}
+                        ).on('receipt', async function(receipt) {
+                            console.log('\nBid sent'); // XXX
+                            console.log(receipt); // XXX
+
+                            var currentTimestamp = Math.floor(new Date().getTime() / 1000);
+                            console.log('\ncurrentTimestamp:',currentTimestamp); // XXX
+
+                            var auction = await auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call();
+
+                            var biddingDeadline = parseInt(auction.biddingDeadline);
+                            console.log('\nbiddingDeadline:',biddingDeadline); // XXX
+
+                            var revealDeadline = parseInt(auction.revealDeadline);
+                            console.log('revealDeadline:',revealDeadline); // XXX
+
+
+                            var safeDelay = 5;
+                            var waitTimeInMS1 = ((biddingDeadline - currentTimestamp) + safeDelay) * 1000;
+                            console.log('Wait time before calling reveal',(waitTimeInMS1/1000)) // XXX
+
+                            setTimeout(
+                                async function(error,event){
+                                    try {
+                                        console.log(job.jobPoster,parseInt(job.id),bidAmount,fakeBid,secret) // XXX
+                                        await auctionFactory.methods.reveal(
+                                            job.jobPoster,
+                                            parseInt(job.id),
+                                            [bidAmount],
+                                            [fakeBid],
+                                            [secret]
+                                        ).send(
+                                            {from:workerAddress, gas:'3000000'}
+                                        ).on('receipt', function(receipt) {
+                                            console.log('\nreveal() called'); // XXX
+                                            console.log(receipt); // XXX
+                                            // TODO Wait until `.revealDeadline` and then call `auctionEnd`
+                                            // var revealDeadline = auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call().revealDeadline;
+                                        })
+                                    } catch(error) {
+                                        console.log(error)
+                                    }
+                                },waitTimeInMS1
+                            )
+
+                            // TODO Call auctionEnd
+                            var waitTimeInMS2 = ((revealDeadline - currentTimestamp) + safeDelay) * 1000;
+                            console.log('Wait time before calling auctionEnd',(waitTimeInMS2/1000))
+
+                            setTimeout(
+                                async function(error,event){
+                                    try {
+                                        console.log('\nAbout to call auctionEnd()') // XXX
+                                        await auctionFactory.methods.auctionEnd(
+                                            job.jobPoster,
+                                            parseInt(job.id)
+                                        ).send(
+                                            {from:workerAddress, gas:'3000000'}
+                                        ).on('receipt', function(receipt) {
+                                            console.log('\nauctionEnd() called'); // XXX
+                                            console.log(receipt); // XXX
+                                            // TODO Wait until `.revealDeadline` and then call `auctionEnd`
+                                            // var revealDeadline = auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call().revealDeadline;
+                                        })
+                                    } catch(error) {
+                                        console.log(error)
+                                    }
+                                },waitTimeInMS2
+                            )
+                        })
+                    }
+                }
+            
             }
-        } else {
-            // TODO 9 Handle this condition / error
-            console.log('Missed outer if-block');
-        }
-    }).on('error', console.error);
-
-
-// TODO Listen for job-posting events emitted by the smart contracts:
-// 	    - JobFactory
-//          x JobDescriptionPosted
-//          o UntrainedModelAndTrainingDatasetShared
-//          o TrainedModelShared
-//          o JobApproved
-//      - AuctionFactory
-//          o AuctionEnded
-
-// AuctionEnded( 
-// jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared()
-//     .on('data', function(event) {
-//         let job = event.returnValues;
-
-
-
-// TODO vickreyAuction.withdraw({from:accounts[1]});
-
-// TODO vickreyAuction.payout(accounts[4],0);
+        )
+    } catch(error) {
+        // TODO Handle error
+        console.log(error)
+    }
+})()
 
 
 
@@ -124,18 +157,52 @@ jobFactoryContract.events.JobDescriptionPosted()
 
 
 
+/*
+async function procAuctionEnded(){
+    let event = await jobFactoryContract.events.AuctionEnded()
+    // (B) This should stop listening for an event related to a job the worker has bid on,
+    //     if was not the highest bidder.
+    try {
+        // TODO
+    } catch(error) {
+        // TODO Handle error
+        console.log(error)
+    }
+}
 
+async function procUntrainedModelAndTrainingDatasetShared(){
+    let event = await jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared()
+    // (C) This should only listen for an event related to a job the worker's bid on,
+    //     and was the highest bidder.
+    try {
+        // TODO
+    } catch(error) {
+        // TODO Handle error
+        console.log(error)
+    }
+}
 
+async function procTrainedModelShared(){
+    let event = await jobFactoryContract.events.TrainedModelShared()
+    // (C) This should only listen for an event related to a job the worker's bid on,
+    //     and was the highest bidder.
+    try {
+        // TODO
+    } catch(error) {
+        // TODO Handle error
+        console.log(error)
+    }
+}
 
-// Download ///////////////////////////////////////////////////////////////////
-
-// TODO Replace `magnet: ...` with a magnet link to the file to be downloaded
-// var magnetURI = 'magnet: ...'
-
-// TODO Create a directory with the user's wallet address, or the job's GUID,
-//      if one doesn't already exist
-// client.add(magnetURI, { path: '/path/to/folder' }, function (torrent) {
-//     torrent.on('done', function () {
-//         console.log('torrent download finished')
-//     })
-// })
+async function procJobApproved(){
+    let event = await jobFactoryContract.events.JobApproved()
+    // (C) This should only listen for an event related to a job the worker's bid on,
+    //     and was the highest bidder.
+    try {
+        // TODO
+    } catch(error) {
+        // TODO Handle error
+        console.log(error)
+    }
+}
+*/
