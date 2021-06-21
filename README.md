@@ -29,3 +29,20 @@ TODO
 
 ## Usage
 
+`daemon` relies on a Web3 provider to communicate with the Ethereum
+network.  This may either be an Infura endpoint or a local `geth` node,
+as the project moves towards production, but has relied on `truffle`
+and `ganache`, so far; for ease of development.
+
+The following commands depend on the commands in the Usage sections of
+`../client/README.md` and `../service/README.md` to be run first.
+
+Note: this development scenario does not incorporate a validator-node.
+
+### End-user (e.g., data scientist)
+
+TODO
+
+### Worker-node
+
+TODO
