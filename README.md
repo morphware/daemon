@@ -41,8 +41,12 @@ Note: this development scenario does not incorporate a validator-node.
 
 ### End-user (e.g., data scientist)
 
-```node main.js```
+Start the back-end process, for the end-user:
+
+`node main.js`
 
 ### Worker-node
 
-```node worker.js```
+Start the back-end process, for the worker-node:
+
+`node worker.js`
