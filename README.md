@@ -25,7 +25,9 @@ This section is currently limited to Ubuntu 20.04.
 
 #### Ubuntu 20.04
 
-TODO
+Install NodeJS dependencies:
+
+`npm install`
 
 ## Usage
 
