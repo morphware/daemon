@@ -41,8 +41,8 @@ Note: this development scenario does not incorporate a validator-node.
 
 ### End-user (e.g., data scientist)
 
-TODO
+```node main.js```
 
 ### Worker-node
 
-TODO
+```node worker.js```
