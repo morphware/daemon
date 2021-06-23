@@ -56,13 +56,16 @@ app.post('/upload', validFields, async function (req, res) {
     ///////////////////////////////////////////////////////////////////////////////
     const fieldsObj = JSON.parse(req.body.fields);
 
+    var biddingDeadline = Math.floor(new Date().getTime() / 1000) + parseInt(fieldsObj['bidding-time'])
+    var revealDeadline = biddingDeadline+30  // TODO Replace this
+
     jobFactoryContract.methods.postJobDescription(
         parseInt(fieldsObj['training-time']),
         parseInt(req.files['training-data'][0].size),
         parseInt(fieldsObj['error-rate']),
         parseInt(Number(fieldsObj['worker-reward'])*.1),
-        parseInt(fieldsObj['bidding-time']),
-        parseInt(Number(fieldsObj['bidding-time'])),
+        biddingDeadline,
+        revealDeadline,
         parseInt(fieldsObj['worker-reward'])
     ).send(
         {from:account4Address, gas:"3000000"}
