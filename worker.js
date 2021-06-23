@@ -141,7 +141,6 @@ TODO Listen for job-posting events emitted by the smart contracts:
                         })
                     }
                 }
-            
             }
         )
     } catch(error) {
