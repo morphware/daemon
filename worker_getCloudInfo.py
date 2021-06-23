@@ -20,12 +20,11 @@ class C:
         self.endpoint = URI().endpoint
 
     def get_gpu_instance_prices(self,provider,service,region):
-        """uri = self.endpoint\
+        uri = self.endpoint\
                 +f'/providers/{provider}'\
                 +f'/services/{service}'\
                 +f'/regions/{region}'\
-                +f'/products'"""
-        uri = 'http://localhost:8000/api/v1/providers/amazon/services/compute/regions/us-east-1/products'
+                +f'/products'
         metadata = json.loads(requests.get(uri).text)
         l = []
         for instanceType in metadata['products']:
