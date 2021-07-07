@@ -6,6 +6,11 @@ const express    = require('express');
 const multer     = require('multer');
 const WebTorrent = require('webtorrent-hybrid');
 const Web3       = require('web3');
+// const sqlite3 = require('sqlite3').verbose();
+
+// var db = new sqlite3.Database('./magnetLinks.db');
+
+
 
 ///////////////////////////////////////////////////////////////////////////////
 var storage = multer.diskStorage({
@@ -57,7 +62,6 @@ var morphwareTokenAbi = JSON.parse(fs.readFileSync(path.resolve(morphwareTokenAB
 var morphwareTokenContractAddress = '0xCfEB869F69431e42cdB54A4F4f105C19C080A601';
 var morphwareToken = new web3.eth.Contract(morphwareTokenAbi,morphwareTokenContractAddress);
 
-var links = {};
 
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -94,24 +98,47 @@ app.post('/upload', validFields, async function (req, res) {
     // TODO return next(error);
 
     ///////////////////////////////////////////////////////////////////////////////
+    // var links = {};
+
+    // db.serialize(function() {
+    //     db.run("DROP TABLE IF EXISTS links; CREATE TABLE links (pk INTEGER PRIMARY KEY AUTOINCREMENT, user_address VARCHAR, job_id INTEGER, jupyter_notebook VARCHAR, training_data VARCHAR, testing_data VARCHAR)");
+
+
+
     for (const [_fieldname, _fileArray] of Object.entries(req.files)) {
         let f = _fileArray[0].path;
-        webtorrent.seed(f, function (torrent) {
+        // webtorrent.seed(f, function (torrent) {
+        webtorrent.seed(f, async function (e, torrent) {
         // TODO 1
-        //   console.log(_fieldname);
+            console.log('\n',_fieldname);
         //   console.log(_fileArray[0].originalname);
         //   console.log(_fileArray[0].size);
-        //   console.log(torrent.magnetURI);
-            links[_fieldname] = torrent.magnetURI;
+            // console.log(torrent.magnetURI);
+            // links[_fieldname] = torrent.magnetURI;
+
+            // fieldName = _fieldname.replace(/-/g, '_');
+            
+            var magnetLink = await torrent.magnetURI;
+            console.log(magnetLink);
+
+            // db.run("INSERT INTO links(user_address,job_id,jupyter_notebook,training_data,testing_data) VALUES (?,?,?,?,?)",
+            //     [account4Address,,,,]);
         });
     }
 
-    var linksObj = JSON.stringify(links);
+    // });
 
-    // TODO 9 Replace links with a more descriptive filename
-    fs.writeFile("links.json", linksObj, function(err, result) {
-        if(err) console.log('error', err);
-    });
+    // db.close();
+
+
+    // console.log(links)
+
+    // var linksObj = JSON.stringify(links);
+
+    // // TODO 9 Replace links with a more descriptive filename
+    // fs.writeFile("links.json", linksObj, function(err, result) {
+    //     if(err) console.log('error', err);
+    // });
 
 
     // TODO 8 Send a legitimate response
