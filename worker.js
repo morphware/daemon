@@ -10,15 +10,15 @@ var provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
 var web3 = new Web3(provider);
 
 var workerAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0';
-var jobFactoryContractAddress = '0xC89Ce4735882C9F0f0FE26686c53074E09B0D550';
-var jobFactoryABIPathname = 'JobFactory-copyABI.json';
 
+var jobFactoryContractAddress = '0xC89Ce4735882C9F0f0FE26686c53074E09B0D550';
+var jobFactoryABIPathname = './abi/JobFactory-copyABI.json';
 var jobFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(jobFactoryABIPathname),'utf-8')).abi;
 var jobFactoryContract = new web3.eth.Contract(jobFactoryAbi,jobFactoryContractAddress);
 
 var minHourlyRate = 5; // TODO Compare this to cost of running on a cloud, as an upper bound, and mining a crypto, as a lower bound
 
-var auctionFactoryABIPathname = 'VickreyAuction-copyABI.json';
+var auctionFactoryABIPathname = './abi/VickreyAuction-copyABI.json';
 var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8')).abi;
 
 /*
@@ -39,7 +39,7 @@ TODO Listen for job-posting events emitted by the smart contracts:
     //
     //     For the sake of simplicity, this is assumed to be true.
     try {
-        console.log('\ninside try') // XXX
+        console.log('\nWorker node listening for JobDescriptionPosted from JobFactory...') // XXX
 
         // jobFactoryContract.once('JobDescriptionPosted', async function(error, event) {
         await jobFactoryContract.events.JobDescriptionPosted(
@@ -151,24 +151,7 @@ TODO Listen for job-posting events emitted by the smart contracts:
 
 
 
-
-
-
-
-
 /*
-async function procAuctionEnded(){
-    let event = await jobFactoryContract.events.AuctionEnded()
-    // (B) This should stop listening for an event related to a job the worker has bid on,
-    //     if was not the highest bidder.
-    try {
-        // TODO
-    } catch(error) {
-        // TODO Handle error
-        console.log(error)
-    }
-}
-
 async function procUntrainedModelAndTrainingDatasetShared(){
     let event = await jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared()
     // (C) This should only listen for an event related to a job the worker's bid on,
