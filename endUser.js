@@ -7,7 +7,7 @@ const Web3       = require('web3');
 
 const webtorrent = new WebTorrent();
 
-const provider = new Web3.providers.HttpProvider('http://localhost:8545');
+var provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
 let web3 = new Web3(provider);
 
 const account4Address = '0xd03ea8624C8C5987235048901fB614fDcA89b117';
@@ -21,7 +21,7 @@ var auctionFactoryContractAddress = '0x254dffcd3277C0b1660F6d42EFbB754edaBAbC2B'
 var auctionFactoryABIPathname = './abi/VickreyAuction-copyABI.json';
 var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8')).abi;
 
-
+var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,auctionFactoryContractAddress);
 
 (async function procAuctionEnded(){
     // (B) This should stop listening for an event related to a job the worker has bid on,
@@ -29,13 +29,13 @@ var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryAB
     try {
         console.log('\nendUser node listening for AuctionEnded from AuctionFactory...') // XXX
 
-        var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,auctionFactoryContractAddress);
 
         await auctionFactory.events.AuctionEnded(
-            { filter: { endUser: account4Address } }).on('data',
-            function(event) {
+            { filter: { endUser: account4Address } },
+            function(error, event) {
 
-                console.log('inside procAuctionEnded await'); // XXX
+                console.log(event);
+                console.log('Inside procAuctionEnded await...'); // XXX
                 
                 var x = event.returnValues;
                 // TODO May need to check the local disk space again, 
@@ -44,7 +44,7 @@ var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryAB
                 console.log(x);
 
                 // FIXME Upload magnet links to smart contract
-
+                //webtorrent.add
 
 
 
