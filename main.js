@@ -39,7 +39,6 @@ const port = 3000;
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-const webtorrent = new WebTorrent();
 
 ///////////////////////////////////////////////////////////////////////////////
 const provider = new Web3.providers.HttpProvider('http://localhost:8545');
@@ -98,28 +97,65 @@ app.post('/upload', validFields, async function (req, res) {
     // TODO return next(error);
 
     ///////////////////////////////////////////////////////////////////////////////
-    // var links = {};
+    var links = {};
 
     // db.serialize(function() {
     //     db.run("DROP TABLE IF EXISTS links; CREATE TABLE links (pk INTEGER PRIMARY KEY AUTOINCREMENT, user_address VARCHAR, job_id INTEGER, jupyter_notebook VARCHAR, training_data VARCHAR, testing_data VARCHAR)");
 
 
-
+    let count = 1; // FIXME Change this back to 3
     for (const [_fieldname, _fileArray] of Object.entries(req.files)) {
         let f = _fileArray[0].path;
-        // webtorrent.seed(f, function (torrent) {
-        webtorrent.seed(f, async function (e, torrent) {
+
+        let webtorrent = new WebTorrent();
+        
+        links[_fieldname] = webtorrent;
+
+        webtorrent.seed(f, function (torrent) {
+        // webtorrent.seed(f, async function (e, torrent) {
         // TODO 1
-            console.log('\n',_fieldname);
+            if (--count == 0) {
+                
+                console.dir(links,{depth:5}) // Note: This works
+
+                // console.dir(links.torrents[0].info.magnetURI,{depth:5}) // Check
+                
+                // console.log(links.torrents[0].info.magnetURI) // Check
+
+
+
+                // TODO Search by key: use DevTools (Chrome)
+
+                // var linksObj = JSON.stringify(links);
+                var d = {}
+
+                d['jupyter-notebook'] = links['jupyter-notebook'].torrents[0].magnetURI;
+                d['training-data']    = links['training-data'].torrents[0].magnetURI;
+                d['testing-data']     = links['testing-data'].torrents[0].magnetURI;
+
+                var dObj = JSON.stringify(d);
+
+                // TODO 9 Replace links with a more descriptive filename
+                fs.writeFile("links.json", dObj, function(err, result) {
+                    if(err) console.log('error', err);
+                });
+
+
+            }
+            // console.log(torrent);
+
+
+            // console.log('\n',_fieldname);
         //   console.log(_fileArray[0].originalname);
         //   console.log(_fileArray[0].size);
             // console.log(torrent.magnetURI);
-            // links[_fieldname] = torrent.magnetURI;
+
+
 
             // fieldName = _fieldname.replace(/-/g, '_');
             
-            var magnetLink = await torrent.magnetURI;
-            console.log(magnetLink);
+            // var magnetLink = torrent.magnetURI;
+            // console.log(magnetLink);
 
             // db.run("INSERT INTO links(user_address,job_id,jupyter_notebook,training_data,testing_data) VALUES (?,?,?,?,?)",
             //     [account4Address,,,,]);
@@ -130,15 +166,6 @@ app.post('/upload', validFields, async function (req, res) {
 
     // db.close();
 
-
-    // console.log(links)
-
-    // var linksObj = JSON.stringify(links);
-
-    // // TODO 9 Replace links with a more descriptive filename
-    // fs.writeFile("links.json", linksObj, function(err, result) {
-    //     if(err) console.log('error', err);
-    // });
 
 
     // TODO 8 Send a legitimate response

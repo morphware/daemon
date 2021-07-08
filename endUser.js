@@ -36,7 +36,9 @@ var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,auctionFactoryContr
 
                 console.log(event);
                 console.log('Inside procAuctionEnded await...'); // XXX
-                
+
+                // Then... Upload magnet links by calling `shareUntrainedModelAndTrainingDataset` in the `JobFactory` contract
+
                 var x = event.returnValues;
                 // TODO May need to check the local disk space again, 
                 //      because the training data may not fit if it
