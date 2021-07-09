@@ -4,6 +4,7 @@ const fs   = require('fs');
 const path = require('path');
 const Web3 = require('web3');
 const disk = require('diskusage');
+const WebTorrent = require('webtorrent-hybrid');
 
 
 var provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
@@ -24,12 +25,12 @@ var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryAB
 /*
 TODO Listen for job-posting events emitted by the smart contracts:
      - JobFactory
-         1. JobDescriptionPosted
-         3. UntrainedModelAndTrainingDatasetShared
-         4. TrainedModelShared
-         5. JobApproved
+       v  1. JobDescriptionPosted
+       o  3. UntrainedModelAndTrainingDatasetShared
+       o  4. TrainedModelShared
+       o  5. JobApproved
      - AuctionFactory
-         2. AuctionEnded
+       v  2. AuctionEnded
 */
 
 (async function procJobDescriptionPosted(){
@@ -43,10 +44,16 @@ TODO Listen for job-posting events emitted by the smart contracts:
 
         // jobFactoryContract.once('JobDescriptionPosted', async function(error, event) {
         await jobFactoryContract.events.JobDescriptionPosted(
-            async function(error, event) {
+            function(error, event) {
+
+                console.log('error',error)
+                console.log('event',event)
 
                 // let event = await jobFactoryContract.events.JobDescriptionPosted()
                 var job = event.returnValues;
+
+                // TEST
+                console.log('job',job) // XXX
 
                 var maxDiskSpace;
                 disk.check('/', function(err, sysinfo) {
@@ -63,7 +70,7 @@ TODO Listen for job-posting events emitted by the smart contracts:
                         var secret = '0x6d6168616d000000000000000000000000000000000000000000000000000000';
 
 
-                        await auctionFactory.methods.bid(
+                        auctionFactory.methods.bid(
                             job.jobPoster,
                             parseInt(job.id),
                             web3.utils.keccak256(web3.utils.encodePacked(bidAmount,fakeBid,secret)),
@@ -151,25 +158,50 @@ TODO Listen for job-posting events emitted by the smart contracts:
 
 
 
-/*
-async function procUntrainedModelAndTrainingDatasetShared(){
-    let event = await jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared()
-    // (C) This should only listen for an event related to a job the worker's bid on,
-    //     and was the highest bidder.
-    try {
-        // TODO
-    } catch(error) {
-        // TODO Handle error
-        console.log(error)
-    }
-}
+// (function procUntrainedModelAndTrainingDatasetShared(){
+//     // (C) This should only listen for an event related to a job the worker's bid on,
+//     //     and was the highest bidder.
+//     try {
+//         jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared(
+//             { filter: { workerNode: workerAddress } },
+//             function(error, event) {
 
+//                 let webtorrent = new WebTorrent();
+
+//                 webtorrent.add()
+
+//                 var downloadsDir = './datalake/worker_node/downloads'
+
+
+
+//             }
+
+//         )
+
+
+
+//     } catch(error) {
+//         // TODO Handle error
+//         console.log(error)
+//     }
+// }
+
+
+
+
+
+
+
+
+
+
+/*
 async function procTrainedModelShared(){
-    let event = await jobFactoryContract.events.TrainedModelShared()
     // (C) This should only listen for an event related to a job the worker's bid on,
     //     and was the highest bidder.
     try {
         // TODO
+        jobFactoryContract.events.TrainedModelShared()
     } catch(error) {
         // TODO Handle error
         console.log(error)
@@ -177,11 +209,11 @@ async function procTrainedModelShared(){
 }
 
 async function procJobApproved(){
-    let event = await jobFactoryContract.events.JobApproved()
     // (C) This should only listen for an event related to a job the worker's bid on,
     //     and was the highest bidder.
     try {
         // TODO
+        jobFactoryContract.events.JobApproved()
     } catch(error) {
         // TODO Handle error
         console.log(error)
