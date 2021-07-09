@@ -15,7 +15,7 @@ const Web3       = require('web3');
 ///////////////////////////////////////////////////////////////////////////////
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'datalake/uploads');
+        cb(null, 'datalake/end_user/uploads');
     },
     // TODO 1 Create a key-value store that associates the original filename
     //        so it can be displayed in the dashboard and tracked by the user.
@@ -66,10 +66,19 @@ var morphwareToken = new web3.eth.Contract(morphwareTokenAbi,morphwareTokenContr
 
 app.post('/upload', validFields, async function (req, res) {
 
+    // TEST
+    console.log(req); // XXX
+    console.log(res); // XXX
+
     // TODO 9 Incorporate `fileFilter`
 
     ///////////////////////////////////////////////////////////////////////////////
     const fieldsObj = JSON.parse(req.body.fields);
+
+    // TEST
+    console.log(fieldsObj); // XXX
+
+
 
     var biddingDeadline = Math.floor(new Date().getTime() / 1000) + parseInt(fieldsObj['bidding-time'])
     var revealDeadline = biddingDeadline+30  // TODO Replace this
@@ -116,7 +125,7 @@ app.post('/upload', validFields, async function (req, res) {
         // TODO 1
             if (--count == 0) {
                 
-                console.dir(links,{depth:5}) // Note: This works
+                // console.dir(links,{depth:5}) // Note: This works
 
                 // console.dir(links.torrents[0].info.magnetURI,{depth:5}) // Check
                 
