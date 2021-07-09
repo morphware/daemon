@@ -2,6 +2,7 @@ const fs         = require('fs');
 const path       = require('path');
 const WebTorrent = require('webtorrent-hybrid');
 const Web3       = require('web3');
+const { URL }    = require('url');
 
 // 9 TODO Import dependency structure from one file
 
@@ -23,21 +24,20 @@ var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryAB
 
 var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,auctionFactoryContractAddress);
 
-(async function procAuctionEnded(){
+(function procAuctionEnded(){
     // (B) This should stop listening for an event related to a job the worker has bid on,
     //     if was not the highest bidder.
     try {
         console.log('\nendUser node listening for AuctionEnded from AuctionFactory...') // XXX
 
 
-        await auctionFactory.events.AuctionEnded(
+        auctionFactory.events.AuctionEnded(
             { filter: { endUser: account4Address } },
             function(error, event) {
 
                 console.log(event);
                 console.log('Inside procAuctionEnded await...'); // XXX
 
-                // Then... Upload magnet links by calling `shareUntrainedModelAndTrainingDataset` in the `JobFactory` contract
 
                 var x = event.returnValues;
                 // TODO May need to check the local disk space again, 
@@ -45,9 +45,48 @@ var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,auctionFactoryContr
                 //      changed.
                 console.log(x);
 
-                // FIXME Upload magnet links to smart contract
-                //webtorrent.add
+                var magnetLinks = JSON.parse(fs.readFileSync('./links.json','utf-8'));;
+                
 
+                for (magnetLink in magnetLinks) {
+                    // Note: This is from the bytes32 stuff:
+                    // magnetLinks[magnetLink] = web3.utils.asciiToHex((new URL(magnetLinks[magnetLink])).searchParams.get('xt').split(':').splice(-1)[0]);
+
+                    // Note: This strips everything but the DHT-hash
+                    // magnetLinks[magnetLink] = (new URL(magnetLinks[magnetLink])).searchParams.get('xt').split(':').splice(-1)[0];
+
+
+
+                    // FIXME
+                    magnetLinks[magnetLink] = (new URL(magnetLinks[magnetLink])).searchParams.get('xt');
+
+                }
+                // TEST
+                console.log(magnetLinks) // XXX
+
+
+                // TEST
+                console.log(typeof(magnetLinks['jupyter-notebook'])) // XXX
+                console.log(typeof(magnetLinks['training-data'])) // XXX
+                console.log(magnetLinks['jupyter-notebook']) // XXX
+                console.log(magnetLinks['training-data']) // XXX
+
+                // Note: `x.endUser` is the same as `account4Address`
+                jobFactoryContract.methods.shareUntrainedModelAndTrainingDataset(
+                    account4Address,
+                    x.auctionId,
+                    magnetLinks['jupyter-notebook'],
+                    magnetLinks['training-data']
+                ).send(
+                    {from:account4Address, gas:'3000000'}
+                ).on('receipt', async function(receipt) {
+                    console.log('\nShared untrained model and training dataset...\n'); // XXX
+                    console.log(receipt); // XXX
+                })
+
+                
+
+                // Then... Upload magnet links by calling `shareUntrainedModelAndTrainingDataset` in the `JobFactory` contract
 
 
                 
