@@ -36,6 +36,7 @@ function downloadFile(job){
             })
         });        
     }
+
 }
 
 
@@ -43,7 +44,7 @@ function downloadFile(job){
     // (C) This should only listen for an event related to a job the worker's bid on,
     //     and was the highest bidder.
     try {
-        console.log('\nworker2 listening for procUntrainedModelAndTrainingDatasetShared from JobFactory...') // XXX
+        console.log('\nworker2 listening for UntrainedModelAndTrainingDatasetShared from JobFactory...') // XXX
 
         jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared(
             { filter: { workerNode: workerAddress } },
@@ -74,10 +75,10 @@ function downloadFile(job){
                 //     })
                 // });
 
-                downloadFile(job)
+                downloadFile(job);
 
                 // FIXME Need something like process.exit() because it seems like the files aren't accessible until this file stops running
-
+                // process.exit()
             }
         )
     } catch(error) {
