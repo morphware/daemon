@@ -157,57 +157,7 @@ TODO Listen for job-posting events emitted by the smart contracts:
 })()
 
 
-
-// (function procUntrainedModelAndTrainingDatasetShared(){
-//     // (C) This should only listen for an event related to a job the worker's bid on,
-//     //     and was the highest bidder.
-//     try {
-//         jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared(
-//             { filter: { workerNode: workerAddress } },
-//             function(error, event) {
-
-//                 let webtorrent = new WebTorrent();
-
-//                 webtorrent.add()
-
-//                 var downloadsDir = './datalake/worker_node/downloads'
-
-
-
-//             }
-
-//         )
-
-
-
-//     } catch(error) {
-//         // TODO Handle error
-//         console.log(error)
-//     }
-// }
-
-
-
-
-
-
-
-
-
-
 /*
-async function procTrainedModelShared(){
-    // (C) This should only listen for an event related to a job the worker's bid on,
-    //     and was the highest bidder.
-    try {
-        // TODO
-        jobFactoryContract.events.TrainedModelShared()
-    } catch(error) {
-        // TODO Handle error
-        console.log(error)
-    }
-}
-
 async function procJobApproved(){
     // (C) This should only listen for an event related to a job the worker's bid on,
     //     and was the highest bidder.
