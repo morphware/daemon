@@ -43,12 +43,12 @@ var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,auctionFactoryContr
                 // TODO May need to check the local disk space again, 
                 //      because the training data may not fit if it
                 //      changed.
-                console.log(x);
+                console.log(x); // XXX
 
                 var magnetLinks = JSON.parse(fs.readFileSync('./links.json','utf-8'));;
                 
 
-                for (magnetLink in magnetLinks) {
+                // for (magnetLink in magnetLinks) {
                     // Note: This is from the bytes32 stuff:
                     // magnetLinks[magnetLink] = web3.utils.asciiToHex((new URL(magnetLinks[magnetLink])).searchParams.get('xt').split(':').splice(-1)[0]);
 
@@ -58,9 +58,9 @@ var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,auctionFactoryContr
 
 
                     // FIXME
-                    magnetLinks[magnetLink] = (new URL(magnetLinks[magnetLink])).searchParams.get('xt');
+                    // magnetLinks[magnetLink] = (new URL(magnetLinks[magnetLink])).searchParams.get('xt');
 
-                }
+                // }
                 // TEST
                 console.log(magnetLinks) // XXX
 
