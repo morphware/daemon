@@ -3,6 +3,7 @@ const path       = require('path');
 const WebTorrent = require('webtorrent-hybrid');
 const Web3       = require('web3');
 const { URL }    = require('url');
+const { spawn }  = require('child_process');
 
 // 9 TODO Import dependency structure from one file
 
@@ -29,12 +30,18 @@ function downloadFile(job){
 
     var links = [job.untrainedModelMagnetLink, job.trainingDatasetMagnetLink]
 
+    let count = 2;
     for (var link of links) {
         webtorrent.add(link, { path: downloadsDir }, function (torrent) {
-            torrent.on('done', function () {
-                console.log('untrainedModelMagnetLink download finished')
-            })
-        });        
+            if (--count == 0) {
+                torrent.on('done', function () {
+                    console.log('untrainedModelMagnetLink download finished')
+                    // FIXME Call `process.exit()` like the decrementing counter, here
+                        process.exit()
+                })
+            }
+            // TODO Handle `torrent.on('error')`
+        });
     }
 
 }
