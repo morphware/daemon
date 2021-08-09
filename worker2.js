@@ -4,6 +4,7 @@ const WebTorrent = require('webtorrent-hybrid');
 const Web3       = require('web3');
 const { URL }    = require('url');
 const { spawn }  = require('child_process');
+const glob       = require('glob');
 
 // 9 TODO Import dependency structure from one file
 
@@ -33,13 +34,41 @@ function downloadFile(job){
     let count = 2;
     for (var link of links) {
         webtorrent.add(link, { path: downloadsDir }, function (torrent) {
-            if (--count == 0) {
-                torrent.on('done', function () {
-                    console.log('untrainedModelMagnetLink download finished')
+            torrent.on('error', console.error);
+            torrent.on('done', function () {
+                if (--count == 0) {
+
+                    console.log('untrainedModelMagnetLink and trainingDatasetMagnetLink download finished')
                     // FIXME Call `process.exit()` like the decrementing counter, here
-                        process.exit()
-                })
-            }
+                    // process.exit()
+
+                    ////////////////
+
+                    var model_file = torrent.path + torrent.files[0].path;
+                    console.log('model_file:',model_file)
+
+                    // Run the Jupyter notebook //////////////
+                    var dataToSend;
+                    // spawn new child process to call the python script
+                    const python = spawn('python3', [`${model_file}`]);
+                    // collect data from script
+                    python.stdout.on('data', function (data) {
+                        console.log('Pipe data from python script ...');
+                        dataToSend = data.toString();
+                    });
+                     // in close event we are sure that stream from child process is closed
+                    python.on('close', (code) => {
+                        console.log(`child process close all stdio with code ${code}`);
+                        // FIXME Do something else here instead
+                        // send data to browser
+                        // res.send(dataToSend)
+
+                        console.log(dataToSend);
+                    });
+                    ////////////////
+
+                }
+            })
             // TODO Handle `torrent.on('error')`
         });
     }
@@ -57,12 +86,12 @@ function downloadFile(job){
             { filter: { workerNode: workerAddress } },
             function(error, event) {
 
-                console.log('event',event);
+                // console.log('event',event);
                 console.log('\nInside procUntrainedModelAndTrainingDatasetShared await...\n'); // XXX
 
 
                 var job = event.returnValues;
-                console.log('job:',job); // XXX
+                // console.log('job:',job); // XXX
 
                 // var downloadsDir = './datalake/worker_node/downloads'+`/${x.jobPoster}/${x.id}`;
 
