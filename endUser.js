@@ -36,7 +36,7 @@ var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,auctionFactoryContr
             function(error, event) {
 
                 console.log(event);
-                console.log('Inside procAuctionEnded await...'); // XXX
+                console.log('Inside procAuctionEnded...'); // XXX
 
 
                 var x = event.returnValues;

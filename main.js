@@ -6,23 +6,34 @@ const express    = require('express');
 const multer     = require('multer');
 const WebTorrent = require('webtorrent-hybrid');
 const Web3       = require('web3');
+const { spawn }  = require('child_process');
+
 // const sqlite3 = require('sqlite3').verbose();
 
 // var db = new sqlite3.Database('./magnetLinks.db');
 
-
+// TODO Un-hardcode this
+const account4Address = '0xd03ea8624C8C5987235048901fB614fDcA89b117';
 
 ///////////////////////////////////////////////////////////////////////////////
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'datalake/end_user/uploads');
+        ///////////////////////
+        // TODO Unhardcode the following jobId (i.e., `0`):
+        var uploadsDir   = `./datalake/end_user/uploads/${account4Address}/0`;
+        if (!fs.existsSync(uploadsDir)){
+            fs.mkdirSync(uploadsDir, { recursive: true });
+        }
+        ///////////////////////
+        cb(null, uploadsDir);
     },
     // TODO 1 Create a key-value store that associates the original filename
     //        so it can be displayed in the dashboard and tracked by the user.
     filename: function (req, file, cb) {
         let ext = '';
         if (file.originalname.split('.').length > 1) {
-            cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+            // cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
+            cb(null, file.fieldname + path.extname(file.originalname));
         }
     }
 });
@@ -44,8 +55,7 @@ app.use(express.json());
 const provider = new Web3.providers.HttpProvider('http://localhost:8545');
 let web3 = new Web3(provider);
 
-// TODO Un-hardcode these three
-const account4Address = '0xd03ea8624C8C5987235048901fB614fDcA89b117';
+// TODO Un-hardcode these three groups
 
 const jobFactoryContractAddress = '0xC89Ce4735882C9F0f0FE26686c53074E09B0D550';
 const jobFactoryAbiPathname = './abi/JobFactory-copyABI.json';
@@ -78,7 +88,47 @@ app.post('/upload', validFields, async function (req, res) {
     // TEST
     console.log(fieldsObj); // XXX
 
+    ///////////////////////////////////////////////////////////////////////////////
+    // `nbconvert`
+    
+    // var untrainedModelFile = req.files['jupyter-notebook'][0];
+    // console.log('untrainedModelFile:',untrainedModelFile);
 
+    // if (path.extname(untrainedModelFile.originalname) == `.ipynb`) {
+    //     console.log('Converting Jupyter notebook...')
+    //     // FIXME
+    //             // TODO Unhardcode the following jobId (i.e., `0`), and wallet address:
+    //     var untrainedModelPath = `./datalake/end_user/uploads/${account4Address}/0`
+    //     var untrainedModelFilePathname  = untrainedModelPath + `/${untrainedModelFile.originalname}`;
+    //     var outPathname                 = untrainedModelPath + `/${untrainedModelFile.fieldname}.py`;
+
+    //     console.log('untrainedModelFilePathname',untrainedModelFilePathname)
+    //     console.log('outPathname',outPathname)
+        
+    //     const notebookConversionProc = spawn("python", ["-m","nbconvert","--to","python",untrainedModelFilePathname,"--output",outPathname], {shell: true});
+    //     var dataToSend;
+
+    //     // collect data from script
+    //     notebookConversionProc.stdout.on('data', function (data) {
+    //         console.log('Pipe data from python script ...');
+    //         dataToSend = data.toString();
+    //     });
+    //      // in close event we are sure that stream from child process is closed
+    //     notebookConversionProc.on('close', (code) => {
+    //         console.log(`child process close all stdio with code ${code}`);
+    //         // FIXME Do something else here instead
+    //         // send data to browser
+    //         // res.send(dataToSend)
+
+    //         console.log(dataToSend);
+    //     });
+
+    // } else if (path.extname(file.originalname) == `.py`) {
+    //     console.log('Not converting Python file...')
+    // } else {
+    //     console.log('Something is wrong!  Upload is neither a Jupyter notebook or Python file.')
+    // }
+    ///////////////////////////////////////////////////////////////////////////////
 
     var biddingDeadline = Math.floor(new Date().getTime() / 1000) + parseInt(fieldsObj['bidding-time'])
     var revealDeadline = biddingDeadline+30  // TODO Replace this

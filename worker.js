@@ -26,7 +26,7 @@ var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryAB
 TODO Listen for job-posting events emitted by the smart contracts:
      - JobFactory
        v  1. JobDescriptionPosted
-       o  3. UntrainedModelAndTrainingDatasetShared
+       v  3. UntrainedModelAndTrainingDatasetShared
        o  4. TrainedModelShared
        o  5. JobApproved
      - AuctionFactory

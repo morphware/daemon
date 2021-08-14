@@ -3,6 +3,7 @@ const path       = require('path');
 const WebTorrent = require('webtorrent-hybrid');
 const Web3       = require('web3');
 const { URL }    = require('url');
+const { spawn }  = require('child_process');
 
 // 9 TODO Import dependency structure from one file
 
@@ -11,12 +12,22 @@ const webtorrent = new WebTorrent();
 var provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
 let web3 = new Web3(provider);
 
-var workerAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0';
+var validatorAddress = '0x95cED938F7991cd0dFcb48F0a06a40FA1aF46EBC';
 
 const jobFactoryContractAddress = '0xC89Ce4735882C9F0f0FE26686c53074E09B0D550';
 const jobFactoryAbiPathname = './abi/JobFactory-copyABI.json';
 let jobFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(jobFactoryAbiPathname),'utf-8')).abi;
 let jobFactoryContract = new web3.eth.Contract(jobFactoryAbi,jobFactoryContractAddress);
+
+
+/*
+
+TODO Python:
+
+model = keras.models.load_model("trained_model.h5")
+
+
+*/
 
 
 function downloadFile(job){
@@ -28,17 +39,59 @@ function downloadFile(job){
     }
 
     var links = [job.trainedModelMagnetLink]
+    let count = 1;
 
     for (var link of links) {
         webtorrent.add(link, { path: downloadsDir }, function (torrent) {
+            torrent.on('error', console.error);
+            torrent.on('downloaded', console.log);
             torrent.on('done', function () {
-                console.log('untrainedModelMagnetLink download finished')
+                if (--count == 0) {
+                    console.log('trainedModelMagnetLink download finished')
+
+                    var trainedModelPathname = downloadsDir+'/trained_model.h5'
+                    console.log('trainedModelPathname:',trainedModelPathname)
+
+                    // FIXME
+
+                    const testingProc = spawn('python3', [`${trainedModelPathname}`], {shell: true});
+
+                    var otsError;
+                    // collect data from script
+                    testingProc.stdout.on('data', function (data) {
+                        console.log('Pipe data from Python script ...');
+                        console.log('data type:',typeof(data)) // XXX
+
+                        otsError = data.toString(); // TODO
+
+                        console.log('otsError type:',typeof(otsError)) // XXX
+                    });
+                     // Assure that the stream from the child process is closed
+                    testingProc.on('close', (code) => {
+                        console.log(`child process close all stdio with code ${code}`);
+
+                        // TODO Incorporate some margin of error
+                        if (parseInt(otsError) <= job.trainingErrorRate) {
+
+                            jobFactoryContract.methods.approveJob(
+                                job.jobPoster,
+                                parseInt(job.id)
+                            ).send(
+                                {from:validatorAddress, gas:'3000000'}
+                            ).on('receipt', async function(receipt) {
+                                console.log('\nApproved job...\n'); // XXX
+                                console.log(receipt); // XXX
+                            })
+                        } else {
+                            console.log('\n\n\nThis model sucks!\n\n\n')
+                        }
+                    });
+                }
             })
         });        
     }
 
 }
-
 
 (function procTrainedModelShared(){
     // (C) This should only listen for an event related to a job the worker's bid on,
@@ -46,38 +99,21 @@ function downloadFile(job){
     try {
         console.log('\nvalidator-node listening for TrainedModelShared from JobFactory...') // XXX
 
+
+        // TODO Add a filter so that the validator node doesn't listen for its own jobs?
+        //      --> Obviously need to check for the addresses to match at the service layer / 
+        //          smart contract level, as well
         jobFactoryContract.events.TrainedModelShared(
             function(error, event) {
 
-                console.log('event',event);
-                console.log('\nInside procUntrainedModelAndTrainingDatasetShared await...\n'); // XXX
-
+                console.log('\nevent:',event); // XXX
+                console.log('\nInside procTrainedModelShared...\n'); // XXX
 
                 var job = event.returnValues;
                 console.log('job:',job); // XXX
 
-                // var downloadsDir = './datalake/worker_node/downloads'+`/${x.jobPoster}/${x.id}`;
-
-                // if (!fs.existsSync(downloadsDir)){
-                //     fs.mkdirSync(downloadsDir, { recursive: true });
-                // }
-
-                // webtorrent.add(x.untrainedModelMagnetLink, { path: downloadsDir }, function (torrent) {
-                //     torrent.on('done', function () {
-                //         console.log('untrainedModelMagnetLink download finished')
-                //     })
-                // });
-
-                // webtorrent.add(x.trainingDatasetMagnetLink, { path: downloadsDir }, function (torrent) {
-                //     torrent.on('done', function () {
-                //         console.log('trainingDatasetMagnetLink download finished')
-                //     })
-                // });
-
                 downloadFile(job);
 
-                // FIXME Need something like process.exit() because it seems like the files aren't accessible until this file stops running
-                // process.exit()
             }
         )
     } catch(error) {

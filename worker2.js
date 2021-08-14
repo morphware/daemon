@@ -10,6 +10,8 @@ const glob       = require('glob');
 
 const webtorrent = new WebTorrent();
 
+webtorrent.on('error', console.error);
+
 var provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
 let web3 = new Web3(provider);
 
@@ -24,9 +26,12 @@ let jobFactoryContract = new web3.eth.Contract(jobFactoryAbi,jobFactoryContractA
 function downloadFile(job){
 
     var downloadsDir = './datalake/worker_node/downloads'+`/${job.jobPoster}/${job.id}`;
-
-    if (!fs.existsSync(downloadsDir)){
-        fs.mkdirSync(downloadsDir, { recursive: true });
+    var uploadsDir   = './datalake/worker_node/uploads'+`/${job.jobPoster}/${job.id}`;
+    var directories  = [downloadsDir, uploadsDir]
+    for (var directory of directories) {
+        if (!fs.existsSync(directory)){
+            fs.mkdirSync(directory, { recursive: true });
+        }
     }
 
     var links = [job.untrainedModelMagnetLink, job.trainingDatasetMagnetLink]
@@ -34,36 +39,68 @@ function downloadFile(job){
     let count = 2;
     for (var link of links) {
         webtorrent.add(link, { path: downloadsDir }, function (torrent) {
+            // if (link == job.untrainedModelMagnetLink) {
+            //     var model_file = torrent.path + '/' + torrent.files[0].path;
+            // }
             torrent.on('error', console.error);
+            torrent.on('downloaded', console.log);
             torrent.on('done', function () {
+                console.log(count, 'files', torrent.files)
                 if (--count == 0) {
 
                     console.log('untrainedModelMagnetLink and trainingDatasetMagnetLink download finished')
                     // FIXME Call `process.exit()` like the decrementing counter, here
                     // process.exit()
-
+ 
                     ////////////////
-
-                    var model_file = torrent.path + torrent.files[0].path;
+                    var model_file = `./datalake/worker_node/downloads/${job.jobPoster}/${job.id}/jupyter-notebook.ipynb`
                     console.log('model_file:',model_file)
 
                     // Run the Jupyter notebook //////////////
-                    var dataToSend;
                     // spawn new child process to call the python script
-                    const python = spawn('python3', [`${model_file}`]);
+
+                    // TODO Add `detached:true` to dict-like object parameterized at the end of `spawn`?
+                    //
+                    // FIXME Remove `shell:true` (security consideration) and have the user add the full-path to the Python file
+                    const trainingProc = spawn('python3', [`${model_file}`], {shell: true});
+                    // const trainingProc = spawn('python3', [`${model_file}`]);
+
+
+                    var trainingErrorRate;
                     // collect data from script
-                    python.stdout.on('data', function (data) {
-                        console.log('Pipe data from python script ...');
-                        dataToSend = data.toString();
+                    trainingProc.stdout.on('data', function (data) {
+                        console.log('Pipe data from Python script ...');
+                        trainingErrorRate = data.toString();
                     });
                      // in close event we are sure that stream from child process is closed
-                    python.on('close', (code) => {
+                    trainingProc.on('close', (code) => {
                         console.log(`child process close all stdio with code ${code}`);
-                        // FIXME Do something else here instead
-                        // send data to browser
-                        // res.send(dataToSend)
 
-                        console.log(dataToSend);
+                        // FIXME  Seed `trained_model.h5`
+                        let afterTrainingCount = 1;
+                        // let webtorrent2 = new WebTorrent();
+                        trainedModelPathname = `./datalake/worker_node/uploads/${job.jobPoster}/${job.id}/trained_model.h5`
+                        
+                        webtorrent.seed(trainedModelPathname, function (torrent) {
+                            if (--afterTrainingCount == 0) {
+
+                                // TODO Should this be re-factored as a new webtorrent object?
+                                //      --> Is `trained_model.h5`'s magnet-link guaranteed to be in the third zero-based index-position?
+                                var trainedModelMagnetLink = webtorrent.torrents[2].magnetURI;
+
+                                console.log('trainedModelMagnetLink:',trainedModelMagnetLink)
+                                console.log('trainingErrorRate:',trainingErrorRate);
+
+                                jobFactoryContract.methods.shareTrainedModel(
+                                    job.jobPoster,
+                                    parseInt(job.id),
+                                    trainedModelMagnetLink,
+                                    parseInt(trainingErrorRate)
+                                ).send(
+                                    {from:workerAddress, gas:"3000000"}
+                                );
+                            }
+                        })
                     });
                     ////////////////
 
