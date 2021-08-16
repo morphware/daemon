@@ -75,7 +75,8 @@ function downloadFile(job){
 
                             jobFactoryContract.methods.approveJob(
                                 job.jobPoster,
-                                parseInt(job.id)
+                                parseInt(job.id),
+                                job.trainedModelMagnetLink
                             ).send(
                                 {from:validatorAddress, gas:'3000000'}
                             ).on('receipt', async function(receipt) {
