@@ -43,12 +43,22 @@ Note: this development scenario does not incorporate a validator-node.
 
 ### End-user (e.g., data scientist)
 
-Start the back-end process, for the end-user:
+Start the back-end processes, for the end-user:
 
 `node main.js`
 
+`node endUser.js`
+
 ### Worker-node
 
-Start the back-end process, for the worker-node:
+Start the back-end processes, for the worker-node:
 
 `node worker.js`
+
+`node worker2.js`
+
+### Validator-node
+
+Start the back-end process, for the validator-node:
+
+`node validator.js`
