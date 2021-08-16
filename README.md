@@ -49,6 +49,8 @@ Start the back-end processes, for the end-user:
 
 `node endUser.js`
 
+`node endUser2.js`
+
 ### Worker-node
 
 Start the back-end processes, for the worker-node:
