@@ -25,70 +25,39 @@ var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,auctionFactoryContr
 
 
 
-function downloadFile(job){
-
-    var downloadsDir = './datalake/end_user/downloads'+`/${job.jobPoster}/${job.id}`;
-
-    if (!fs.existsSync(downloadsDir)){
-        fs.mkdirSync(downloadsDir, { recursive: true });
-    }
-
-    var links = [job.trainedModelMagnetLink]
-    let count = 1;
-
-    for (var link of links) {
-        webtorrent.add(link, { path: downloadsDir }, function (torrent) {
-            torrent.on('error', console.error);
-            torrent.on('downloaded', console.log);
-            torrent.on('done', function () {
-                if (--count == 0) {
-                    console.log('endUser2.js: trainedModelMagnetLink download finished')
-
-                }
-            })
-        });        
-    }
-
-}
-
-
-(function procJobApproved(){
+(function procTrainedModelShared(){
     try {
-        console.log('\nendUser node listening for JobApproved from JobFactory...') // XXX
+        console.log('\nendUser node listening for TrainedModelShared from JobFactory...') // XXX
 
 
-        jobFactoryContract.events.JobApproved(
+        jobFactoryContract.events.TrainedModelShared(
             { filter: { jobPoster: account4Address } },
             function(error, event) {
 
-                console.log(event);
-                console.log('Inside procJobApproved...'); // XXX
+                console.log(event); // XXX
+                console.log('Inside TrainedModelShared...'); // XXX
 
 
                 var job = event.returnValues;
 
                 console.log(job); // XXX
 
-                // Note: `x.endUser` is the same as `account4Address`
-                auctionFactory.methods.payout(
-                    account4Address,
-                    job.id
+                var magnetLinks = JSON.parse(fs.readFileSync('./links.json','utf-8'));;
+
+
+                console.log(magnetLinks['testing-data']) // XXX
+
+
+                jobFactoryContract.methods.shareTestingDataset(
+                    job.id,
+                    job.trainedModelMagnetLink,
+                    magnetLinks['testing-data']
                 ).send(
                     {from:account4Address, gas:'3000000'}
                 ).on('receipt', async function(receipt) {
-                    console.log('\nCalled payout funct...\n'); // XXX
+                    console.log('\nShared testing dataset...\n'); // XXX
                     console.log(receipt); // XXX
-
-                    downloadFile(job);
                 })
-
-
-
-
-
-                // TODO Then... download trained model
-
-
 
 
             }

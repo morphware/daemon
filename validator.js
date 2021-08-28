@@ -38,8 +38,8 @@ function downloadFile(job){
         fs.mkdirSync(downloadsDir, { recursive: true });
     }
 
-    var links = [job.trainedModelMagnetLink]
-    let count = 1;
+    var links = [job.trainedModelMagnetLink,job.testingDatasetMagnetLink]
+    let count = 2;
 
     for (var link of links) {
         webtorrent.add(link, { path: downloadsDir }, function (torrent) {
@@ -47,7 +47,7 @@ function downloadFile(job){
             torrent.on('downloaded', console.log);
             torrent.on('done', function () {
                 if (--count == 0) {
-                    console.log('trainedModelMagnetLink download finished')
+                    console.log('Downloads finished')
 
                     var trainedModelPathname = downloadsDir+'/trained_model.h5'
                     console.log('trainedModelPathname:',trainedModelPathname)
@@ -71,7 +71,7 @@ function downloadFile(job){
                         console.log(`child process close all stdio with code ${code}`);
 
                         // TODO Incorporate some margin of error
-                        if (parseInt(otsError) <= job.trainingErrorRate) {
+                        if (parseInt(otsError) <= job.targetErrorRate) {
 
                             jobFactoryContract.methods.approveJob(
                                 job.jobPoster,
@@ -84,6 +84,7 @@ function downloadFile(job){
                                 console.log(receipt); // XXX
                             })
                         } else {
+                            // TODO Change this
                             console.log('\n\n\nThis model sucks!\n\n\n')
                         }
                     });
@@ -94,9 +95,8 @@ function downloadFile(job){
 
 }
 
-(function procTrainedModelShared(){
-    // (C) This should only listen for an event related to a job the worker's bid on,
-    //     and was the highest bidder.
+(function proTestingDatasetShared(){
+
     try {
         console.log('\nvalidator-node listening for TrainedModelShared from JobFactory...') // XXX
 
@@ -104,11 +104,11 @@ function downloadFile(job){
         // TODO Add a filter so that the validator node doesn't listen for its own jobs?
         //      --> Obviously need to check for the addresses to match at the service layer / 
         //          smart contract level, as well
-        jobFactoryContract.events.TrainedModelShared(
+        jobFactoryContract.events.TestingDatasetShared(
             function(error, event) {
 
                 console.log('\nevent:',event); // XXX
-                console.log('\nInside procTrainedModelShared...\n'); // XXX
+                console.log('\nInside proTestingDatasetShared...\n'); // XXX
 
                 var job = event.returnValues;
                 console.log('job:',job); // XXX
