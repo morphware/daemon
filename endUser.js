@@ -73,7 +73,6 @@ var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,auctionFactoryContr
 
                 // Note: `x.endUser` is the same as `account4Address`
                 jobFactoryContract.methods.shareUntrainedModelAndTrainingDataset(
-                    account4Address,
                     x.auctionId,
                     magnetLinks['jupyter-notebook'],
                     magnetLinks['training-data']
