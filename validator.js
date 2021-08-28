@@ -46,6 +46,7 @@ function downloadFile(job){
             torrent.on('error', console.error);
             torrent.on('downloaded', console.log);
             torrent.on('done', function () {
+                console.log(count, 'files', torrent.files)
                 if (--count == 0) {
                     console.log('Downloads finished')
 
@@ -98,7 +99,7 @@ function downloadFile(job){
 (function procTestingDatasetShared(){
 
     try {
-        console.log('\nvalidator-node listening for TrainedModelShared from JobFactory...') // XXX
+        console.log('\nvalidator-node listening for TestingDatasetShared from JobFactory...') // XXX
 
 
         // TODO Add a filter so that the validator node doesn't listen for its own jobs?
