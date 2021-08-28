@@ -95,7 +95,7 @@ function downloadFile(job){
 
 }
 
-(function proTestingDatasetShared(){
+(function procTestingDatasetShared(){
 
     try {
         console.log('\nvalidator-node listening for TrainedModelShared from JobFactory...') // XXX
@@ -108,7 +108,7 @@ function downloadFile(job){
             function(error, event) {
 
                 console.log('\nevent:',event); // XXX
-                console.log('\nInside proTestingDatasetShared...\n'); // XXX
+                console.log('\nInside procTestingDatasetShared...\n'); // XXX
 
                 var job = event.returnValues;
                 console.log('job:',job); // XXX
