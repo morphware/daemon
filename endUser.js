@@ -2,7 +2,6 @@ const fs         = require('fs');
 const path       = require('path');
 const WebTorrent = require('webtorrent-hybrid');
 const Web3       = require('web3');
-const { URL }    = require('url');
 
 // 9 TODO Import dependency structure from one file
 
@@ -24,76 +23,71 @@ var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryAB
 
 var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,auctionFactoryContractAddress);
 
-(function procAuctionEnded(){
-    // (B) This should stop listening for an event related to a job the worker has bid on,
-    //     if was not the highest bidder.
-    try {
-        console.log('\nendUser node listening for AuctionEnded from AuctionFactory...') // XXX
 
 
-        auctionFactory.events.AuctionEnded(
-            { filter: { endUser: account4Address } },
-            function(error, event) {
+async function downloadFiles(job){
+    try{
+        let downloadsDir = './datalake/end_user/downloads'+`/${job.jobPoster}/${job.id}`;
 
-                console.log(event);
-                console.log('Inside procAuctionEnded...'); // XXX
+        await fs.promise.mkdirSync(downloadsDir, { recursive: true });
 
+        let links = [job.trainedModelMagnetLink]
+        let count = 0;
 
-                var x = event.returnValues;
-                // TODO May need to check the local disk space again, 
-                //      because the training data may not fit if it
-                //      changed.
-                console.log(x); // XXX
-
-                var magnetLinks = JSON.parse(fs.readFileSync('./links.json','utf-8'));;
-                
-
-                // for (magnetLink in magnetLinks) {
-                    // Note: This is from the bytes32 stuff:
-                    // magnetLinks[magnetLink] = web3.utils.asciiToHex((new URL(magnetLinks[magnetLink])).searchParams.get('xt').split(':').splice(-1)[0]);
-
-                    // Note: This strips everything but the DHT-hash
-                    // magnetLinks[magnetLink] = (new URL(magnetLinks[magnetLink])).searchParams.get('xt').split(':').splice(-1)[0];
-
-
-
-                    // FIXME
-                    // magnetLinks[magnetLink] = (new URL(magnetLinks[magnetLink])).searchParams.get('xt');
-
-                // }
-                // TEST
-                console.log(magnetLinks) // XXX
-
-
-                // TEST
-                console.log(typeof(magnetLinks['jupyter-notebook'])) // XXX
-                console.log(typeof(magnetLinks['training-data'])) // XXX
-                console.log(magnetLinks['jupyter-notebook']) // XXX
-                console.log(magnetLinks['training-data']) // XXX
-
-                // Note: `x.endUser` is the same as `account4Address`
-                jobFactoryContract.methods.shareUntrainedModelAndTrainingDataset(
-                    x.auctionId,
-                    magnetLinks['jupyter-notebook'],
-                    magnetLinks['training-data']
-                ).send(
-                    {from:account4Address, gas:'3000000'}
-                ).on('receipt', async function(receipt) {
-                    console.log('\nShared untrained model and training dataset...\n'); // XXX
-                    console.log(receipt); // XXX
-                })
-
-                
-
-                // Then... Upload magnet links by calling `shareUntrainedModelAndTrainingDataset` in the `JobFactory` contract
-
-
-                
-
-            }
-        )
-    } catch(error) {
-        // TODO Handle error
-        console.log(error)
+        for (var link of links) {
+            webtorrent.add(link, { path: downloadsDir }, function (torrent) {
+                count++;
+                torrent.on('error', console.error);
+                torrent.on('downloaded', console.log);
+                torrent.on('done', function(){
+                    if (--count == 0) {
+                        console.log('endUser3.js: trainedModelMagnetLink download finished')
+                        // do stuff here on done...
+                    }
+                });
+            });        
+        }
+    }catch(error){
+        // Look for FS error
+        console.error('ERROR!!! `downloadFiles`', error);
     }
-})()
+
+}
+
+jobFactoryContract.events.JobApproved({
+    filter: {
+        jobPoster: account4Address
+    }
+}, function(error, event) {
+    try{
+        console.log(event);
+        console.log('Inside procJobApproved...'); // XXX
+
+
+        var job = event.returnValues;
+
+        console.log(job); // XXX
+
+        // Note: `x.endUser` is the same as `account4Address`
+        auctionFactory.methods.payout(
+            account4Address,
+            job.id
+        ).send(
+            {from:account4Address, gas:'3000000'}
+        ).on('receipt', async function(receipt) {
+            try{
+                console.log('\nCalled payout funct...\n'); // XXX
+                console.log(receipt); // XXX
+
+                await downloadFiles(job);
+
+            }catch(error){
+                console.error('ERROR!!! `payout receipt`', error);
+            }
+        });
+
+        // TODO Then... download trained model   
+    }catch(error){
+        console.error('ERROR!!! `JobApproved`', error);
+    }
+});
