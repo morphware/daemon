@@ -1,14 +1,18 @@
-#!/usr/bin/env node
+'use strict';
+
 const bodyParser = require('body-parser');
 const express    = require('express');
+const conf       = require('./conf');
 
 const app  = express();
-const port = 3000;
+
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
-app.use('/apiV0/', './router/api_v0');
+app.use('/api/V0/', require('./routes/api_v0'));
 
-app.listen(port, () => {
-    console.log(`Server running at http://localhost:${port}`);
+app.listen(conf.httpPort, () => {
+    console.log(`Server running at http://localhost:${conf.httpPort}`);
 });
+
+module.exports = app;

@@ -2,8 +2,9 @@
 
 const router = require('express').Router();
 const multer = require('multer');
+const webtorrent = require('../controller/torrent');
 
-const {jobFactoryContract, morphwareToken} = require('./model/contract');
+const {jobFactoryContract, morphwareToken} = require('../model/contract');
 
 
 // TODO Un-hardcode this
@@ -14,7 +15,7 @@ var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         ///////////////////////
         // TODO Unhardcode the following jobId (i.e., `0`):
-        var uploadsDir   = `./datalake/end_user/uploads/${account4Address}/0`;
+        var uploadsDir   = `./datalake/end_user/uploads/${account4Address}/0`;  // This should be the auctionID
         if (!fs.existsSync(uploadsDir)){
             fs.mkdirSync(uploadsDir, { recursive: true });
         }
@@ -40,7 +41,7 @@ var validFields = upload.fields([
 ]);
 ///////////////////////////////////////////////////////////////////////////////
 
-app.post('/upload', validFields, async function (req, res) {
+router.post('/', validFields, async function (req, res) {
 
     // TEST
     console.log(req); // XXX
@@ -101,10 +102,12 @@ app.post('/upload', validFields, async function (req, res) {
     var workerReward = parseInt(fieldsObj['worker-reward']);
 
     morphwareToken.methods.transfer(
-        auctionFactoryContractAddress,workerReward
-    ).send(
-        {from:account4Address, gas:"3000000"}
-    );
+        auctionFactoryContractAddress,
+        workerReward
+    ).send({
+        from: account4Address,
+        gas:"3000000"
+    });
 
     jobFactoryContract.methods.postJobDescription(
         parseInt(fieldsObj['training-time']),
@@ -116,22 +119,38 @@ app.post('/upload', validFields, async function (req, res) {
         workerReward
     ).send(
         {from:account4Address, gas:"3000000"}
-    );
+    ).on('receipt', function(receipt){
 
-    // TODO return next(error);
+	    // TODO Call auctionEnd
+	    var waitTimeInMS2 = ((revealDeadline - currentTimestamp) + safeDelay) * 1000;
+	    console.log('Wait time before calling auctionEnd',(waitTimeInMS2/1000))
 
-    ///////////////////////////////////////////////////////////////////////////////
+	    setTimeout(function(error,event){
+	        try {
+	            console.log('\nAbout to call auctionEnd()') // XXX
+	            auctionFactory.methods.auctionEnd(
+	                job.jobPoster,
+	                parseInt(job.id)
+	            ).send(
+	                {from:account4Address, gas:'3000000'}
+	            ).on('receipt', function(receipt) {
+	                console.log('\nauctionEnd() called'); // XXX
+	                console.log(receipt); // XXX
+	                // TODO Wait until `.revealDeadline` and then call `auctionEnd`
+	                // var revealDeadline = auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call().revealDeadline;
+	            })
+	        } catch(error) {
+	            console.log(error)
+	        }
+	    }, waitTimeInMS2);
+    });
+
+
     var links = {};
-
-    // db.serialize(function() {
-    //     db.run("DROP TABLE IF EXISTS links; CREATE TABLE links (pk INTEGER PRIMARY KEY AUTOINCREMENT, user_address VARCHAR, job_id INTEGER, jupyter_notebook VARCHAR, training_data VARCHAR, testing_data VARCHAR)");
-
 
     let count = 0; // FIXME Change this back to 3
     for (const [_fieldname, _fileArray] of Object.entries(req.files)) {
         let f = _fileArray[0].path;
-
-        let webtorrent = new WebTorrent();
         
         links[_fieldname] = webtorrent;
 
@@ -140,17 +159,7 @@ app.post('/upload', validFields, async function (req, res) {
         // TODO 1
             if (--count == 0) {
                 
-                // console.dir(links,{depth:5}) // Note: This works
 
-                // console.dir(links.torrents[0].info.magnetURI,{depth:5}) // Check
-                
-                // console.log(links.torrents[0].info.magnetURI) // Check
-
-
-
-                // TODO Search by key: use DevTools (Chrome)
-
-                // var linksObj = JSON.stringify(links);
                 var d = {}
 
                 d['jupyter-notebook'] = links['jupyter-notebook'].torrents[0].magnetURI;
@@ -166,32 +175,11 @@ app.post('/upload', validFields, async function (req, res) {
 
 
             }
-            // console.log(torrent);
-
-
-            // console.log('\n',_fieldname);
-        //   console.log(_fileArray[0].originalname);
-        //   console.log(_fileArray[0].size);
-            // console.log(torrent.magnetURI);
-
-
-
-            // fieldName = _fieldname.replace(/-/g, '_');
-            
-            // var magnetLink = torrent.magnetURI;
-            // console.log(magnetLink);
-
-            // db.run("INSERT INTO links(user_address,job_id,jupyter_notebook,training_data,testing_data) VALUES (?,?,?,?,?)",
-            //     [account4Address,,,,]);
         });
     }
-
-    // });
-
-    // db.close();
-
-
 
     // TODO 8 Send a legitimate response
     res.send('success');
 });
+
+module.exports = router;

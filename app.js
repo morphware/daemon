@@ -5,7 +5,7 @@
 const conf = require('./conf');
 
 // Load express
-const app = require('./express.js');
+const app = require('./express');
 
 // Load data-sci user listeners
 const dataSci = require('./endUser');

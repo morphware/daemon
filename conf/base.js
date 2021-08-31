@@ -1,1 +1,3 @@
-module.exports = {};
+module.exports = {
+	httpPort: 3000,
+};

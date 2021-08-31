@@ -1,26 +1,84 @@
+'use strict';
+
 const fs         = require('fs');
 const path       = require('path');
-const WebTorrent = require('webtorrent-hybrid');
-const Web3       = require('web3');
-const { URL }    = require('url');
 const { spawn }  = require('child_process');
-const glob       = require('glob');
+const disk       = require('diskusage');
+const webtorrent = require('./controller/torrent');
 
-// 9 TODO Import dependency structure from one file
-
-const webtorrent = new WebTorrent();
-
-webtorrent.on('error', console.error);
-
-var provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
-let web3 = new Web3(provider);
+const {jobFactoryContract, morphwareToken, web3} = require('./model/contract');
 
 var workerAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0';
+var auctionFactoryABIPathname = './abi/VickreyAuction-copyABI.json';
+var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8')).abi;
 
-const jobFactoryContractAddress = '0xC89Ce4735882C9F0f0FE26686c53074E09B0D550';
-const jobFactoryAbiPathname = './abi/JobFactory-copyABI.json';
-let jobFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(jobFactoryAbiPathname),'utf-8')).abi;
-let jobFactoryContract = new web3.eth.Contract(jobFactoryAbi,jobFactoryContractAddress);
+async function checkDisk(size){
+    try{
+        let {free} = await disk.check('/');
+
+        return size <= free ? true : false;
+    }catch(error){
+        console.error('ERROR!!!, `chechDisk`', error)
+    }
+}
+
+function processPostedJob(job){
+    var auctionFactory = new web3.eth.Contract(auctionFactoryAbi, job.auctionAddress);
+
+    var bidAmount = 11;
+    var fakeBid = false;
+    var secret = '0x6d6168616d000000000000000000000000000000000000000000000000000000';
+
+    auctionFactory.methods.bid(
+        job.jobPoster,
+        parseInt(job.id),
+        web3.utils.keccak256(web3.utils.encodePacked(bidAmount,fakeBid,secret)),
+        bidAmount
+    ).send({
+        from:workerAddress,
+        gas:'3000000'
+    }).on('receipt', async function(receipt) {
+        console.log('\nBid sent'); // XXX
+        console.log(receipt); // XXX
+
+        var currentTimestamp = Math.floor(new Date().getTime() / 1000);
+        console.log('\ncurrentTimestamp:',currentTimestamp); // XXX
+
+        var auction = await auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call();
+
+        var biddingDeadline = parseInt(auction.biddingDeadline);
+        console.log('\nbiddingDeadline:',biddingDeadline); // XXX
+
+        var revealDeadline = parseInt(auction.revealDeadline);
+        console.log('revealDeadline:',revealDeadline); // XXX
+
+        var safeDelay = 5;
+        var waitTimeInMS1 = ((biddingDeadline - currentTimestamp) + safeDelay) * 1000;
+        console.log('Wait time before calling reveal',(waitTimeInMS1/1000)) // XXX
+
+        setTimeout(function(error, event){
+            try {
+                console.log(job.jobPoster,parseInt(job.id),bidAmount,fakeBid,secret) // XXX
+                auctionFactory.methods.reveal(
+                    job.jobPoster,
+                    parseInt(job.id),
+                    [bidAmount],
+                    [fakeBid],
+                    [secret]
+                ).send({
+                    from:workerAddress, gas:'3000000'
+                }).on('receipt', function(receipt) {
+                    console.log('\nreveal() called'); // XXX
+                    console.log(receipt); // XXX
+                    // TODO Wait until `.revealDeadline` and then call `auctionEnd`
+                    // var revealDeadline = auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call().revealDeadline;
+                });
+            } catch(error) {
+                console.log(error)
+            }
+        }, waitTimeInMS1);
+    });
+}
 
 
 async function seedTrainedData(job){
@@ -50,9 +108,10 @@ async function seedTrainedData(job){
                 );
             }
         })  
+    }catch(error){
+        console.log('ERROR!!! `seedTrainedData function`', error);
     }
 }
-
 
 function executeNoteBook(){
     return new Promise((resolve, reject)=>{
@@ -91,7 +150,7 @@ function executeNoteBook(){
             console.log(`child process close all stdio with code ${code}`);
 
             // check exit code here
-            resolve(code)
+            resolve(code);
         });
     });
 }
@@ -131,6 +190,22 @@ async function downloadFiles(job){
     }
 }
 
+jobFactoryContract.events.JobDescriptionPosted(async function(error, event) {
+    try{
+        if(!event) return false;
+        var job = event.returnValues;
+
+        if(!await checkDisk(job.trainingDatasetSize)){
+            console.info('not enough free disk space, passing');
+            return false;
+        }
+
+        await processPostedJob(job);
+    }catch(error){
+        console.error('ERROR!!! ``', error);
+    }
+});
+
 // (C) This should only listen for an event related to a job the worker's bid on,
 //     and was the highest bidder.
 jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared({
@@ -139,14 +214,16 @@ jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared({
     }
 }, async function(error, event){
     try{
+        if(!event) return false;
         // console.log('event',event);
         console.log('\nInside procUntrainedModelAndTrainingDatasetShared await...\n'); // XXX
         var job = event.returnValues;
 
         await downloadFiles(job);
         await executeNoteBook(job);
+        await seedTrainedData(job);
 
     }catch(error){
         console.error('ERROR!!! `UntrainedModelAndTrainingDatasetShared` listener', error);
     }
-})
+});
