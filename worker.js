@@ -9,7 +9,7 @@ const webtorrent = require('./controller/torrent');
 const {jobFactoryContract, morphwareToken, web3} = require('./model/contract');
 
 var workerAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0';
-var auctionFactoryABIPathname = './abi/VickreyAuction-copyABI.json';
+var auctionFactoryABIPathname = './abi/VickreyAuction-RopstenABI.json';
 var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8')).abi;
 
 async function checkDisk(size){

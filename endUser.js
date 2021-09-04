@@ -8,7 +8,7 @@ const {jobFactoryContract, morphwareToken, web3} = require('./model/contract');
 
 const account4Address = '0xd03ea8624C8C5987235048901fB614fDcA89b117';
 
-var auctionFactoryABIPathname = './abi/VickreyAuction-copyABI.json';
+var auctionFactoryABIPathname = './abi/VickreyAuction-RopstenABI.json';
 var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8')).abi;
 
 var auctionFactory = new web3.eth.Contract(

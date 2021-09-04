@@ -1,21 +1,25 @@
 'use strict';
 
+const fs = require('fs');
+const path = require('path');
 const router = require('express').Router();
 const multer = require('multer');
 const webtorrent = require('../controller/torrent');
+const conf = require('../conf')
 
-const {jobFactoryContract, morphwareToken} = require('../model/contract');
+const {jobFactoryContract, auctionFactory, morphwareToken, account, web3} = require('../model/contract');
+
+
 
 
 // TODO Un-hardcode this
-const account4Address = '0xd03ea8624C8C5987235048901fB614fDcA89b117';
 
 ///////////////////////////////////////////////////////////////////////////////
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         ///////////////////////
         // TODO Unhardcode the following jobId (i.e., `0`):
-        var uploadsDir   = `./datalake/end_user/uploads/${account4Address}/0`;  // This should be the auctionID
+        var uploadsDir   = `./datalake/end_user/uploads/${account.address}/0`;  // This should be the auctionID
         if (!fs.existsSync(uploadsDir)){
             fs.mkdirSync(uploadsDir, { recursive: true });
         }
@@ -42,144 +46,153 @@ var validFields = upload.fields([
 ///////////////////////////////////////////////////////////////////////////////
 
 router.post('/', validFields, async function (req, res) {
+    try{
 
-    // TEST
-    console.log(req); // XXX
+        // TEST
+        // TODO 9 Incorporate `fileFilter`
 
-    // TODO 9 Incorporate `fileFilter`
+        ///////////////////////////////////////////////////////////////////////////////
+        const fieldsObj = JSON.parse(req.body.fields);
 
-    ///////////////////////////////////////////////////////////////////////////////
-    const fieldsObj = JSON.parse(req.body.fields);
+        // TEST
 
-    // TEST
-    console.log(fieldsObj); // XXX
-
-    ///////////////////////////////////////////////////////////////////////////////
-    // `nbconvert`
-    
-    // var untrainedModelFile = req.files['jupyter-notebook'][0];
-    // console.log('untrainedModelFile:',untrainedModelFile);
-
-    // if (path.extname(untrainedModelFile.originalname) == `.ipynb`) {
-    //     console.log('Converting Jupyter notebook...')
-    //     // FIXME
-    //             // TODO Unhardcode the following jobId (i.e., `0`), and wallet address:
-    //     var untrainedModelPath = `./datalake/end_user/uploads/${account4Address}/0`
-    //     var untrainedModelFilePathname  = untrainedModelPath + `/${untrainedModelFile.originalname}`;
-    //     var outPathname                 = untrainedModelPath + `/${untrainedModelFile.fieldname}.py`;
-
-    //     console.log('untrainedModelFilePathname',untrainedModelFilePathname)
-    //     console.log('outPathname',outPathname)
+        ///////////////////////////////////////////////////////////////////////////////
+        // `nbconvert`
         
-    //     const notebookConversionProc = spawn("python", ["-m","nbconvert","--to","python",untrainedModelFilePathname,"--output",outPathname], {shell: true});
-    //     var dataToSend;
+        // var untrainedModelFile = req.files['jupyter-notebook'][0];
+        // console.log('untrainedModelFile:',untrainedModelFile);
 
-    //     // collect data from script
-    //     notebookConversionProc.stdout.on('data', function (data) {
-    //         console.log('Pipe data from python script ...');
-    //         dataToSend = data.toString();
-    //     });
-    //      // in close event we are sure that stream from child process is closed
-    //     notebookConversionProc.on('close', (code) => {
-    //         console.log(`child process close all stdio with code ${code}`);
-    //         // FIXME Do something else here instead
-    //         // send data to browser
-    //         // res.send(dataToSend)
+        // if (path.extname(untrainedModelFile.originalname) == `.ipynb`) {
+        //     console.log('Converting Jupyter notebook...')
+        //     // FIXME
+        //             // TODO Unhardcode the following jobId (i.e., `0`), and wallet address:
+        //     var untrainedModelPath = `./datalake/end_user/uploads/${account.address}/0`
+        //     var untrainedModelFilePathname  = untrainedModelPath + `/${untrainedModelFile.originalname}`;
+        //     var outPathname                 = untrainedModelPath + `/${untrainedModelFile.fieldname}.py`;
 
-    //         console.log(dataToSend);
-    //     });
+        //     console.log('untrainedModelFilePathname',untrainedModelFilePathname)
+        //     console.log('outPathname',outPathname)
+            
+        //     const notebookConversionProc = spawn("python", ["-m","nbconvert","--to","python",untrainedModelFilePathname,"--output",outPathname], {shell: true});
+        //     var dataToSend;
 
-    // } else if (path.extname(file.originalname) == `.py`) {
-    //     console.log('Not converting Python file...')
-    // } else {
-    //     console.log('Something is wrong!  Upload is neither a Jupyter notebook or Python file.')
-    // }
-    ///////////////////////////////////////////////////////////////////////////////
+        //     // collect data from script
+        //     notebookConversionProc.stdout.on('data', function (data) {
+        //         console.log('Pipe data from python script ...');
+        //         dataToSend = data.toString();
+        //     });
+        //      // in close event we are sure that stream from child process is closed
+        //     notebookConversionProc.on('close', (code) => {
+        //         console.log(`child process close all stdio with code ${code}`);
+        //         // FIXME Do something else here instead
+        //         // send data to browser
+        //         // res.send(dataToSend)
 
-    var biddingDeadline = Math.floor(new Date().getTime() / 1000) + parseInt(fieldsObj['bidding-time'])
-    var revealDeadline = biddingDeadline+30  // TODO Replace this
+        //         console.log(dataToSend);
+        //     });
 
-    var workerReward = parseInt(fieldsObj['worker-reward']);
+        // } else if (path.extname(file.originalname) == `.py`) {
+        //     console.log('Not converting Python file...')
+        // } else {
+        //     console.log('Something is wrong!  Upload is neither a Jupyter notebook or Python file.')
+        // }
+        ///////////////////////////////////////////////////////////////////////////////
 
-    morphwareToken.methods.transfer(
-        auctionFactoryContractAddress,
-        workerReward
-    ).send({
-        from: account4Address,
-        gas:"3000000"
-    });
+        var biddingDeadline = Math.floor(new Date().getTime() / 1000) + parseInt(fieldsObj['bidding-time'])
+        var revealDeadline = biddingDeadline+30  // TODO Replace this
 
-    jobFactoryContract.methods.postJobDescription(
-        parseInt(fieldsObj['training-time']),
-        parseInt(req.files['training-data'][0].size),
-        parseInt(fieldsObj['error-rate']),
-        parseInt(workerReward*.1),
-        biddingDeadline,
-        revealDeadline,
-        workerReward
-    ).send(
-        {from:account4Address, gas:"3000000"}
-    ).on('receipt', function(receipt){
+        var workerReward = parseInt(fieldsObj['worker-reward']);
 
-	    // TODO Call auctionEnd
-	    var waitTimeInMS2 = ((revealDeadline - currentTimestamp) + safeDelay) * 1000;
-	    console.log('Wait time before calling auctionEnd',(waitTimeInMS2/1000))
+        var tx = {
+            from: account.address,
+            data: morphwareToken.methods.transfer(conf.auctionFactoryContractAddress, workerReward).encodeABI(), 
+            gas:"3000000"
+        }
+        const signPromise = await account.signTransaction(tx);
+        console.log('signPromise', signPromise.rawTransaction);
+        const send = await web3.eth.sendSignedTransaction(signPromise.rawTransaction);
 
-	    setTimeout(function(error,event){
-	        try {
-	            console.log('\nAbout to call auctionEnd()') // XXX
-	            auctionFactory.methods.auctionEnd(
-	                job.jobPoster,
-	                parseInt(job.id)
-	            ).send(
-	                {from:account4Address, gas:'3000000'}
-	            ).on('receipt', function(receipt) {
-	                console.log('\nauctionEnd() called'); // XXX
-	                console.log(receipt); // XXX
-	                // TODO Wait until `.revealDeadline` and then call `auctionEnd`
-	                // var revealDeadline = auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call().revealDeadline;
-	            })
-	        } catch(error) {
-	            console.log(error)
-	        }
-	    }, waitTimeInMS2);
-    });
+        console.log('send', send);
 
 
-    var links = {};
 
-    let count = 0; // FIXME Change this back to 3
-    for (const [_fieldname, _fileArray] of Object.entries(req.files)) {
-        let f = _fileArray[0].path;
-        
-        links[_fieldname] = webtorrent;
+        jobFactoryContract.methods.postJobDescription(
+            parseInt(fieldsObj['training-time']),
+            parseInt(req.files['training-data'][0].size),
+            parseInt(fieldsObj['error-rate']),
+            parseInt(workerReward*.1),
+            biddingDeadline,
+            revealDeadline,
+            workerReward
+        ).send(
+            {from: account.address, gas:"3000000"}
+        ).on('receipt', function(receipt){
 
-        webtorrent.seed(f, function (torrent) {
-        // webtorrent.seed(f, async function (e, torrent) {
-        // TODO 1
-            if (--count == 0) {
-                
+    	    // TODO Call auctionEnd
+    	    var waitTimeInMS2 = ((revealDeadline - currentTimestamp) + safeDelay) * 1000;
+    	    console.log('Wait time before calling auctionEnd',(waitTimeInMS2/1000))
 
-                var d = {}
-
-                d['jupyter-notebook'] = links['jupyter-notebook'].torrents[0].magnetURI;
-                d['training-data']    = links['training-data'].torrents[0].magnetURI;
-                d['testing-data']     = links['testing-data'].torrents[0].magnetURI;
-
-                var dObj = JSON.stringify(d);
-
-                // TODO 9 Replace links with a more descriptive filename
-                fs.writeFile("links.json", dObj, function(err, result) {
-                    if(err) console.log('error', err);
-                });
-
-
-            }
+    	    setTimeout(function(error,event){
+    	        try {
+    	            console.log('\nAbout to call auctionEnd()') // XXX
+    	            auctionFactory.methods.auctionEnd(
+    	                job.jobPoster,
+    	                parseInt(job.id)
+    	            ).send(
+    	                {from:account.address, gas:'3000000'}
+    	            ).on('receipt', function(receipt) {
+    	                console.log('\nauctionEnd() called'); // XXX
+    	                console.log(receipt); // XXX
+    	                // TODO Wait until `.revealDeadline` and then call `auctionEnd`
+    	                // var revealDeadline = auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call().revealDeadline;
+    	            })
+    	        } catch(error) {
+    	            console.log(error)
+    	        }
+    	    }, waitTimeInMS2);
         });
-    }
 
-    // TODO 8 Send a legitimate response
-    res.send('success');
+
+        var links = {};
+
+        let count = 0; // FIXME Change this back to 3
+        for (const [_fieldname, _fileArray] of Object.entries(req.files)) {
+            let f = _fileArray[0].path;
+            
+            links[_fieldname] = webtorrent;
+
+            webtorrent.seed(f, function (torrent) {
+            // webtorrent.seed(f, async function (e, torrent) {
+            // TODO 1
+                if (--count == 0) {
+                    
+
+                    var d = {}
+
+                    d['jupyter-notebook'] = links['jupyter-notebook'].torrents[0].magnetURI;
+                    d['training-data']    = links['training-data'].torrents[0].magnetURI;
+                    d['testing-data']     = links['testing-data'].torrents[0].magnetURI;
+
+                    var dObj = JSON.stringify(d);
+
+                    // TODO 9 Replace links with a more descriptive filename
+                    fs.writeFile("links.json", dObj, function(err, result) {
+                        if(err) console.log('error', err);
+                    });
+
+
+                }
+            });
+        }
+
+        // TODO 8 Send a legitimate response
+        res.send('success');
+
+
+
+    }catch(error){
+        console.log('ERROR!!! `post contract`', error.lineNuber, error, error.stack)
+    }
 });
 
 module.exports = router;
