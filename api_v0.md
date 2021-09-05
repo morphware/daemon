@@ -3,77 +3,94 @@
 This is the documentation for the V0 API and is very much a work in progress.
 
 ## Contract
+
 `api/v0/contract`
-	Manages job contracts
 
-	* GET **NOT IMPLEMENTED YET**
-		Return current contracts
+Manages job contracts
 
-	* POST
-		Start a new contract for a job 
-		Fields:
-		* `stop-training` STRING
-		* `stop-training-automatic` STRING
-		* `training-time` NUMBER
-		* `error-rate` NUMBER
-		* `bidding-time` NUMER
-		* `worker-reward` NUMBER
-		* `test-model` BOOL
+* **GET** *NOT IMPLEMENTED YET*
+	Return current contracts
+
+* **POST**
+	Start a new contract for a job 
+	Post fields:
+	* `stop-training` *STRING*
+	* `stop-training-automatic` *STRING*
+	* `training-time` *NUMBER*
+	* `error-rate` *NUMBER*
+	* `bidding-time` *NUMER*
+	* `worker-reward` *NUMBER* Amount of MWT to be paid for a complete job.
+	* `test-model` *BOOL*
 		
-		returns
+	Exmaple
+	
+	Blocked by #15
 
-	* PUT PATCH DELETE
-		are not implemented, contracts can not be modified once submitted
+* **PUT**, **PATCH**, **DELETE**
+	
+	Will not implemented, contracts can not be modified once submitted
 
 ## Network(ETH)
-	Status about connection to an eth node
 
-	* GET
-		Returns if a connection exists
+`/api/v0/network`
 
-		Query **none*
+Status about connection to an eth node
 
-		Fields
-			* `status` BOOL connection to eth node
+* **GET**
+	
+	Returns if a connection exists
 
-		Example
+	Query **none**
 
-		``` bash
-		curl 127.0.0.1:3000/api/V0/network
-		{"status":true}
-		
-		```
+	Resposne fields:
+	* `status` *BOOL* connection to eth node
 
-	* To do
-		Add endpoints to modify the current connection
+	Example
+
+	``` bash
+	curl 127.0.0.1:3000/api/V0/network
+	{"status":true}
+	```
+
+* To do
+  * Add endpoints to modify the current connection
 
 ## Torrents
-	Torrents the client is currently interacting with
 
-	* GET
-		Return information from the torrent instance
+`/api/v0/torrent`
 
-		Query **none**
+Torrents the client is currently interacting with
 
-		Fields
-			* `download` NUMBER The current download speed in bytes
-			* `upload` NUMBER The current upload speed in bytes
-			* `torrents` ARRAY List of current torrents
+* **GET**
+	Return information from the torrent instance
 
-		Example
+	Query **none**
 
-		```bash
-		curl 127.0.0.1:3000/api/V0/torrent
-		{"download":0,"upload":0,"torrents":[]}
-		
-		```
+	Response fields:
+	* `download` *NUMBER* The current download speed in bytes
+	* `upload` *NUMBER* The current upload speed in bytes
+	* `torrents` *ARRAY* List of current torrents
+
+	Example
+
+	```bash
+	curl 127.0.0.1:3000/api/V0/torrent
+	{"download":0,"upload":0,"torrents":[]}
+
+	```
 
 	* To do
 		Add endpoints to interact with torrents
 
 
 ## Wallet **Coming soon!**
-	View and send ETH and MWT associated with the current wallet
+
+`/api/v0/wallet`
+
+View and send ETH and MWT associated with the current wallet
 
 ## Configuration **Coming soon!**
-	View and manage runtime and persistent conf file
+
+`api/v0/conf`
+
+View and manage runtime and persistent conf file
