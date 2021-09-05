@@ -4,7 +4,7 @@ const path       = require('path');
 const Web3       = require('web3');
 const conf       = require('../conf');
 
-const provider = new Web3.providers.WebsocketProvider(conf.wssEthAddress);
+const provider = new Web3.providers.WebsocketProvider(conf.ethAddress);
 const web3 = new Web3(provider);
 
 const account = web3.eth.accounts.privateKeyToAccount(conf.wallet.privateKey)
