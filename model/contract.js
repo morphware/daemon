@@ -2,9 +2,9 @@
 const fs         = require('fs');
 const path       = require('path');
 const Web3       = require('web3');
-const conf       = require('./../conf');
+const conf       = require('../conf');
 
-const provider = new Web3.providers.WebsocketProvider('wss://ropsten.infura.io/ws/v3/dc53ba9a23564600bfbe5f8c2f345d1d');
+const provider = new Web3.providers.WebsocketProvider(conf.wssEthAddress);
 const web3 = new Web3(provider);
 
 const account = web3.eth.accounts.privateKeyToAccount(conf.wallet.privatekey)
@@ -25,7 +25,27 @@ var morphwareTokenABIPathname = './abi/MorphwareToken-RopstenABI.json';
 var morphwareTokenAbi = JSON.parse(fs.readFileSync(path.resolve(morphwareTokenABIPathname),'utf-8')).abi;
 const morphwareToken = new web3.eth.Contract(morphwareTokenAbi, conf.morphwareTokenContractAddress);
 
-module.exports = {jobFactoryContract, morphwareToken, auctionFactory, web3, provider, account};
+// move this to wallet/account file
+
+
+async function transaction(data, gas) {
+    try{
+        let signPromise = await account.signTransaction({
+            from: account.address,
+            gas,
+            data
+        });
+        
+        console.log(signPromise)
+
+        return await web3.eth.sendSignedTransaction(signPromise.rawTransaction);   
+    }catch(error){
+        console.error('ERROR!!!! `transaction`', error);
+        throw error;
+    }
+}
+
+module.exports = {jobFactoryContract, morphwareToken, auctionFactory, web3, provider, account, transaction};
 
 
 provider.on('connection', console.log)
