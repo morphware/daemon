@@ -12,6 +12,11 @@ Each time a file is load, its over layed onto the conf object. A environment or
 Any valid Java Script can be placed in each conf file. `module.exports` must
 export a object.
 
+## Setting up the `secrets.js` file
+
+A `secrets.js` template file can simply be copied and edited to your needs.
+`mv conf/secrets.js.template conf/secrets.js`
+
 ## Conf fields
 
 The following fields are read the conf object during execution and can be placed
