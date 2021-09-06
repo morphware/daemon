@@ -15,14 +15,14 @@ export a object.
 ## Setting up the `secrets.js` file
 
 A `secrets.js` template file can simply be copied and edited to your needs.
-`mv conf/secrets.js.template conf/secrets.js`
+`cp conf/secrets.js.template conf/secrets.js`
 
 ## Conf fields
 
-The following fields are read the conf object during execution and can be placed
-in any file that makes sense.
+The following fields are used in the conf object during execution and can be
+placed in any file file that makes sense.
 
-* `httpPort` *NUMBER* **REQUIRED** The TCP port for the http interface to run
+* `httpPort` *NUMBER* **REQUIRED** The TCP port for the HTTP interface to listen
 on.
 * `wallet` *OBJECT* **REQUIRED** Configuration of the Etherum account. It take
 the following fields:
@@ -31,10 +31,10 @@ the following fields:
 * `isGPUnode` *BOOL* If the current node is a accepting jobs.
 
 
-### Conf fields end users should not mess with
+### Conf fields users should not mess with
 
 The following fields should not be edited unless you fully understand what they
-do. Little to know error checking can be done to determine valid but wrong
+do. Little to no error checking can be done to determine if valid but wrong
 settings are applied.
 
 * `ethAddress` *STRING* **REQUIRED** The remote Etherum node to connect to.
@@ -43,4 +43,22 @@ settings are applied.
 * `morphwareTokenContractAddress` *STRING* **REQUIRED** The Morphware address
 
 
+## Usage
 
+Simply require the conf directory relative to the current file;
+
+```js
+const conf = require('./conf');
+
+console.log(conf.httpPort)
+// 3000
+
+```
+
+Changes made to the conf object during run time are not persistent.
+
+## Settings to add
+
+* `dataPath` *STRING* Path the app will use for data
+* `httpBindAddress` *STRING* IP for the HTTP server to bind
+* `torrentListenPort` *STRING* TCP port for the torrent client to listen on
