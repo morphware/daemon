@@ -6,7 +6,7 @@ const { spawn }  = require('child_process');
 const disk       = require('diskusage');
 const webtorrent = require('./controller/torrent');
 
-const {jobFactoryContract, morphwareToken, web3} = require('./model/contract');
+const {jobFactoryContract, morphwareToken, web3, onConect, account} = require('./model/contract');
 
 var workerAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0';
 var auctionFactoryABIPathname = './abi/VickreyAuction-RopstenABI.json';
@@ -35,8 +35,7 @@ function processPostedJob(job){
         web3.utils.keccak256(web3.utils.encodePacked(bidAmount,fakeBid,secret)),
         bidAmount
     ).send({
-        from:workerAddress,
-        gas:'3000000'
+        from: account.address, gas:'3000000'
     }).on('receipt', async function(receipt) {
         console.log('\nBid sent'); // XXX
         console.log(receipt); // XXX
@@ -66,7 +65,7 @@ function processPostedJob(job){
                     [fakeBid],
                     [secret]
                 ).send({
-                    from:workerAddress, gas:'3000000'
+                    from: account.address, gas:'3000000'
                 }).on('receipt', function(receipt) {
                     console.log('\nreveal() called'); // XXX
                     console.log(receipt); // XXX
@@ -104,7 +103,7 @@ async function seedTrainedData(job){
                     trainedModelMagnetLink,
                     parseInt(trainingErrorRate)
                 ).send(
-                    {from:workerAddress, gas:"3000000"}
+                    {from: account.address, gas:"3000000"}
                 );
             }
         })  
@@ -193,6 +192,8 @@ async function downloadFiles(job){
 jobFactoryContract.events.JobDescriptionPosted(async function(error, event) {
     try{
         if(!event) return false;
+        console.log('found posted job', event);
+
         var job = event.returnValues;
 
         if(!await checkDisk(job.trainingDatasetSize)){
@@ -227,4 +228,5 @@ jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared({
         console.error('ERROR!!! `UntrainedModelAndTrainingDatasetShared` listener', error);
     }
 });
+
 

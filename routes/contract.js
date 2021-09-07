@@ -87,34 +87,49 @@ router.post('/', validFields, async function (req, res, next) {
         }
 
 
-        return res.json({status:'success'})
-        
+        var workerReward = fieldsObj['worker-reward'];
+
+
         var biddingDeadline = Math.floor(new Date().getTime() / 1000) + parseInt(fieldsObj['bidding-time'])
         var revealDeadline = biddingDeadline+30  // TODO Replace this
 
-        var workerReward = parseInt(fieldsObj['worker-reward']);
+        // morphwareToken.methods.balanceOf('0x17Ae698Ed7Ed3994631b83311F39bc00Ef3C0aC7').call().then(console.log).catch(console.error)
 
-        await transaction(
-            morphwareToken.methods.transfer(
-                conf.auctionFactoryContractAddress, workerReward
-            ).encodeABI(),
-            "3000000"
+        // morphwareToken.methods.transfer(
+        //     '0x17Ae698Ed7Ed3994631b83311F39bc00Ef3C0aC7', web3.utils.toWei(workerReward.toString())
+        // ).send().then(console.log).catch(console.error)
+
+
+        let transfer = await morphwareToken.methods.transfer(
+            conf.auctionFactoryContractAddress, web3.utils.toWei(workerReward.toString())
+        ).send(
+            {from: account.address, gas:"3000000"}
         );
 
-        console.log('sent founds')
 
-        let receipt = await transaction(
-            jobFactoryContract.methods.postJobDescription(
-                parseInt(fieldsObj['training-time']),
-                parseInt(req.files['training-data'][0].size),
-                parseInt(fieldsObj['error-rate']),
-                parseInt(workerReward*.1),
-                biddingDeadline,
-                revealDeadline,
-                workerReward
-            ).encodeABI(),
-            "2900000"
-        )
+        // let founds = await transaction(
+        //     "3000000",
+        //     conf.auctionFactoryContractAddress
+        // );
+
+        console.log('sent founds', transfer);
+
+
+        let receipt = await jobFactoryContract.methods.postJobDescription(
+            parseInt(fieldsObj['training-time']),
+            parseInt(req.files['training-data'][0].size),
+            parseInt(fieldsObj['error-rate']),
+            parseInt(workerReward*.1),
+            biddingDeadline,
+            revealDeadline,
+            workerReward
+        ).send({from: account.address, gas:"3000000"})
+
+
+        console.log('receipt', receipt)
+
+        return res.json({status:'success'})
+
 
 	    // TODO Call auctionEnd, this doesnt belong here.
 	    var waitTimeInMS2 = ((revealDeadline - currentTimestamp) + safeDelay) * 1000;
@@ -127,7 +142,7 @@ router.post('/', validFields, async function (req, res, next) {
 	                job.jobPoster,
 	                parseInt(job.id)
 	            ).send(
-	                {from:account.address, gas:'3000000'}
+	                {gas:'3000000'}
 	            ).on('receipt', function(receipt) {
 	                console.log('\nauctionEnd() called'); // XXX
 	                console.log(receipt); // XXX
