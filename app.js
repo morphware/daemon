@@ -12,5 +12,5 @@ const dataSci = require('./endUser');
 
 // Load GPU node stuff
 if(conf.isGPUnode){
-	require('./worker');
+	// require('./worker');
 }

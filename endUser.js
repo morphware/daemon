@@ -4,17 +4,7 @@ const fs         = require('fs');
 const path       = require('path');
 const webtorrent = require('./controller/torrent');
 const conf       = require('./conf');
-const {jobFactoryContract, morphwareToken, web3} = require('./model/contract');
-
-const account4Address = '0xd03ea8624C8C5987235048901fB614fDcA89b117';
-
-var auctionFactoryABIPathname = './abi/VickreyAuction-RopstenABI.json';
-var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8')).abi;
-
-var auctionFactory = new web3.eth.Contract(
-    auctionFactoryAbi,
-    conf.auctionFactoryContractAddress
-);
+const {jobFactoryContract, morphwareToken, auctionFactory, web3, account} = require('./model/contract');
 
 
 async function downloadFiles(job){
@@ -49,7 +39,7 @@ async function downloadFiles(job){
 
 auctionFactory.events.AuctionEnded({
     filter: {
-        endUser: account4Address 
+        endUser: account.address 
     }
 }, function(error, event) {
     try{
@@ -57,18 +47,23 @@ auctionFactory.events.AuctionEnded({
         console.log('Inside procAuctionEnded...', event, error); // XXX
 
 
-        var x = event.returnValues;
+        var results = event.returnValues;
+
+        if(results.winner === '0x0000000000000000000000000000000000000000'){
+            console.log('No one won...');
+            return false;
+        }
 
         var magnetLinks = JSON.parse(fs.readFileSync('./links.json','utf-8'));;
         
 
-        // Note: `x.endUser` is the same as `account4Address`
+        // Note: `x.endUser` is the same as `account.address`
         jobFactoryContract.methods.shareUntrainedModelAndTrainingDataset(
             x.auctionId,
             magnetLinks['jupyter-notebook'],
             magnetLinks['training-data']
         ).send(
-            {from:account4Address, gas:'3000000'}
+            {from:account.address, gas:'3000000'}
         ).on('receipt', async function(receipt) {
             console.log('\nShared untrained model and training dataset...\n'); // XXX
             console.log(receipt); // XXX
@@ -81,7 +76,7 @@ auctionFactory.events.AuctionEnded({
 
 jobFactoryContract.events.TrainedModelShared({
     filter: {
-        jobPoster: account4Address
+        jobPoster: account.address
     }
 }, function(error, event){
     try{
@@ -107,7 +102,7 @@ jobFactoryContract.events.TrainedModelShared({
             job.trainedModelMagnetLink,
             magnetLinks['testing-data']
         ).send(
-            {from:account4Address, gas:'3000000'}
+            {from:account.address, gas:'3000000'}
         ).on('receipt', async function(receipt) {
             console.log('\nShared testing dataset...\n'); // XXX
             console.log(receipt); // XXX
@@ -119,7 +114,7 @@ jobFactoryContract.events.TrainedModelShared({
 
 jobFactoryContract.events.JobApproved({
     filter: {
-        jobPoster: account4Address
+        jobPoster: account.address
     }
 }, function(error, event) {
     try{
@@ -129,12 +124,12 @@ jobFactoryContract.events.JobApproved({
 
         var job = event.returnValues;
 
-        // Note: `x.endUser` is the same as `account4Address`
+        // Note: `x.endUser` is the same as `account.address`
         auctionFactory.methods.payout(
-            account4Address,
+            account.address,
             job.id
         ).send({
-            from:account4Address, gas:'3000000'
+            from:account.address, gas:'3000000'
         }).on('receipt', async function(receipt) {
             try{
                 console.log('\nCalled payout funct...\n'); // XXX

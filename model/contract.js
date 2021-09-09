@@ -22,12 +22,12 @@ if(!conf.wallet || !conf.wallet.privateKey){
 }
 
 const jobFactoryAbiPathname = './abi/JobFactory-RopstenABI.json';
-let jobFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(jobFactoryAbiPathname),'utf-8')).abi;
+let jobFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(jobFactoryAbiPathname),'utf-8'));
 let jobFactoryContract = new web3.eth.Contract(jobFactoryAbi, conf.jobFactoryContractAddress, {from: account.address});
 
 
 var auctionFactoryABIPathname = './abi/VickreyAuction-RopstenABI.json';
-var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8')).abi;
+var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8'));
 var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,conf.auctionFactoryContractAddress, {from: account.address});
 
 
@@ -50,14 +50,15 @@ let onConect = [async function(){
 
 
 
-provider.on('connect', function(){
+web3.currentProvider.on('connect', function(){
     for(let func of onConect){
         func();
     }
 })
-provider.on('error', function(){console.log('error', arguments)})
-provider.on('block', function(){console.log('block', arguments)})
-provider.on('start', function(){console.log('start', arguments)})
+web3.currentProvider.on('disconnect', function(){console.log('disconnect', arguments)})
+web3.currentProvider.on('error', function(){console.log('error', arguments)})
+web3.currentProvider.on('block', function(){console.log('block', arguments)})
+web3.currentProvider.on('start', function(){console.log('start', arguments)})
 
 
 
