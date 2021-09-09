@@ -1,60 +1,79 @@
 'use strict';
 
-const contract = require('./contract');
+const conf = require('../conf');
+const {
+    web3,
+    account,
+    transaction,
+    jobFactoryContract,
+    auctionFactory,
+    morphwareToken,
+} = require('./contract');
+
+
 
 class MorphwareWallet{
-	constructor(address){
-		this.address = address
+	constructor(privateKeyOrAccount){
+		if(typeof(privateKeyOrAccount) === 'string'){
+    		this.account = web3.eth.accounts.privateKeyToAccount(privateKeyOrAccount)
+		}else if(typeof(privateKeyOrAccount) === 'object' && privateKeyOrAccount.address){
+			this.account = privateKeyOrAccount
+		}else{
+			throw 'Account or private key not provided.'
+		}
 	}
 
 	async getBalance(){
-		return await contract.morphwareToken.methods.balanceOf(con.account.address).call()
+		return await morphwareToken.methods.balanceOf(this.account.address).call()
 	}
 
-	async transaction(data, gas) {
+	async send(address, gas) {
 	    try{
-	        let signPromise = await account.signTransaction({
-	            from: account.address,
-	            gas,
-	            data
-	        });
-	        
-	        return await web3.eth.sendSignedTransaction(signPromise.rawTransaction);   
+			return await morphwareToken.methods.transfer(
+	            address,
+	            web3.utils.toWei(workerReward.toString())
+	        ).send(
+	            {from: this.account.address, gas:"3000000"}
+	        );
 	    }catch(error){
 	        console.error('ERROR!!!! `transaction`', error);
 	        throw error;
 	    }
 	}
 
+	async getTransactionHistory(){
+		try{
+			let out = [];
 
+			let transactions = await web3.eth.getPastLogs({
+				fromBlock:'0x0', address: conf.morphwareTokenContractAddress
+			})
+
+			for(let transaction of transactions){
+				transaction = await web3.eth.getTransaction(transaction.transactionHash)
+				console.log(transaction, 'asdasd', [transaction.to, transaction.from])
+				// morphwareToken._jsonInterface[14], where 'signature' = '0xa9059cbb'
+				if([transaction.to, transaction.from].includes(this.account.address)){
+					let data = web3.eth.abi.decodeLog([
+		    			{ internalType: 'address', name: 'recipient', type: 'address' },
+		    			{ internalType: 'uint256', name: 'amount', type: 'uint256' }
+		  			], transaction.input.replace('0xa9059cbb', '0x'));
+
+					out.push({...transaction, MwtValue: data.account });
+
+				}
+
+
+			}
+
+			return out;
+
+		}catch(error){
+
+			return []
+		}
+	}
 }
+
 
 module.exports = {MorphwareWallet};
-
-
-
-out = await web3.eth.getPastLogs({fromBlock:'0x0',address:conaddy})
-for(let i of out){
-	await web3.eth.getTransaction(i.transactionHash)
-}
-
-
-async function checkBlock(address) {
-    let block = await web3.eth.getBlock('latest');
-    let number = block.number;
-    let transactions = block.transactions;
-    //console.log('Search Block: ' + transactions);
-
-    if (block != null && block.transactions != null) {
-        for (let txHash of block.transactions) {
-            let tx = await web3.eth.getTransaction(txHash);
-            if (address == tx.to.toLowerCase()) {
-                console.log("from: " + tx.from.toLowerCase() + " to: " + tx.to.toLowerCase() + " value: " + tx.value);
-            }
-        }
-    }
-}
-
-
- var transactionChecker = new  TransactionChecker('0x69fb2a80542721682bfe8daa8fee847cddd1a267');
- transactionChecker.checkBlock();
