@@ -1,207 +1,232 @@
-#!/usr/bin/env node
+'use strict';
 
-const fs   = require('fs');
-const path = require('path');
-const Web3 = require('web3');
-const disk = require('diskusage');
-const WebTorrent = require('webtorrent-hybrid');
-const {jobFactoryContract} = require('./model/contract')
+const fs         = require('fs');
+const path       = require('path');
+const { spawn }  = require('child_process');
+const disk       = require('diskusage');
+const webtorrent = require('./controller/torrent');
 
-var provider = new Web3.providers.WebsocketProvider('ws://localhost:8545');
-var web3 = new Web3(provider);
+const {jobFactoryContract, morphwareToken, web3, onConect, account} = require('./model/contract');
 
 var workerAddress = '0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0';
-
-var minHourlyRate = 5; // TODO Compare this to cost of running on a cloud, as an upper bound, and mining a crypto, as a lower bound
-
-var auctionFactoryABIPathname = './abi/VickreyAuction-copyABI.json';
+var auctionFactoryABIPathname = './abi/VickreyAuction-RopstenABI.json';
 var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8')).abi;
 
-/*
-TODO Listen for job-posting events emitted by the smart contracts:
-     - JobFactory
-       v  1. JobDescriptionPosted
-       o  3. UntrainedModelAndTrainingDatasetShared
-       o  4. TrainedModelShared
-       o  5. JobApproved
-     - AuctionFactory
-       v  2. AuctionEnded
-*/
-
-
-console.log('\nWorker node listening for JobDescriptionPosted from JobFactory...') // XXX
-
-        // jobFactoryContract.once('JobDescriptionPosted', async function(error, event) {
-jobFactoryContract.events.JobDescriptionPosted(function(error, event) {
+async function checkDisk(size){
     try{
-        console.log('error',error)
-        console.log('event',event)
+        let {free} = await disk.check('/');
 
-        // let event = await jobFactoryContract.events.JobDescriptionPosted()
-        var job = event.returnValues;
+        return size <= free ? true : false;
+    }catch(error){
+        console.error('ERROR!!!, `chechDisk`', error)
+    }
+}
 
-        // TEST
-        console.log('job',job) // XXX
+function processPostedJob(job){
+    var auctionFactory = new web3.eth.Contract(auctionFactoryAbi, job.auctionAddress);
 
-        var maxDiskSpace;
-        disk.check('/', function(err, sysinfo) {
-            maxDiskSpace = sysinfo.free;
-        });
+    var bidAmount = 11;
+    var fakeBid = false;
+    var secret = '0x6d6168616d000000000000000000000000000000000000000000000000000000';
 
-        if (parseInt(job.trainingDatasetSize) <= maxDiskSpace) {
-            if ((parseInt(job.workerReward) / (parseInt(job.estimatedTrainingTime) / 60)) >= minHourlyRate) {
+    auctionFactory.methods.bid(
+        job.jobPoster,
+        parseInt(job.id),
+        web3.utils.keccak256(web3.utils.encodePacked(bidAmount,fakeBid,secret)),
+        bidAmount
+    ).send({
+        from: account.address, gas:'3000000'
+    }).on('receipt', async function(receipt) {
+        console.log('\nBid sent'); // XXX
+        console.log(receipt); // XXX
 
-                var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,job.auctionAddress);
+        var currentTimestamp = Math.floor(new Date().getTime() / 1000);
+        console.log('\ncurrentTimestamp:',currentTimestamp); // XXX
 
-                var bidAmount = 11;
-                var fakeBid = false;
-                var secret = '0x6d6168616d000000000000000000000000000000000000000000000000000000';
+        var auction = await auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call();
 
+        var biddingDeadline = parseInt(auction.biddingDeadline);
+        console.log('\nbiddingDeadline:',biddingDeadline); // XXX
 
-                auctionFactory.methods.bid(
+        var revealDeadline = parseInt(auction.revealDeadline);
+        console.log('revealDeadline:',revealDeadline); // XXX
+
+        var safeDelay = 5;
+        var waitTimeInMS1 = ((biddingDeadline - currentTimestamp) + safeDelay) * 1000;
+        console.log('Wait time before calling reveal',(waitTimeInMS1/1000)) // XXX
+
+        setTimeout(function(error, event){
+            try {
+                console.log(job.jobPoster,parseInt(job.id),bidAmount,fakeBid,secret) // XXX
+                auctionFactory.methods.reveal(
                     job.jobPoster,
                     parseInt(job.id),
-                    web3.utils.keccak256(web3.utils.encodePacked(bidAmount,fakeBid,secret)),
-                    bidAmount
-                ).send(
-                    {from:workerAddress, gas:'3000000'}
-                ).on('receipt', async function(receipt) {
-                    console.log('\nBid sent'); // XXX
+                    [bidAmount],
+                    [fakeBid],
+                    [secret]
+                ).send({
+                    from: account.address, gas:'3000000'
+                }).on('receipt', function(receipt) {
+                    console.log('\nreveal() called'); // XXX
                     console.log(receipt); // XXX
-
-                    var currentTimestamp = Math.floor(new Date().getTime() / 1000);
-                    console.log('\ncurrentTimestamp:',currentTimestamp); // XXX
-
-                    var auction = await auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call();
-
-                    var biddingDeadline = parseInt(auction.biddingDeadline);
-                    console.log('\nbiddingDeadline:',biddingDeadline); // XXX
-
-                    var revealDeadline = parseInt(auction.revealDeadline);
-                    console.log('revealDeadline:',revealDeadline); // XXX
-
-
-                    var safeDelay = 5;
-                    var waitTimeInMS1 = ((biddingDeadline - currentTimestamp) + safeDelay) * 1000;
-                    console.log('Wait time before calling reveal',(waitTimeInMS1/1000)) // XXX
-
-                    setTimeout(function(error,event){
-                        try {
-                            console.log(job.jobPoster,parseInt(job.id),bidAmount,fakeBid,secret) // XXX
-                            auctionFactory.methods.reveal(
-                                job.jobPoster,
-                                parseInt(job.id),
-                                [bidAmount],
-                                [fakeBid],
-                                [secret]
-                            ).send(
-                                {from:workerAddress, gas:'3000000'}
-                            ).on('receipt', function(receipt) {
-                                console.log('\nreveal() called'); // XXX
-                                console.log(receipt); // XXX
-                                // TODO Wait until `.revealDeadline` and then call `auctionEnd`
-                                // var revealDeadline = auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call().revealDeadline;
-                            })
-                        } catch(error) {
-                            console.log(error)
-                        }
-                    }, waitTimeInMS1);
-
-                    // TODO Call auctionEnd
-                    var waitTimeInMS2 = ((revealDeadline - currentTimestamp) + safeDelay) * 1000;
-                    console.log('Wait time before calling auctionEnd',(waitTimeInMS2/1000))
-
-                    setTimeout(function(error,event){
-                        try {
-                            console.log('\nAbout to call auctionEnd()') // XXX
-                            auctionFactory.methods.auctionEnd(
-                                job.jobPoster,
-                                parseInt(job.id)
-                            ).send(
-                                {from:workerAddress, gas:'3000000'}
-                            ).on('receipt', function(receipt) {
-                                console.log('\nauctionEnd() called'); // XXX
-                                console.log(receipt); // XXX
-                                // TODO Wait until `.revealDeadline` and then call `auctionEnd`
-                                // var revealDeadline = auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call().revealDeadline;
-                            })
-                        } catch(error) {
-                            console.log(error)
-                        }
-                    }, waitTimeInMS2);
-                })
+                    // TODO Wait until `.revealDeadline` and then call `auctionEnd`
+                    // var revealDeadline = auctionFactory.methods.auctions(job.jobPoster,parseInt(job.id)).call().revealDeadline;
+                });
+            } catch(error) {
+                console.log(error)
             }
+        }, waitTimeInMS1);
+    });
+}
+
+
+async function seedTrainedData(job){
+    try{
+        // FIXME  Seed `trained_model.h5`
+        let afterTrainingCount = 1;
+        // let webtorrent2 = new WebTorrent();
+        trainedModelPathname = `./datalake/worker_node/uploads/${job.jobPoster}/${job.id}/trained_model.h5`
+        
+        webtorrent.seed(trainedModelPathname, function (torrent) {
+            if (--afterTrainingCount == 0) {
+
+                // TODO Should this be re-factored as a new webtorrent object?
+                //      --> Is `trained_model.h5`'s magnet-link guaranteed to be in the third zero-based index-position?
+                var trainedModelMagnetLink = webtorrent.torrents[2].magnetURI;
+
+                console.log('trainedModelMagnetLink:',trainedModelMagnetLink)
+                console.log('trainingErrorRate:',trainingErrorRate);
+
+                jobFactoryContract.methods.shareTrainedModel(
+                    job.jobPoster,
+                    parseInt(job.id),
+                    trainedModelMagnetLink,
+                    parseInt(trainingErrorRate)
+                ).send(
+                    {from: account.address, gas:"3000000"}
+                );
+            }
+        })  
+    }catch(error){
+        console.log('ERROR!!! `seedTrainedData function`', error);
+    }
+}
+
+function executeNoteBook(){
+    return new Promise((resolve, reject)=>{
+        console.log('untrainedModelMagnetLink and trainingDatasetMagnetLink download finished')
+        // FIXME Call `process.exit()` like the decrementing counter, here
+        // process.exit()
+
+        ////////////////
+        var model_file = `./datalake/worker_node/downloads/${job.jobPoster}/${job.id}/jupyter-notebook.ipynb`
+        console.log('model_file:',model_file)
+
+        // Run the Jupyter notebook //////////////
+        // spawn new child process to call the python script
+
+        // TODO Add `detached:true` to dict-like object parameterized at the end of `spawn`?
+        //
+        // FIXME Remove `shell:true` (security consideration) and have the user add the full-path to the Python file
+        const child = spawn('python3', [`${model_file}`], {shell: true});
+        // const child = spawn('python3', [`${model_file}`]);
+
+
+        var trainingErrorRate;
+        // collect data from script
+        child.stdout.on('data', function (data) {
+            console.log('Pipe data from Python script ...');
+            trainingErrorRate = data.toString();
+        });
+
+        child.on('error', function(data){
+            console.error('ERROR!!! `executeNoteBook` child error', data);
+            reject(data);
+        })
+
+        // in close event we are sure that stream from child process is closed
+        child.on('close', (code) => {
+            console.log(`child process close all stdio with code ${code}`);
+
+            // check exit code here
+            resolve(code);
+        });
+    });
+}
+
+async function downloadFiles(job){
+    try{
+        var downloadsDir = './datalake/worker_node/downloads'+`/${job.jobPoster}/${job.id}`;
+        var uploadsDir   = './datalake/worker_node/uploads'+`/${job.jobPoster}/${job.id}`;
+        var directories  = [downloadsDir, uploadsDir]
+
+        for (var directory of directories) {
+            await fs.promise.mkdir(directory, { recursive: true });
         }
 
+        var links = [job.untrainedModelMagnetLink, job.trainingDatasetMagnetLink]
+        let count = 0;
+
+        for (var link of links) {
+            webtorrent.add(link, { path: downloadsDir }, function (torrent) {
+                count++;
+                // if (link == job.untrainedModelMagnetLink) {
+                //     var model_file = torrent.path + '/' + torrent.files[0].path;
+                // }
+                torrent.on('error', console.error);
+                torrent.on('downloaded', console.log);
+                torrent.on('done', function () {
+                    console.log(count, 'files', torrent.files)
+                    if (--count == 0) {
+                        return true;
+                    }
+                });
+            });
+        }
+    }catch{
+        // Watch for FS errors here
+        console.error('ERROR!!! `downloadFiles`', error);
+    }
+}
+
+jobFactoryContract.events.JobDescriptionPosted(async function(error, event) {
+    try{
+        if(!event) return false;
+        console.log('found posted job', event);
+
+        var job = event.returnValues;
+
+        if(!await checkDisk(job.trainingDatasetSize)){
+            console.info('not enough free disk space, passing');
+            return false;
+        }
+
+        await processPostedJob(job);
+    }catch(error){
+        console.error('ERROR!!! ``', error);
+    }
+});
+
+// (C) This should only listen for an event related to a job the worker's bid on,
+//     and was the highest bidder.
+jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared({
+    filter:{
+        workerNode: workerAddress
+    }
+}, async function(error, event){
+    try{
+        if(!event) return false;
+        // console.log('event',event);
+        console.log('\nInside procUntrainedModelAndTrainingDatasetShared await...\n'); // XXX
+        var job = event.returnValues;
+
+        await downloadFiles(job);
+        await executeNoteBook(job);
+        await seedTrainedData(job);
 
     }catch(error){
-        console.log(error);
-        // throw error;
+        console.error('ERROR!!! `UntrainedModelAndTrainingDatasetShared` listener', error);
     }
-})
+});
 
 
-
-
-// (function procUntrainedModelAndTrainingDatasetShared(){
-//     // (C) This should only listen for an event related to a job the worker's bid on,
-//     //     and was the highest bidder.
-//     try {
-//         jobFactoryContract.events.UntrainedModelAndTrainingDatasetShared(
-//             { filter: { workerNode: workerAddress } },
-//             function(error, event) {
-
-//                 let webtorrent = new WebTorrent();
-
-//                 webtorrent.add()
-
-//                 var downloadsDir = './datalake/worker_node/downloads'
-
-
-
-//             }
-
-//         )
-
-
-
-//     } catch(error) {
-//         // TODO Handle error
-//         console.log(error)
-//     }
-// }
-
-
-
-
-
-
-
-
-
-
-/*
-async function procTrainedModelShared(){
-    // (C) This should only listen for an event related to a job the worker's bid on,
-    //     and was the highest bidder.
-    try {
-        // TODO
-        jobFactoryContract.events.TrainedModelShared()
-    } catch(error) {
-        // TODO Handle error
-        console.log(error)
-    }
-}
-
-async function procJobApproved(){
-    // (C) This should only listen for an event related to a job the worker's bid on,
-    //     and was the highest bidder.
-    try {
-        // TODO
-        jobFactoryContract.events.JobApproved()
-    } catch(error) {
-        // TODO Handle error
-        console.log(error)
-    }
-}
-*/
