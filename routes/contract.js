@@ -5,12 +5,13 @@ const path = require('path');
 const router = require('express').Router();
 const multer = require('multer');
 const webtorrent = require('../controller/torrent');
+
+const {wallet} = require('../model/morphware');
 const conf = require('../conf')
+
 
 const {
     web3,
-    account,
-    transaction,
     jobFactoryContract,
     auctionFactory,
     morphwareToken,
@@ -91,11 +92,10 @@ router.post('/', validFields, async function (req, res, next) {
         var revealDeadline = biddingDeadline+30  // TODO Replace this
 
 
-        let transfer = await morphwareToken.methods.transfer(
-            conf.auctionFactoryContractAddress, web3.utils.toWei(workerReward.toString())
-        ).send(
-            {from: account.address, gas:"3000000"}
-        ).on('transactionHash', (hash)=>{console.log('transfer hash', hash)}
+
+        let transfer = await wallet.send(
+            conf.auctionFactoryContractAddress,
+            web3.utils.toWei(workerReward.toString())
         );
 
         // console.log('transfer', transfer)

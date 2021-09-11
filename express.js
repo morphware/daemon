@@ -6,7 +6,7 @@ const conf       = require('./conf');
 
 const app  = express();
 
-app.use(bodyParser.urlencoded({ extended: true }));
+// app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
 
 app.use('/api/V0/', require('./routes/api_v0'));
@@ -28,13 +28,13 @@ app.use(function(req, res, next) {
 app.use(function(err, req, res, next) {
   console.error(err.status || res.status, err.name, req.method, req.url);
   if(![401, 404].includes(err.status || res.status)){
-    console.error(err.message);
+    console.error(err.message || err);
     console.error(err.stack);
     console.error('=========================================');
   }
 
   res.status(err.status || 500);
-  res.json({name: err.name, message: err.message});
+  res.json({error: err});
 });
 
 module.exports = app;

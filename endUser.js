@@ -4,7 +4,8 @@ const fs         = require('fs');
 const path       = require('path');
 const webtorrent = require('./controller/torrent');
 const conf       = require('./conf');
-const {jobFactoryContract, morphwareToken, auctionFactory, web3, account} = require('./model/contract');
+const {jobFactoryContract, auctionFactory, web3} = require('./model/contract');
+const {wallet} = require('./model/morphware');
 
 
 async function downloadFiles(job){
@@ -39,7 +40,7 @@ async function downloadFiles(job){
 
 auctionFactory.events.AuctionEnded({
     filter: {
-        endUser: account.address 
+        endUser: wallet.address 
     }
 }, function(error, event) {
     try{
@@ -57,13 +58,13 @@ auctionFactory.events.AuctionEnded({
         var magnetLinks = JSON.parse(fs.readFileSync('./links.json','utf-8'));;
         
 
-        // Note: `x.endUser` is the same as `account.address`
+        // Note: `x.endUser` is the same as `wallet.address`
         jobFactoryContract.methods.shareUntrainedModelAndTrainingDataset(
             x.auctionId,
             magnetLinks['jupyter-notebook'],
             magnetLinks['training-data']
         ).send(
-            {from:account.address, gas:'3000000'}
+            {from:wallet.address, gas:'3000000'}
         ).on('receipt', async function(receipt) {
             console.log('\nShared untrained model and training dataset...\n'); // XXX
             console.log(receipt); // XXX
@@ -76,7 +77,7 @@ auctionFactory.events.AuctionEnded({
 
 jobFactoryContract.events.TrainedModelShared({
     filter: {
-        jobPoster: account.address
+        jobPoster: wallet.address
     }
 }, function(error, event){
     try{
@@ -102,7 +103,7 @@ jobFactoryContract.events.TrainedModelShared({
             job.trainedModelMagnetLink,
             magnetLinks['testing-data']
         ).send(
-            {from:account.address, gas:'3000000'}
+            {from:wallet.address, gas:'3000000'}
         ).on('receipt', async function(receipt) {
             console.log('\nShared testing dataset...\n'); // XXX
             console.log(receipt); // XXX
@@ -114,7 +115,7 @@ jobFactoryContract.events.TrainedModelShared({
 
 jobFactoryContract.events.JobApproved({
     filter: {
-        jobPoster: account.address
+        jobPoster: wallet.address
     }
 }, function(error, event) {
     try{
@@ -124,12 +125,12 @@ jobFactoryContract.events.JobApproved({
 
         var job = event.returnValues;
 
-        // Note: `x.endUser` is the same as `account.address`
+        // Note: `x.endUser` is the same as `wallet.address`
         auctionFactory.methods.payout(
-            account.address,
+            wallet.address,
             job.id
         ).send({
-            from:account.address, gas:'3000000'
+            from:wallet.address, gas:'3000000'
         }).on('receipt', async function(receipt) {
             try{
                 console.log('\nCalled payout funct...\n'); // XXX

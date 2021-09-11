@@ -1,27 +1,36 @@
 'use strict';
 
+const path = require('path');
 const conf = require('../conf');
-const {web3, morphwareToken} = require('./contract');
-
+const {web3} = require('./contract');
+var wallet = null
 
 class MorphwareWallet{
 	constructor(privateKeyOrAccount){
 		if(typeof(privateKeyOrAccount) === 'string'){
 			this.account = web3.eth.accounts.privateKeyToAccount(privateKeyOrAccount)
 		}else if(typeof(privateKeyOrAccount) === 'object' && privateKeyOrAccount.address){
+			// A web3 account isnt an instance of anything...
 			this.account = privateKeyOrAccount
 		}else{
 			throw 'Account or private key not provided.'
 		}
-
+		
 		this.address = this.account.address;
 		this.sign = this.account.sign;
 		this.privateKey = this.account.privateKey;
 		this.transactions = []
 
+		// Assign this wallets address to a contract do the contract can sign
+		// transactions.
+		this.contract = this.constructor.tokenContract.clone()
+		this.contract.options.from = this.address
+
 		this.getTransactionHistory();
 	}
 
+	static tokenAbi = require(path.resolve(conf.morphwareTokenABIPath));
+	static tokenContract = new web3.eth.Contract(this.tokenAbi, conf.morphwareTokenContractAddress);
 	static wallets = [];
 
 	static add(privateKeyOrAccount){
@@ -32,14 +41,23 @@ class MorphwareWallet{
 	}
 
 	async getBalance(){
-		return await morphwareToken.methods.balanceOf(this.address).call()
+		return await this.contract.methods.balanceOf(this.address).call()
 	}
 
 	async send(address, amount, gas) {
 		try{
-			let transfer = morphwareToken.methods.transfer(
+
+			if(!web3.utils.isAddress(address)){
+				throw 'Invalid address provided'
+			}
+
+			if(Number.isNaN(Number(amount))){
+				throw 'Invalid amount provided'
+			}
+
+			let transfer = this.contract.methods.transfer(
 				address,
-				web3.utils.toWei(amount.toString())
+				amount
 			);
 
 			return await transfer.send({
@@ -79,7 +97,9 @@ class MorphwareWallet{
 }
 
 
-morphwareToken.events.Transfer((error, event)=>{
+// Listen for transfer events to keep the tracked wallets transactions history
+// fresh.
+MorphwareWallet.tokenContract.events.Transfer((error, event)=>{
 	if(event.returnValues.to in MorphwareWallet.wallets){
 		MorphwareWallet.wallets[event.returnValues.to].transactions.push(event);
 	}
@@ -89,4 +109,19 @@ morphwareToken.events.Transfer((error, event)=>{
 	}
 });
 
-module.exports = {MorphwareWallet};
+
+// Set up the default wallet and use it as the default.
+if(!conf.wallet || !conf.wallet.privateKey){
+	console.error('Private key not found!!!');
+	console.error('Please add this private key to your secrets.js file\n');
+	console.error(web3.eth.accounts.create().privateKey);
+	process.exit(1);
+}else{
+	let account = web3.eth.accounts.privateKeyToAccount(conf.wallet.privateKey);
+	console.info(`Account found for ${account.address}`);
+	web3.eth.accounts.wallet.add(account);
+	web3.eth.defaultAccount = account.address;
+	wallet = MorphwareWallet.add(account);
+}
+
+module.exports = {MorphwareWallet, wallet};

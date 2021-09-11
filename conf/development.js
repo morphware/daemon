@@ -1,4 +1,5 @@
 module.exports = {
+	morphwareTokenABIPath: './abi/MorphwareToken.json',
 	morphwareTokenContractAddress: '0xbc40e97e6d665ce77e784349293d716b030711bc',
 	
 	// https://ropsten.etherscan.io/address/0x0f96cf29c8d9f65f83e6992cad3ebbe9a395f332#code
