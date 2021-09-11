@@ -21,6 +21,9 @@ Manages job contracts
 	* `bidding-time` *NUMER*
 	* `worker-reward` *NUMBER* Amount of MWT to be paid for a complete job.
 	* `test-model` *BOOL*
+	* `jupyter-notebook` *STRRING* Local path to the jupyter-notebook 
+	* `training-data` *STRRING* Local path to the training-data 
+	* `testing-data` *STRRING* Local path to the testing-data
 		
 	Exmaple
 	

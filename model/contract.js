@@ -14,6 +14,7 @@ const jobFactoryAbiPathname = './abi/JobFactory-RopstenABI.json';
 let jobFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(jobFactoryAbiPathname),'utf-8'));
 let jobFactoryContract = new web3.eth.Contract(jobFactoryAbi, conf.jobFactoryContractAddress,);
 
+
 var auctionFactoryABIPathname = './abi/VickreyAuction-RopstenABI.json';
 var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8'));
 var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,conf.auctionFactoryContractAddress,);
