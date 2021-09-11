@@ -14,16 +14,16 @@ Manages job contracts
 * **POST**
 	Start a new contract for a job 
 	Post fields:
-	* `stop-training` *STRING*
-	* `stop-training-automatic` *STRING*
-	* `training-time` *NUMBER*
-	* `error-rate` *NUMBER*
-	* `bidding-time` *NUMER*
-	* `worker-reward` *NUMBER* Amount of MWT to be paid for a complete job.
-	* `test-model` *BOOL*
-	* `jupyter-notebook` *STRRING* Local path to the jupyter-notebook 
-	* `training-data` *STRRING* Local path to the training-data 
-	* `testing-data` *STRRING* Local path to the testing-data
+	* `stopTraining` *STRING*
+	* `stopTrainingAutomatic` *STRING*
+	* `trainingTime` *NUMBER*
+	* `errorTate` *NUMBER*
+	* `biddingTime` *NUMER*
+	* `workerReward` *NUMBER* Amount of MWT to be paid for a complete job.
+	* `testModel` *BOOL*
+	* `jupyterNotebook` *STRRING* Local path to the jupyter-notebook 
+	* `trainingData` *STRRING* Local path to the training-data 
+	* `testingData` *STRRING* Local path to the testing-data
 		
 	Exmaple
 	
