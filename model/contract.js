@@ -14,12 +14,13 @@ const jobFactoryAbiPathname = './abi/JobFactory-RopstenABI.json';
 let jobFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(jobFactoryAbiPathname),'utf-8'));
 let jobFactoryContract = new web3.eth.Contract(jobFactoryAbi, conf.jobFactoryContractAddress,);
 
+
 var auctionFactoryABIPathname = './abi/VickreyAuction-RopstenABI.json';
 var auctionFactoryAbi = JSON.parse(fs.readFileSync(path.resolve(auctionFactoryABIPathname),'utf-8'));
 var auctionFactory = new web3.eth.Contract(auctionFactoryAbi,conf.auctionFactoryContractAddress,);
 
 
-web3.currentProvider.on('connect', function(){console.log('connect', arguments)});
+web3.currentProvider.on('connect', function(...args){console.log('connect', args, arguments)});
 web3.currentProvider.on('disconnect', function(){console.log('disconnect', arguments)})
 web3.currentProvider.on('error', function(){console.log('error', arguments)})
 web3.currentProvider.on('block', function(){console.log('block', arguments)})

@@ -14,15 +14,18 @@ Manages job contracts
 * **POST**
 	Start a new contract for a job 
 	Post fields:
-	* `stop-training` *STRING*
-	* `stop-training-automatic` *STRING*
-	* `training-time` *NUMBER*
-	* `error-rate` *NUMBER*
-	* `bidding-time` *NUMER*
-	* `worker-reward` *NUMBER* Amount of MWT to be paid for a complete job.
-	* `test-model` *BOOL*
+	* `stopTraining` *STRING*
+	* `stopTrainingAutomatic` *STRING*
+	* `trainingTime` *NUMBER*
+	* `errorTate` *NUMBER*
+	* `biddingTime` *NUMER*
+	* `workerReward` *NUMBER* Amount of MWT to be paid for a complete job.
+	* `testModel` *BOOL*
+	* `jupyterNotebook` *STRRING* Local path to the jupyter-notebook 
+	* `trainingData` *STRRING* Local path to the training-data 
+	* `testingData` *STRRING* Local path to the testing-data
 		
-	Exmaple
+	Example
 	
 	Blocked by #15
 
@@ -42,7 +45,7 @@ Status about connection to an eth node
 
 	Query **none**
 
-	Resposne fields:
+	Response fields:
 	* `status` *BOOL* connection to eth node
 
 	Example
@@ -126,7 +129,7 @@ View and send MWT associated with the current wallet
 
 	Query **none**
 
-	Resposne fields:
+	Response fields:
 	* `balance` *STRING* Current address MWT balance as in wei.
 	* `address` *STRING* Current Address.
 
@@ -146,7 +149,7 @@ View and send MWT associated with the current wallet
 
 	Query **none**
 
-	Resposne fields:
+	Response fields:
 	* `transactions` *ARRAY* List of transaction.
 	* `address` *STRING* Current Address.
 
@@ -195,7 +198,7 @@ View and send MWT associated with the current wallet
 	* `amount` *STRING* **REQUIRED** The amount of MWT to send, in wei.
 	* `gas` *STRING* The gas you would like to use.
 
-	Resposne fields:
+	Response fields:
 	* `transaction` *ARRAY* Returned transaction.
 
 	Example

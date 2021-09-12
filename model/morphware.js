@@ -100,12 +100,20 @@ class MorphwareWallet{
 // Listen for transfer events to keep the tracked wallets transactions history
 // fresh.
 MorphwareWallet.tokenContract.events.Transfer((error, event)=>{
-	if(event.returnValues.to in MorphwareWallet.wallets){
-		MorphwareWallet.wallets[event.returnValues.to].transactions.push(event);
+	if(error){
+		console.error('Error `MorphwareWallet.tokenContract.events.Transfer` from event', error);
+		return ;
 	}
+	try{
+		if(event.returnValues.to in MorphwareWallet.wallets){
+			MorphwareWallet.wallets[event.returnValues.to].transactions.push(event);
+		}
 
-	if(event.returnValues.from in MorphwareWallet.wallets){
-		MorphwareWallet.wallets[event.returnValues.from].transactions.push(event);
+		if(event.returnValues.from in MorphwareWallet.wallets){
+			MorphwareWallet.wallets[event.returnValues.from].transactions.push(event);
+		}		
+	}catch(error){
+		console.error("Error `MorphwareWallet.tokenContract.events.Transfer`", error, event)
 	}
 });
 
