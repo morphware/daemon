@@ -19,9 +19,9 @@ class JobPoster{
 
 		this.jobContract = jobFactoryContract.clone();
 		this.jobContract.options.from = this.wallet.address;
+
 		this.auctionContract = auctionFactoryContract.clone();
 		this.auctionContract.options.from = this.wallet.address;
-
 
 		this.jobID = null;
 		this.jobData = {};
@@ -47,7 +47,6 @@ class JobPoster{
 
 	async __parsePostFile(data){
 		try{
-
 			this.data.files = {};
 			let fileFields = [
 				'jupyterNotebook',
@@ -56,7 +55,7 @@ class JobPoster{
 			]
 
 			for(let field of fileFields){
-				let {magnetURI} = await seedFile(data[field]);
+				let {magnetURI} = await webtorrent.findOrSeed(data[field]);
 				this.data.files[field] = {
 					path: data[field],
 					magnetURI: magnetURI
@@ -75,16 +74,13 @@ class JobPoster{
 			// Transfer founds for the contract to hold in escrow
 			let transfer = await this.wallet.send(
 				conf.auctionFactoryContractAddress,
-				web3.utils.toWei(this.data.workerReward.toString())
+				this.data.workerReward
 			);
 
 			this.transactions.push(transfer);
 			
 			// Seed files
 			this.__parsePostFile(this.data);
-
-			// Listen for events related to this job
-			this.events();
 
 			// Calculate the auction timing
 			var biddingDeadline = Math.floor(new Date().getTime() / 1000) + parseInt(this.data.biddingTime)
@@ -95,7 +91,7 @@ class JobPoster{
 				parseInt(this.data.trainingTime),
 				parseInt(32000), // get size this.data['training-data']
 				parseInt(this.data.errorRate),
-				web3.utils.toWei(this.data.workerReward.toString()), // This is the validator, a percent of the total worker reward.
+				web3.utils.toWei((this.data.workerReward*.1).toString()),
 				biddingDeadline,
 				revealDeadline,
 				web3.utils.toWei(this.data.workerReward.toString())
@@ -105,6 +101,8 @@ class JobPoster{
 				gas: await action.estimateGas()
 			});
 
+			// Listen for events related to this job
+			this.events();
 
 			// Gather data about the job
 			this.jobData = receipt.events.JobDescriptionPosted
@@ -163,7 +161,6 @@ class JobPoster{
 
 	async shareTesting(){
 		try{
-
 			let action = this.jobContract.methods.shareTestingDataset(
 				this.jobID,
 				this.files.trainedModel.magnetURI,
@@ -179,9 +176,9 @@ class JobPoster{
 		}
 	}
 
-	async payOut(){
+	async payout(){
 		try{
-			console.log('Inside jodPosterpayOut', this.jobID)
+			console.log('Inside jodPosterpayout', this.jobID)
 			let action = this.auctionContract.methods.payout(
 				this.wallet.address,
 				job.id
@@ -207,21 +204,29 @@ class JobPoster{
 		};
 
 		this.auctionContract.events.allEvents(filter, (error, event)=>{
-			console.info(`event ${event.event} from auctionContract.`);
-			this.lastEvent = event.event;
-			this.transactions.push(event);
-			if(this[event.event]) this[event.event](event.events[event.event]);
+			try{
+				console.info(`event ${event.event} from auctionContract.`);
+				this.lastEvent = event.event;
+				this.transactions.push(event);
+				if(this[event.event]) this[event.event](parseEvent(event));
+			}catch(error){
+				console.error('job', this, 'event', event);
+			}
 		});
 
 		this.jobContract.events.allEvents(filter, (error, event)=>{
-			console.info(`event ${event.event} from jobContract.`);
-			this.lastEvent = event.event;
-			this.transactions.push(event);
-			if(this[event.event]) this[event.event](event.events[event.event]);
+			try{
+				console.info(`event ${event.event} from jobContract.`);
+				this.lastEvent = event.event;
+				this.transactions.push(event);
+				if(this[event.event]) this[event.event](parseEvent(event));
+			}catch(error){
+				console.error('job', this, 'event', event);
+			}
 		});
 	}
 
-	async auctionEndEd(event){
+	async AuctionEnded(event){
 		try{
 			console.log('Inside procAuctionEnded...', event); // XXX
 
@@ -271,12 +276,16 @@ class JobPoster{
 }
 
 // Helpers
-function seedFile(file){
-	return new Promise(function(resolve, reject){
-		webtorrent.seed(file, function(torrent){
-			resolve(torrent); // magnetURI
-		});
-	});
+function parseEvent(event){
+	/*
+	we want to get to the object that holds `returnValues`. Sometime its in the
+	event, and sometimes there is next in a `evens` object.
+	*/
+	let name = event.event;
+	if(event.events && event.events[name]){
+		return event.events[name]
+	}
+	return event;
 }
 
 module.exports = {JobPoster};
