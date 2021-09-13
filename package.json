@@ -2,17 +2,14 @@
   "name": "daemon",
   "version": "1.0.0",
   "description": "",
-  "main": "electron.js",
+  "main": "electron-prod.js",
   "scripts": {
     "start-frontend": "npm --prefix frontend start",
-    "start-backend": "npm --prefix backend start", 
-    "build": "npm --prefix frontend build",
-    "test": "npm --prefix frontend test",
-    "eject": "npm --prefix frontend eject",
+    "start-backend": "npm --prefix backend start",
+    "build": "node build.js",
     "dev": "concurrently -k \"BROWSER=none npm runstart-frontend\" \"npm:electron\" \"npm run start-backend\"",
     "electron": "wait-on tcp:3000 && electron .",
     "postinstall": "npm --prefix frontend install; npm --prefix backend install"
-
   },
   "repository": {
     "type": "git",
@@ -28,6 +25,9 @@
     "concurrently": "^6.2.1",
     "electron": "^14.0.0",
     "electron-is-dev": "^2.0.0",
-    "wait-on": "^6.0.0"
+    "electron-packager": "^15.4.0",
+    "extend": "^3.0.2",
+    "wait-on": "^6.0.0",
+    "fs-extra": "^10.0.0"
   }
 }

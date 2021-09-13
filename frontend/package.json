@@ -28,6 +28,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "build": "react-scripts build",
     "winbuild": "react-scripts build && robocopy .\\build ..\\www /MIR",
     "linbuild": "react-scripts build && cp -a ./build/. ../www/",
     "test": "react-scripts test",
