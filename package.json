@@ -1,24 +1,33 @@
 {
   "name": "daemon",
-  "version": "0.1.0",
-  "description": "Morphware desktop daemon",
-  "main": "main.js",
+  "version": "1.0.0",
+  "description": "",
+  "main": "electron.js",
   "scripts": {
-    "start": "node app.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start-frontend": "npm --prefix frontend start",
+    "start-backend": "npm --prefix backend start", 
+    "build": "npm --prefix frontend build",
+    "test": "npm --prefix frontend test",
+    "eject": "npm --prefix frontend eject",
+    "dev": "concurrently -k \"BROWSER=none npm runstart-frontend\" \"npm:electron\" \"npm run start-backend\"",
+    "electron": "wait-on tcp:3000 && electron .",
+    "postinstall": "npm --prefix frontend install; npm --prefix backend install"
+
   },
-  "author": "Kenso Trabing",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/morphware/daemon.git"
+  },
+  "author": "",
   "license": "ISC",
-  "dependencies": {
-    "diskusage": "^1.1.3",
-    "express": "^4.17.1",
-    "express-fileupload": "^1.2.1",
-    "multer": "^1.4.2",
-    "web3": "^1.3.6",
-    "webtorrent-hybrid": "^4.0.3"
+  "bugs": {
+    "url": "https://github.com/morphware/daemon/issues"
   },
+  "homepage": "https://github.com/morphware/daemon#readme",
   "devDependencies": {
-    "node-diskfree": "^0.1.0",
-    "sqlite3": "^5.0.2"
+    "concurrently": "^6.2.1",
+    "electron": "^14.0.0",
+    "electron-is-dev": "^2.0.0",
+    "wait-on": "^6.0.0"
   }
 }
