@@ -43,7 +43,7 @@ const exec = util.promisify(require('child_process').exec);
 	// console.log(await exec('npx electron-packager ./build daemon --platform=win32 --arch=x64 --out dist/ --overwrite'))
 	try{
 		// console.log(await exec('npx electron-builder install-app-deps
-		console.log(await exec('node ./node_modules/electron-builder/cli.js -w'))
+		console.log(await exec('node ./node_modules/electron-builder/cli.js -wl'))
 	}catch(error){
 		console.log('builder error', error)
 	}
