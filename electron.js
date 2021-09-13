@@ -10,8 +10,13 @@ function createWindow() {
   const win = new BrowserWindow({
     width: 1540,
     height: 850,
+    "autoHideMenuBar": true,
+    "minWidth": 1540,
+    "minHeight": 850,
     webPreferences: {
       nodeIntegration: true,
+      webSecurity: false,
+      plugins: true
     },
   });
 

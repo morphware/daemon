@@ -1,6 +1,5 @@
 'use strict';
 
-const path = require('path');
 const conf = require('../conf');
 const {web3} = require('./contract');
 var wallet = null
@@ -29,7 +28,7 @@ class MorphwareWallet{
 		this.getTransactionHistory();
 	}
 
-	static tokenAbi = require(path.resolve(conf.morphwareTokenABIPath));
+	static tokenAbi = require(`./../abi/${conf.morphwareTokenABIPath}`);
 	static tokenContract = new web3.eth.Contract(this.tokenAbi, conf.morphwareTokenContractAddress);
 	static wallets = [];
 
