@@ -4,13 +4,15 @@
   "description": "",
   "main": "electron.js",
   "scripts": {
-    "start": "npm --prefix frontend start",
+    "start-frontend": "npm --prefix frontend start",
     "start-backend": "npm --prefix backend start", 
     "build": "npm --prefix frontend build",
     "test": "npm --prefix frontend test",
     "eject": "npm --prefix frontend eject",
-    "dev": "concurrently -k \"BROWSER=none npm start\" \"npm:electron\" \"npm run start-backend\"",
-    "electron": "wait-on tcp:3000 && electron ."
+    "dev": "concurrently -k \"BROWSER=none npm runstart-frontend\" \"npm:electron\" \"npm run start-backend\"",
+    "electron": "wait-on tcp:3000 && electron .",
+    "postinstall": "npm --prefix frontend install; npm --prefix backend install"
+
   },
   "repository": {
     "type": "git",
