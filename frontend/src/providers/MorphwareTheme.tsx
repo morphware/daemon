@@ -52,7 +52,7 @@ declare module "@material-ui/core/styles/createTheme" {
 export const theme: ThemeProps = createTheme({
   palette: {
     primary: {
-      main: "#4f5b66",
+      main: "#5B676D",
     },
     secondary: {
       main: "#55341",
@@ -62,25 +62,31 @@ export const theme: ThemeProps = createTheme({
     h6: {
       // eslint-disable-next-line quotes
       fontFamily: ['"Ubuntu"', "Open Sans"].join(","),
+      fontSize: "20px",
+    },
+    body1: {
+      // eslint-disable-next-line quotes
+      fontFamily: ['"Ubuntu"', "Open Sans"].join(","),
+      fontSize: "15px",
     },
   },
   navBar: {
-    main: "#dfd7d2",
-    selected: "#a2a79b",
-    innerBorder: "#ffffff",
-    text: "#ffffff",
+    main: "#ffffff",
+    selected: "#C8C8C8",
+    innerBorder: "#afaeae",
+    text: "#4B4B4C",
   },
   paper: {
-    main: "#c0c5ce",
+    main: "#C8C8C8",
   },
   background: {
-    main: "#c0c5ce",
+    main: "#ececec",
   },
   selectedNavbar: {
     main: "#65737e",
   },
   formSectionBackground: {
-    main: "#7f95b8",
+    main: "#dbd9d9",
   },
 });
 
