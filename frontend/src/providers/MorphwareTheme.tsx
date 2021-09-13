@@ -24,6 +24,9 @@ export interface ThemeProps extends ThemeOptions {
   formSectionBackground?: {
     main: React.CSSProperties["color"];
   };
+  metaDataContainer?: {
+    main: React.CSSProperties["color"];
+  };
 }
 
 declare module "@material-ui/core/styles/createTheme" {
@@ -44,6 +47,9 @@ declare module "@material-ui/core/styles/createTheme" {
       main: React.CSSProperties["color"];
     };
     formSectionBackground?: {
+      main: React.CSSProperties["color"];
+    };
+    metaDataContainer?: {
       main: React.CSSProperties["color"];
     };
   }
@@ -87,6 +93,9 @@ export const theme: ThemeProps = createTheme({
   },
   formSectionBackground: {
     main: "#dbd9d9",
+  },
+  metaDataContainer: {
+    main: "#5B676D",
   },
 });
 
