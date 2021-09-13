@@ -105,7 +105,7 @@ const NavBar = () => {
           <NavLink
             title={navOptions.Torrents}
             icon={homeNav}
-            to="/"
+            to="/torrents"
             setSelected={setSelectedNavItem}
             selected={navOptions.Torrents === selectedNavItem}
           ></NavLink>
