@@ -62,6 +62,11 @@ const styles = makeStyles({
       curser: "pointer",
     },
   },
+  metaDataContainer: {
+    width: "100%",
+    height: "80%",
+    border: `1px solid ${theme.metaDataContainer?.main}`,
+  },
 });
 
 const FileField = ({
@@ -78,6 +83,7 @@ const FileField = ({
   const accept = acceptedValues ? acceptedValues.join(",") : "*";
 
   const form = useForm();
+  const classes = styles();
 
   const formatFileSize = (bytes: number, decimalPoint?: number) => {
     if (bytes == 0) return "0 Bytes";
@@ -130,15 +136,7 @@ const FileField = ({
       return (
         <>
           <Grid item xs={6}>
-            <Grid
-              container
-              xs={12}
-              style={{
-                width: "100%",
-                height: "80%",
-                border: "1px #dadada solid",
-              }}
-            >
+            <Grid container xs={12} className={classes.metaDataContainer}>
               <Grid
                 item
                 xs={4}
