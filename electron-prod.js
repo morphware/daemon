@@ -4,7 +4,6 @@ const path = require('path');
 
 const { app, BrowserWindow } = require('electron');
 
-const expressApp = require('./express');
 
 function createWindow() {
   // Create the browser window.
@@ -42,3 +41,5 @@ app.on('activate', () => {
     createWindow();
   }
 });
+
+const expressApp = require('./express');

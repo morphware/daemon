@@ -1,14 +1,13 @@
 'use strict';
 
-const path = require('path');
 const conf = require('../conf');
 const {web3} = require('./contract');
 const webtorrent = require('../controller/torrent');
 
-let jobFactoryAbi = require(path.resolve(conf.jobFactoryAbiPath));
+let jobFactoryAbi = require(`./../abi/${conf.jobFactoryAbiPath}`);
 let jobFactoryContract = new web3.eth.Contract(jobFactoryAbi, conf.jobFactoryContractAddress);
 
-var auctionFactoryAbi = require(path.resolve(conf.auctionFactoryABIPath));
+var auctionFactoryAbi = require(`./../abi/${conf.auctionFactoryABIPath}`);
 var auctionFactoryContract = new web3.eth.Contract(auctionFactoryAbi,conf.auctionFactoryContractAddress);
 
 

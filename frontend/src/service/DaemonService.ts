@@ -4,7 +4,7 @@ export interface IDaemonService {
 }
 
 export class DaemonService implements IDaemonService {
-  private readonly baseUrl: string = "http://127.0.0.1:3000";
+  private readonly baseUrl: string = "http://127.0.0.1:3001";
 
   constructor() {}
 
