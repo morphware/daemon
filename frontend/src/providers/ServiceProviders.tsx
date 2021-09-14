@@ -1,20 +1,33 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect, useState } from "react";
 import { ITrainingModelValuesV2 } from "../mappers/TrainModelFormMappers";
-import { ActiveTorrents, DaemonService } from "../service/DaemonService";
+import {
+  ActiveTorrents,
+  DaemonService,
+  SendMWTRequestProps,
+  WalletBalanceProps,
+  WalletHistoryProps,
+} from "../service/DaemonService";
 
 export const DaemonContext = React.createContext({} as daemonServiceProps);
 
 interface daemonServiceProps {
   daemonService: DaemonService;
   torrents?: ActiveTorrents;
+  walletBalance?: WalletBalanceProps;
+  walletHistory?: WalletHistoryProps;
   getTorrents: () => Promise<void>;
   submitTrainModelRequest(modelRequest: ITrainingModelValuesV2): Promise<void>;
+  getBalance(): Promise<void>;
+  getWalletHistory(): Promise<void>;
+  sendMWT(sendMWTRequest: SendMWTRequestProps): Promise<void>;
 }
 
 const ServiceProviders: React.FC = ({ children }) => {
   const daemonService = new DaemonService();
   const [torrents, setTorrents] = useState<ActiveTorrents>();
+  const [walletBalance, setWalletBalance] = useState<WalletBalanceProps>();
+  const [walletHistory, setWalletHistory] = useState<WalletHistoryProps>();
 
   const getTorrents = async () => {
     const torrents = await daemonService.getActiveTorrents();
@@ -22,16 +35,38 @@ const ServiceProviders: React.FC = ({ children }) => {
     setTorrents(torrents);
   };
 
+  const getBalance = async () => {
+    const walletBalanceProps = await daemonService.getMWTBalance();
+    setWalletBalance(walletBalanceProps);
+  };
+
+  const getWalletHistory = async () => {
+    const walletBalanceProps = await daemonService.getWalletHistory();
+    setWalletHistory(walletBalanceProps);
+  };
+
+  const sendMWT = async (sendMWTRequest: SendMWTRequestProps) => {
+    const transaction = await daemonService.sendMWT(sendMWTRequest);
+    return transaction;
+  };
+
   const daemonServicContext: daemonServiceProps = {
     daemonService: daemonService,
     torrents: torrents,
+    walletBalance: walletBalance,
+    walletHistory: walletHistory,
     getTorrents: getTorrents,
     submitTrainModelRequest: daemonService.submitTrainModelRequest,
+    getBalance: getBalance,
+    getWalletHistory: getWalletHistory,
+    sendMWT: sendMWT,
   };
 
   useEffect(() => {
-    console.log("Getting torrents");
+    console.log("Getting torrents, balance");
     getTorrents();
+    getBalance();
+    getWalletHistory();
   }, []);
 
   return (

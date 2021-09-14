@@ -16,7 +16,7 @@ export interface ActiveTorrents {
   torrents: Array<TorrentData>;
 }
 
-interface WalletBalanceProps {
+export interface WalletBalanceProps {
   balance: string;
   address: string;
 }
@@ -24,12 +24,12 @@ interface WalletBalanceProps {
 type TransactionProps = any;
 
 //TODO: write out entire transaction interface
-interface WalletHistoryProps {
+export interface WalletHistoryProps {
   transactions: Array<TransactionProps>;
   address: string;
 }
 
-interface SendMWTRequestProps {
+export interface SendMWTRequestProps {
   address: string;
   amount: string;
   gas: string;
