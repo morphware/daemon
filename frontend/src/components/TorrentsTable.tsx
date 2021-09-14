@@ -125,7 +125,7 @@ const headCells: HeadCell[] = [
     numeric: true,
     disablePadding: false,
     label: "Time Remaining",
-    unit: "(s)",
+    unit: "(m)",
   },
   {
     id: "magnetURI",
