@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import logo from "../assets/logoV2.png";
 import homeNav from "../assets/train.png";
+import torrentsNav from "../assets/torrents.png";
+import settings from "../assets/settings.png";
 import { Link } from "react-router-dom";
 import { theme } from "../providers/MorphwareTheme";
 import { makeStyles, Typography } from "@material-ui/core";
@@ -71,7 +73,13 @@ const NavLink = ({ to, icon, title, setSelected, selected }: NavLinkProps) => {
     <Link className={classes.itemLink} to={to}>
       <div className={className} onClick={() => setSelected(title)}>
         <div>
-          <img src={icon} alt={title} width="20%" height="20%" />
+          <img
+            style={{ color: "white" }}
+            src={icon}
+            alt={title}
+            width="35%"
+            height="35%"
+          />
         </div>
         <div className={classes.navText}>
           <Typography variant="h6">{title}</Typography>
@@ -104,14 +112,14 @@ const NavBar = () => {
           ></NavLink>
           <NavLink
             title={navOptions.Torrents}
-            icon={homeNav}
+            icon={torrentsNav}
             to="/torrents"
             setSelected={setSelectedNavItem}
             selected={navOptions.Torrents === selectedNavItem}
           ></NavLink>
           <NavLink
             title={navOptions.Settings}
-            icon={homeNav}
+            icon={settings}
             to="/settings"
             setSelected={setSelectedNavItem}
             selected={navOptions.Settings === selectedNavItem}
