@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useContext, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import clsx from "clsx";
 import {
   createStyles,
@@ -67,36 +66,6 @@ const createData = (
 ): Data => {
   return { name, progress, downloadSpeed, numPeers, timeRemaining, magnetURI };
 };
-
-const mockTorrents = [
-  {
-    name: "jupyter-notebook.html",
-    progress: 2,
-    downloadSpeed: 1,
-    numPeers: 12,
-    timeRemaining: 32,
-    magnetURI:
-      "magnet:?xt=urn:btih:f35be570c19b5e026930e97a9533ac7207f960a4&dn=jupyter-notebook.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
-  },
-  {
-    name: "training-data.html",
-    progress: 35,
-    downloadSpeed: 3,
-    numPeers: 87,
-    timeRemaining: 66,
-    magnetURI:
-      "magnet:?xt=urn:btih:7948a0c8a8407274fa5bc63219eaa061b495e5db&dn=training-data.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
-  },
-  {
-    name: "testing-data.md",
-    progress: 54,
-    downloadSpeed: 73,
-    numPeers: 2,
-    timeRemaining: 4,
-    magnetURI:
-      "magnet:?xt=urn:btih:c38689c760a42c2f4060935ebfbf6e55d42350f9&dn=testing-data.md&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
-  },
-];
 
 function descendingComparator<T>(a: T, b: T, orderBy: keyof T) {
   if (b[orderBy] < a[orderBy]) {
@@ -297,8 +266,25 @@ const EnhancedTable = () => {
   const [orderBy, setOrderBy] = React.useState<keyof Data>("progress");
   const [selected, setSelected] = React.useState<string[]>([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
+  const [dense] = React.useState(false);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+
+  const daemonService = useContext(DaemonContext);
+
+  const torrents = useMemo(() => {
+    return daemonService.torrents
+      ? daemonService.torrents?.torrents.map((torrent) =>
+          createData(
+            torrent.name,
+            torrent.progress,
+            torrent.downloadSpeed,
+            torrent.numPeers,
+            torrent.timeRemaining,
+            torrent.magnetURI
+          )
+        )
+      : [];
+  }, [daemonService.torrents]);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,
@@ -311,7 +297,7 @@ const EnhancedTable = () => {
 
   const handleSelectAllClick = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.checked) {
-      const newSelecteds = mockTorrents.map((n) => n.name);
+      const newSelecteds = torrents.map((n) => n.name);
       setSelected(newSelecteds);
       return;
     }
@@ -352,8 +338,7 @@ const EnhancedTable = () => {
   const isSelected = (name: string) => selected.indexOf(name) !== -1;
 
   const emptyRows =
-    rowsPerPage -
-    Math.min(rowsPerPage, mockTorrents.length - page * rowsPerPage);
+    rowsPerPage - Math.min(rowsPerPage, torrents.length - page * rowsPerPage);
 
   const copyToClipBoard = (torrentURI: string) => {
     navigator.clipboard.writeText(torrentURI);
@@ -376,12 +361,12 @@ const EnhancedTable = () => {
             orderBy={orderBy}
             onSelectAllClick={handleSelectAllClick}
             onRequestSort={handleRequestSort}
-            rowCount={mockTorrents.length}
+            rowCount={torrents.length}
           />
           <TableBody>
-            {stableSort(mockTorrents, getComparator(order, orderBy))
+            {stableSort(torrents, getComparator(order, orderBy))
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row, index) => {
+              .map((row) => {
                 const isItemSelected = isSelected(row.name);
                 return (
                   <TableRow
@@ -434,7 +419,7 @@ const EnhancedTable = () => {
       <TablePagination
         rowsPerPageOptions={[5]}
         component="div"
-        count={mockTorrents.length}
+        count={torrents.length}
         rowsPerPage={rowsPerPage}
         page={page}
         onPageChange={handleChangePage}

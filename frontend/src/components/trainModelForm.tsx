@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useRef, useState, useContext, useEffect } from "react";
 import { Form, Field } from "react-final-form";
 import {
@@ -20,6 +19,7 @@ import { formFieldsMapper } from "../mappers/TrainModelFormMappers";
 import { theme } from "../providers/MorphwareTheme";
 import { makeStyles } from "@material-ui/core";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;
 export type FileListProps = Array<FileProps>;
 interface FileFieldProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -83,7 +83,6 @@ const FileField = ({
   const accept = acceptedValues ? acceptedValues.join(",") : "*";
 
   const form = useForm();
-  const classes = styles();
 
   const formatFileSize = (bytes: number, decimalPoint?: number) => {
     if (bytes == 0) return "0 Bytes";
@@ -266,6 +265,7 @@ const TrainModelForm = () => {
     const formFields = formFieldsMapper(values);
     console.log("legacy fields: ", formFields);
     await daemonService.submitTrainModelRequest(formFields);
+    await daemonService.getTorrents();
   };
 
   return (
@@ -325,13 +325,13 @@ const TrainModelForm = () => {
 
               <FileField
                 name="trainingData"
-                buttonText="Upload you Training Data."
+                buttonText="Upload you Training Data"
                 acceptedValues={[".gzip", " .tar.bs", " .tar.gz", " .zip"]}
                 removeFilesSignal={removeFilesSignal}
               />
               <FileField
                 name="testingData"
-                buttonText="Upload you Testing Data."
+                buttonText="Upload you Testing Data"
                 acceptedValues={[".gzip", " .tar.bs", " .tar.gz", " .zip"]}
                 removeFilesSignal={removeFilesSignal}
               />
