@@ -1,5 +1,5 @@
 'use strict';
-const WebTorrent = require('webtorrent-hybrid');
+const WebTorrent = require('webtorrent');
 
 const webtorrent = new WebTorrent();
 
