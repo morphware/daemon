@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useRef, useState, useContext, useEffect } from "react";
 import { Form, Field } from "react-final-form";
 import {
@@ -20,6 +19,7 @@ import { formFieldsMapper } from "../mappers/TrainModelFormMappers";
 import { theme } from "../providers/MorphwareTheme";
 import { makeStyles } from "@material-ui/core";
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;
 export type FileListProps = Array<FileProps>;
 interface FileFieldProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -61,6 +61,11 @@ const styles = makeStyles({
     "&:hover": {
       curser: "pointer",
     },
+  },
+  metaDataContainer: {
+    width: "100%",
+    height: "80%",
+    border: `1px solid ${theme.metaDataContainer?.main}`,
   },
 });
 
@@ -105,15 +110,10 @@ const FileField = ({
   };
 
   const removeUploadedFile = () => {
-    console.log("inputRef before VALUE: ", inputRef?.current);
-    console.log("values before: ", form.getState().values);
-
     if (inputRef.current?.files) {
       inputRef.current.value = "";
       setFileUploaded(false);
       form.change(name, undefined);
-      console.log("inputRef after: ", inputRef.current.value);
-      console.log("values after: ", form.getState().values);
     }
   };
 
@@ -130,15 +130,7 @@ const FileField = ({
       return (
         <>
           <Grid item xs={6}>
-            <Grid
-              container
-              xs={12}
-              style={{
-                width: "100%",
-                height: "80%",
-                border: "1px #dadada solid",
-              }}
-            >
+            <Grid container xs={12} className={classes.metaDataContainer}>
               <Grid
                 item
                 xs={4}
@@ -202,8 +194,6 @@ const FileField = ({
     }
     return <Grid item className="empty" xs={8} />;
   };
-
-  console.log("inputRef FIRST:", inputRef);
 
   return (
     <Grid
@@ -275,6 +265,7 @@ const TrainModelForm = () => {
     const formFields = formFieldsMapper(values);
     console.log("legacy fields: ", formFields);
     await daemonService.submitTrainModelRequest(formFields);
+    await daemonService.getTorrents();
   };
 
   return (
@@ -314,56 +305,47 @@ const TrainModelForm = () => {
           onSubmit={handleSubmit}
           style={{ height: "100%" }}
         >
-          <Paper
-            className="form-paper"
-            style={{
-              padding: 50,
-              height: "calc(100vh - 50px)",
-              paddingBottom: 0,
-              backgroundColor: theme.background?.main,
-            }}
-          >
-            <Grid container alignItems="flex-start" spacing={2}>
-              <Paper
-                style={{
-                  padding: 30,
-                  height: "fit-content",
-                  width: "100%",
-                  backgroundColor: theme.formSectionBackground?.main,
-                  marginBottom: 50,
-                }}
-                elevation={3}
-              >
-                <FileField
-                  name="jupyterNotebook"
-                  buttonText="Upload your Jupyter Notebook"
-                  acceptedValues={[".py", " .ipymb"]}
-                  removeFilesSignal={removeFilesSignal}
-                />
+          <Grid container alignItems="flex-start" spacing={2}>
+            <Paper
+              style={{
+                padding: 30,
+                height: "fit-content",
+                width: "100%",
+                backgroundColor: theme.formSectionBackground?.main,
+                marginBottom: 50,
+              }}
+              elevation={3}
+            >
+              <FileField
+                name="jupyterNotebook"
+                buttonText="Upload your Jupyter Notebook"
+                acceptedValues={[".py", " .ipymb"]}
+                removeFilesSignal={removeFilesSignal}
+              />
 
-                <FileField
-                  name="trainingData"
-                  buttonText="Upload you Training Data."
-                  acceptedValues={[".gzip", " .tar.bs", " .tar.gz", " .zip"]}
-                  removeFilesSignal={removeFilesSignal}
-                />
-                <FileField
-                  name="testingData"
-                  buttonText="Upload you Testing Data."
-                  acceptedValues={[".gzip", " .tar.bs", " .tar.gz", " .zip"]}
-                  removeFilesSignal={removeFilesSignal}
-                />
-              </Paper>
-              <Paper
-                style={{
-                  padding: 30,
-                  width: "100%",
-                  backgroundColor: theme.formSectionBackground?.main,
-                }}
-                elevation={3}
-              >
-                <Grid container alignItems="flex-start" spacing={2}>
-                  {/* <Grid item xs={4} style={{ textAlign: "start" }}>
+              <FileField
+                name="trainingData"
+                buttonText="Upload you Training Data"
+                acceptedValues={[".gzip", " .tar.bs", " .tar.gz", " .zip"]}
+                removeFilesSignal={removeFilesSignal}
+              />
+              <FileField
+                name="testingData"
+                buttonText="Upload you Testing Data"
+                acceptedValues={[".gzip", " .tar.bs", " .tar.gz", " .zip"]}
+                removeFilesSignal={removeFilesSignal}
+              />
+            </Paper>
+            <Paper
+              style={{
+                padding: 30,
+                width: "100%",
+                backgroundColor: theme.formSectionBackground?.main,
+              }}
+              elevation={3}
+            >
+              <Grid container alignItems="flex-start" spacing={2}>
+                {/* <Grid item xs={4} style={{ textAlign: "start" }}>
                     <Typography variant="h6">
                       How will your model stop training?
                     </Typography>
@@ -386,145 +368,144 @@ const TrainModelForm = () => {
                       ]}
                     />
                   </Grid> */}
-                  <Grid item xs={4} style={{ textAlign: "start" }}>
-                    <Typography variant="h6">
-                      How will it stop training?
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Radios
-                      name="stopTrainingAutomatic"
-                      required={true}
-                      gridSize={6}
-                      color="primary"
-                      data={[
-                        {
-                          label: "Error rate will reach a threshold value",
-                          value: "threshold_value",
-                        },
-                        {
-                          label: "Error rate will stop meaningfully decreasing",
-                          value: "threshold_slope",
-                        },
-                        {
-                          label: "Maximum number of epochs (not fallback)",
-                          value: "max_num_epochs",
-                        },
-                        { label: "Other", value: "other" },
-                      ]}
-                    />
-                  </Grid>
-                  <Grid item xs={4} style={{ textAlign: "start" }}>
-                    <Typography variant="h6">Job Specification</Typography>
-                  </Grid>
-                  <Grid container />
-                  <Grid container xs={8} spacing={2}>
-                    <Grid item xs={6}>
-                      <TextField
-                        label="Training Time (estimate)"
-                        name="trainingTime"
-                        required={true}
-                        type="number"
-                        style={{
-                          width: "80%",
-                          display: "flex",
-                          justifyContent: "flex-start",
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        label="Error Rate"
-                        name="errorRate"
-                        required={true}
-                        type="number"
-                        style={{
-                          width: "80%",
-                          display: "flex",
-                          justifyContent: "flex-start",
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        label="Bidding Time"
-                        name="biddingTime"
-                        required={true}
-                        type="number"
-                        style={{
-                          width: "80%",
-                          display: "flex",
-                          justifyContent: "flex-start",
-                        }}
-                      />
-                    </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        label="Bounty"
-                        name="workerReward"
-                        type="number"
-                        required={true}
-                        style={{
-                          width: "80%",
-                          display: "flex",
-                          justifyContent: "flex-start",
-                        }}
-                      />
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={4}>
-                    <Radios
-                      name="testModel"
-                      required={true}
-                      gridSize={7}
-                      color="primary"
-                      data={[
-                        {
-                          label: "Test Model",
-                          value: "yes",
-                        },
-                        {
-                          label: "Do not Test Model",
-                          value: "no",
-                        },
-                      ]}
-                    />
-                  </Grid>
+                <Grid item xs={4} style={{ textAlign: "start" }}>
+                  <Typography variant="h6">
+                    How will it stop training?
+                  </Typography>
                 </Grid>
-              </Paper>
-              <Grid
-                container
-                xs={12}
-                style={{ marginTop: 16 }}
-                justifyContent="flex-end"
-              >
-                <Grid item style={{ paddingRight: 16 }}>
-                  <Button
-                    type="button"
-                    variant="contained"
-                    onClick={() => {
-                      form.reset();
-                      setRemoveFilesSignal(!removeFilesSignal);
-                    }}
-                    disabled={submitting || pristine}
-                  >
-                    Reset
-                  </Button>
-                </Grid>
-                <Grid item>
-                  <Button
-                    type="submit"
-                    variant="contained"
+                <Grid item xs={8}>
+                  <Radios
+                    name="stopTrainingAutomatic"
+                    required={true}
+                    gridSize={6}
                     color="primary"
-                    disabled={submitting}
-                  >
-                    SUBMIT
-                  </Button>
+                    data={[
+                      {
+                        label: "Error rate will reach a threshold value",
+                        value: "threshold_value",
+                      },
+                      {
+                        label: "Error rate will stop meaningfully decreasing",
+                        value: "threshold_slope",
+                      },
+                      {
+                        label: "Maximum number of epochs (not fallback)",
+                        value: "max_num_epochs",
+                      },
+                      { label: "Other", value: "other" },
+                    ]}
+                  />
+                </Grid>
+                <Grid item xs={4} style={{ textAlign: "start" }}>
+                  <Typography variant="h6">Job Specification</Typography>
+                </Grid>
+                <Grid container />
+                <Grid container xs={8} spacing={2}>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Training Time (estimate)"
+                      name="trainingTime"
+                      required={true}
+                      type="number"
+                      style={{
+                        width: "80%",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Error Rate"
+                      name="errorRate"
+                      required={true}
+                      type="number"
+                      style={{
+                        width: "80%",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Bidding Time"
+                      name="biddingTime"
+                      required={true}
+                      type="number"
+                      style={{
+                        width: "80%",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                      }}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Bounty"
+                      name="workerReward"
+                      type="number"
+                      required={true}
+                      style={{
+                        width: "80%",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                      }}
+                    />
+                  </Grid>
+                </Grid>
+                <Grid item xs={4}>
+                  <Radios
+                    name="testModel"
+                    required={true}
+                    gridSize={7}
+                    color="primary"
+                    data={[
+                      {
+                        label: "Test Model",
+                        value: "yes",
+                      },
+                      {
+                        label: "Do not Test Model",
+                        value: "no",
+                      },
+                    ]}
+                  />
                 </Grid>
               </Grid>
-              <Grid item style={{ marginTop: 16 }}></Grid>
+            </Paper>
+            <Grid
+              container
+              xs={12}
+              style={{ marginTop: 16 }}
+              justifyContent="flex-end"
+            >
+              <Grid item style={{ paddingRight: 16 }}>
+                <Button
+                  type="button"
+                  variant="contained"
+                  onClick={() => {
+                    form.reset();
+                    setRemoveFilesSignal(!removeFilesSignal);
+                  }}
+                  disabled={submitting || pristine}
+                >
+                  Reset
+                </Button>
+              </Grid>
+              <Grid item>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={submitting}
+                >
+                  SUBMIT
+                </Button>
+              </Grid>
             </Grid>
-          </Paper>
+            <Grid item style={{ marginTop: 16 }}></Grid>
+          </Grid>
         </form>
       )}
     />

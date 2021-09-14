@@ -8,6 +8,7 @@
     "start-backend": "npm --prefix backend start",
     "build": "node build.js",
     "dev": "concurrently -k \"BROWSER=none npm run start-frontend\" \"npm:electron\" \"npm run start-backend\"",
+    "windev": "concurrently -k \"cross-env BROWSER=none npm run start-frontend\" \"npm:electron\" \"npm run start-backend\"",
     "electron": "wait-on tcp:3000 && electron .",
     "postinstall": "npm --prefix frontend install && npm --prefix backend install && electron-builder install-app-deps",
     "flatpak64": "electron-installer-flatpak --src dist/morphware-linux-x64/ --dest dist/installers/ --arch x64"
@@ -37,18 +38,24 @@
   },
   "build": {
     "appId": "com.electron.morphware",
-    "productName" : "Morphware Wallet",
+    "productName": "Morphware Wallet",
     "npmRebuild": true,
     "copyright": "Copyright © 2021 Morphware, LLC",
-    "directories":{
+    "directories": {
       "app": "build",
       "output": "dist"
     },
-    "win":{
-      "target": ["portable"]
+    "win": {
+      "target": [
+        "portable"
+      ]
     },
     "linux": {
-      "target": ["AppImage", "deb", "rpm"]
+      "target": [
+        "AppImage",
+        "deb",
+        "rpm"
+      ]
     }
   }
 }
