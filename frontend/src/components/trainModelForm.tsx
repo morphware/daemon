@@ -325,13 +325,13 @@ const TrainModelForm = () => {
 
               <FileField
                 name="trainingData"
-                buttonText="Upload you Training Data"
+                buttonText="Upload your Training Data"
                 acceptedValues={[".gzip", " .tar.bs", " .tar.gz", " .zip"]}
                 removeFilesSignal={removeFilesSignal}
               />
               <FileField
                 name="testingData"
-                buttonText="Upload you Testing Data"
+                buttonText="Upload your Testing Data"
                 acceptedValues={[".gzip", " .tar.bs", " .tar.gz", " .zip"]}
                 removeFilesSignal={removeFilesSignal}
               />
