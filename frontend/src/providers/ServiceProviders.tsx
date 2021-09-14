@@ -12,19 +12,13 @@ interface daemonServiceProps {
   submitTrainModelRequest(modelRequest: ITrainingModelValuesV2): Promise<void>;
 }
 
-// const mockTorrentsCallback: Promise<ActiveTorrents> = async () => {
-//   return await setTimeout(() =>{
-//     return Promise.resolve(mockTorrents);
-//   }, 2000);
-// };
-
 const ServiceProviders: React.FC = ({ children }) => {
   const daemonService = new DaemonService();
   const [torrents, setTorrents] = useState<ActiveTorrents>();
 
   const getTorrents = async () => {
     const torrents = await daemonService.getActiveTorrents();
-    // const torrents = await mockTorrentsCallback();
+    console.log("getting torernts");
     setTorrents(torrents);
   };
 

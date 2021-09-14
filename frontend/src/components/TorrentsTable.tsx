@@ -19,12 +19,9 @@ import Toolbar from "@material-ui/core/Toolbar";
 import Typography from "@material-ui/core/Typography";
 import Paper from "@material-ui/core/Paper";
 import IconButton from "@material-ui/core/IconButton";
-import Tooltip from "@material-ui/core/Tooltip";
-import DeleteIcon from "@material-ui/icons/Delete";
-import FilterListIcon from "@material-ui/icons/FilterList";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
-import { theme, ThemeProps } from "../providers/MorphwareTheme";
-import { Box, Button } from "@material-ui/core";
+import { theme } from "../providers/MorphwareTheme";
+import { Box } from "@material-ui/core";
 import RefreshIcon from "@material-ui/icons/Refresh";
 import { DaemonContext } from "../providers/ServiceProviders";
 
@@ -165,7 +162,7 @@ const headCells: HeadCell[] = [
     id: "magnetURI",
     numeric: true,
     disablePadding: false,
-    label: "magnet URI",
+    label: "Magnet URI",
   },
 ];
 
@@ -252,12 +249,6 @@ const EnhancedTableToolbar = (props: EnhancedTableToolbarProps) => {
         [classes.highlight]: numSelected > 0,
       })}
     >
-      {/* <Typography
-        className={classes.title}
-        variant="h6"
-        id="tableTitle"
-        component="div"
-      >asd</Typography> */}
       <Box
         style={{
           display: "flex",
@@ -369,7 +360,7 @@ const EnhancedTable = () => {
   };
 
   return (
-    <Paper className={classes.paper}>
+    <Paper className={classes.paper} elevation={3}>
       <EnhancedTableToolbar numSelected={selected.length} />
       <TableContainer>
         <Table
@@ -392,8 +383,6 @@ const EnhancedTable = () => {
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((row, index) => {
                 const isItemSelected = isSelected(row.name);
-                const labelId = `enhanced-table-checkbox-${index}`;
-
                 return (
                   <TableRow
                     hover
@@ -403,6 +392,7 @@ const EnhancedTable = () => {
                     tabIndex={-1}
                     key={row.name}
                     selected={isItemSelected}
+                    style={{ borderBottom: "1px solid black" }}
                   >
                     <TableCell align="right">
                       <Typography variant="body1">{row.name}</Typography>
@@ -427,7 +417,7 @@ const EnhancedTable = () => {
                       <IconButton
                         onClick={() => copyToClipBoard(row.magnetURI)}
                       >
-                        <FileCopyIcon fontSize="large" color="secondary" />
+                        <FileCopyIcon fontSize="medium" color="secondary" />
                       </IconButton>
                     </TableCell>
                   </TableRow>

@@ -1,6 +1,6 @@
 import { createStyles, makeStyles } from "@material-ui/core";
 import React from "react";
-import TrainModelForm from "../components/TrainModelForm";
+import TrainModelForm from "../components/trainModelForm";
 import { theme } from "../providers/MorphwareTheme";
 import "./TrainModel.css";
 

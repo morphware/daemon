@@ -305,15 +305,6 @@ const TrainModelForm = () => {
           onSubmit={handleSubmit}
           style={{ height: "100%" }}
         >
-          {/* <Paper
-            className="form-paper"
-            style={{
-              padding: 50,
-              height: "calc(100vh - 50px)",
-              paddingBottom: 0,
-              backgroundColor: theme.background?.main,
-            }}
-          > */}
           <Grid container alignItems="flex-start" spacing={2}>
             <Paper
               style={{
@@ -515,7 +506,6 @@ const TrainModelForm = () => {
             </Grid>
             <Grid item style={{ marginTop: 16 }}></Grid>
           </Grid>
-          {/* </Paper> */}
         </form>
       )}
     />
