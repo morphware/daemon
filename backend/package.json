@@ -12,6 +12,7 @@
     "email": "engineering@morphware.com"
   },
   "dependencies": {
+    "args": "^5.0.1",
     "check-disk-space": "^3.0.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
