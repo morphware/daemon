@@ -1,4 +1,4 @@
-import { formFields } from "../components/TrainModelForm";
+import { formFields } from "../components/trainModelForm";
 
 export interface ITrainingModelValuesV2 {
   jupyterNotebook: string;
