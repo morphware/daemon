@@ -3,7 +3,7 @@ import logo from "../assets/logoV2.png";
 import homeNav from "../assets/train.png";
 import { Link } from "react-router-dom";
 import { theme } from "../providers/MorphwareTheme";
-import { makeStyles } from "@material-ui/core";
+import { makeStyles, Typography } from "@material-ui/core";
 
 enum navOptions {
   Train = "Train",
@@ -73,7 +73,9 @@ const NavLink = ({ to, icon, title, setSelected, selected }: NavLinkProps) => {
         <div>
           <img src={icon} alt={title} width="20%" height="20%" />
         </div>
-        <div className={classes.navText}>{title}</div>
+        <div className={classes.navText}>
+          <Typography variant="h6">{title}</Typography>
+        </div>
       </div>
     </Link>
   );
@@ -85,8 +87,6 @@ const NavBar = () => {
   );
 
   const classes = styles();
-  console.log("Classes: ", classes);
-  console.log("theme: ", theme);
 
   return (
     <div className={classes.navContainer}>
@@ -105,7 +105,7 @@ const NavBar = () => {
           <NavLink
             title={navOptions.Torrents}
             icon={homeNav}
-            to="/"
+            to="/torrents"
             setSelected={setSelectedNavItem}
             selected={navOptions.Torrents === selectedNavItem}
           ></NavLink>

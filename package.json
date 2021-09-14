@@ -8,7 +8,8 @@
     "start-backend": "npm --prefix backend start",
     "build": "node build.js",
     "dev": "concurrently -k \"BROWSER=none npm run start-frontend\" \"npm:electron\" \"npm run start-backend\"",
-    "electron": "wait-on tcp:3000 && electron ."
+    "electron": "wait-on tcp:3000 && electron .",
+    "windev": "concurrently -k \"cross-env BROWSER=none npm run start-frontend\" \"npm:electron\" \"npm run start-backend\""
   },
   "repository": {
     "type": "git",
