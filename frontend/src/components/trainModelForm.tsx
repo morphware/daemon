@@ -105,15 +105,10 @@ const FileField = ({
   };
 
   const removeUploadedFile = () => {
-    console.log("inputRef before VALUE: ", inputRef?.current);
-    console.log("values before: ", form.getState().values);
-
     if (inputRef.current?.files) {
       inputRef.current.value = "";
       setFileUploaded(false);
       form.change(name, undefined);
-      console.log("inputRef after: ", inputRef.current.value);
-      console.log("values after: ", form.getState().values);
     }
   };
 
@@ -202,8 +197,6 @@ const FileField = ({
     }
     return <Grid item className="empty" xs={8} />;
   };
-
-  console.log("inputRef FIRST:", inputRef);
 
   return (
     <Grid

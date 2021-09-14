@@ -85,8 +85,6 @@ const NavBar = () => {
   );
 
   const classes = styles();
-  console.log("Classes: ", classes);
-  console.log("theme: ", theme);
 
   return (
     <div className={classes.navContainer}>

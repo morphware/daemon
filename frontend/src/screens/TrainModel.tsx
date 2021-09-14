@@ -3,7 +3,6 @@ import React from "react";
 import TrainModelForm from "../components/TrainModelForm";
 import { theme } from "../providers/MorphwareTheme";
 import "./TrainModel.css";
-import TrainModelForm from "../components/trainModelForm"; //"./components/TrainModelForm";
 
 const styles = makeStyles(() =>
   createStyles({
