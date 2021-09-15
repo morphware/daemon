@@ -84,6 +84,7 @@ const ServiceProviders: React.FC = ({ children }) => {
   useEffect(() => {
     const interval = setInterval(async () => {
       await getConnectionStatus();
+      await getBalance();
     }, 10000);
     return () => clearInterval(interval);
   }, []);
