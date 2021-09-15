@@ -8,7 +8,7 @@ import { Route, Switch } from "react-router-dom";
 import ServiceProviders from "./providers/ServiceProviders";
 import { MorphwareTheme } from "./providers/MorphwareTheme";
 import { Box } from "@material-ui/core";
-import WalletInfo from "./components/WalletInfo";
+import WalletInfo from "./components/WalletFooterInfo";
 
 const App = () => {
   return (

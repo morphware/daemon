@@ -8,6 +8,7 @@ import { Link } from "react-router-dom";
 import { theme } from "../providers/MorphwareTheme";
 import { Grid, IconButton, makeStyles, Typography } from "@material-ui/core";
 import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
+import WalletModal from "../components/WalletModal";
 
 enum navOptions {
   Train = "Train",
@@ -144,7 +145,7 @@ const NavBar = () => {
           padding: "20px",
         }}
       >
-        <IconButton
+        {/* <IconButton
           style={{ width: "fit-content" }}
           // onClick={updateTorrents} disabled={fetchingTorrents}
         >
@@ -152,7 +153,8 @@ const NavBar = () => {
             style={{ fontSize: 48 }}
             color="secondary"
           />
-        </IconButton>
+        </IconButton> */}
+        <WalletModal />
       </Grid>
     </Grid>
   );

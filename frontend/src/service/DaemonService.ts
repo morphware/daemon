@@ -21,7 +21,27 @@ export interface WalletBalanceProps {
   address: string;
 }
 
-type TransactionProps = any;
+export interface TransactionProps {
+  address: string;
+  blockHash: string;
+  blockNumber: number;
+  data: string;
+  logIndex: number;
+  removed: boolean;
+  topics: Array<string>;
+  transactionHash: string;
+  transactionIndex: number;
+  id: string;
+  returnValues: {
+    0: string;
+    1: string;
+    2: string;
+    __length__: number;
+    from: string;
+    to: string;
+    value: string;
+  };
+}
 
 //TODO: write out entire transaction interface
 export interface WalletHistoryProps {
