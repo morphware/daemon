@@ -1,6 +1,8 @@
 'use strict';
 
 const extend = require('extend');
+const fs = require('fs-extra');
+var args = require('args');
 
 const environment = process.env.NODE_ENV || 'development';
 
@@ -12,7 +14,7 @@ function load(filePath, required){
 			console.error(`Loading ${filePath} file failed!\n`, error);
 			process.exit(1);
 		} else if (error.code === 'MODULE_NOT_FOUND'){
-			console.warn(`No config file ${filePath} FOUND! This may cause issues...`);
+			console.warn(`No config file ${filePath}! This may cause issues...`);
 			if (required){
 				process.exit(1);
 			}
@@ -23,10 +25,33 @@ function load(filePath, required){
 	}
 };
 
+var conf = load('./base', true);
+
+
+if(!fs.pathExistsSync('./conf/secrets.js')){
+	var appDataPath = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
+	appDataPath += `/${conf.appName}/${environment}/local.json`
+	
+	conf.localAppData = appDataPath;
+
+	if(!fs.pathExistsSync(appDataPath)){
+		console.log('making appData file ', appDataPath);
+		fs.ensureDirSync(appDataPath.replace('/local.json', ''));
+		fs.writeJsonSync(appDataPath, {});
+	}
+}
+
+args
+  .option('httpPort', 'http port')
+  .option('wallet', 'Wallet Object', undefined, value=>{
+  	return JSON.parse(value);
+  });
+
 module.exports = extend(
 	true, // enable deep copy
-	load('./base', true),
-	load(`./${environment}`),
-	load('./secrets'),
+	conf, // Base conf gets loaded fist
+	load(`./${environment}`), // Load any environment settings
+	load(conf.localAppData || './secrets'), // Load local settings
+	args.parse(process.argv), // Settings applied at runtime trump all!
 	{environment}
 );

@@ -5,13 +5,13 @@
   "main": "electron.js",
   "scripts": {
     "start-frontend": "npm --prefix frontend start",
-    "start-backend": "npm --prefix backend start",
+    "start-backend": "npm --prefix backend start --",
     "build": "node build.js",
-    "dev": "concurrently -k \"BROWSER=none npm run start-frontend\" \"npm:electron\" \"npm run start-backend\"",
-    "windev": "concurrently -k \"cross-env BROWSER=none npm run start-frontend\" \"npm:electron\" \"npm run start-backend\"",
+    "dev": "node devRun.js",
+    "dev-old": "concurrently -k \"BROWSER=none npm run start-frontend\" \"npm:electron\" \"npm run start-backend\" --",
     "electron": "wait-on tcp:3000 && electron .",
-    "postinstall": "npm --prefix frontend install && npm --prefix backend install && electron-builder install-app-deps",
-    "flatpak64": "electron-installer-flatpak --src dist/morphware-linux-x64/ --dest dist/installers/ --arch x64"
+    "windev": "concurrently -k \"cross-env BROWSER=none npm run start-frontend\" \"npm:electron\" \"npm run start-backend\"",
+    "postinstall": "npm --prefix backend install && npm --prefix frontend install"
   },
   "repository": {
     "type": "git",
@@ -27,22 +27,22 @@
   "homepage": "https://github.com/morphware/daemon#readme",
   "devDependencies": {
     "concurrently": "^6.2.1",
-    "electron": "^14.0.0",
+    "electron": "^14.0.1",
     "electron-builder": "^22.11.7",
-    "electron-installer-flatpak": "^0.8.0",
     "electron-is-dev": "^2.0.0",
-    "electron-packager": "^15.4.0",
+    "eletcron": "^0.0.1-security",
     "extend": "^3.0.2",
     "fs-extra": "^10.0.0",
+    "node-gyp": "^8.2.0",
+    "nodemon": "^2.0.12",
     "wait-on": "^6.0.0"
   },
   "build": {
     "appId": "com.electron.morphware",
-    "productName": "Morphware Wallet",
-    "npmRebuild": true,
+    "productName": "MorphwareWallet",
     "copyright": "Copyright © 2021 Morphware, LLC",
     "directories": {
-      "app": "build",
+      "app": "app-src",
       "output": "dist"
     },
     "win": {

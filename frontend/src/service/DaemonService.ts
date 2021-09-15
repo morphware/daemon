@@ -67,7 +67,7 @@ export interface IDaemonService {
   getConnectionStatus(): Promise<ConnectionStatusProps>;
 }
 export class DaemonService implements IDaemonService {
-  private readonly baseUrl: string = "http://127.0.0.1:3001";
+  private readonly baseUrl: string = "http://" + window.localStorage.getItem("url") || "127.0.0.1:3001";
 
   constructor() {}
 

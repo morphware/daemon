@@ -5,45 +5,44 @@ const extend = require('extend');
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
 
-
-
 (async function(){
 	// Will we need to merge the package.json files so electron can build with
 	//the correct packages
 	const basePackage = require('./package');
 	const daemonPackage = require('./backend/package');
-	const buildPackage = extend(true, daemonPackage, {main: 'electron-prod.js', scripts:{postinstall:null}});
+	const buildPackage = extend(true, daemonPackage, {/*devDependencies: basePackage.devDependencies,*/ main: 'electron-prod.js', scripts:{postinstall:null}});
 
-	// Remove old build contents
-	await fs.remove('./build');
+	console.info('Remove old build contents');
+	await fs.remove('./app-src');
 
-	// Grab the backend
-	await fs.copy('./backend', './build/');
+	console.info('Grab the backend')
+	await fs.copy('./backend', './app-src/');
 	
-	// Clean up build directory 
-	await fs.remove('./build/node_modules');
-	await fs.remove('./build/package-lock.json');
+	console.info('Clean up build directory ')
+	await fs.remove('./app-src/node_modules');
+	await fs.remove('./app-src/package-lock.json');
+	await fs.remove('./app-src/conf/secrets.js');
 
-	// Write the new package.json
-	await fs.writeJson('./build/package.json', buildPackage);
-	
-	// Install a clean copy of the packages
-	// console.log(await exec(`npm --prefix build install`));
+	console.info('Write the new package.json');
+	await fs.writeJson('./app-src/package.json', buildPackage, {spaces: 2});
 
-	// Grab the electron run file
-	await fs.copy('./electron-prod.js', './build/electron-prod.js');
+	console.info('Grab the electron run file')
+	await fs.copy('./electron-prod.js', './app-src/electron-prod.js');
 
-	// Build the frontend
-	console.log(await exec(`npm --prefix frontend run build`));
+	console.info('Build the frontend');
+	let frontEndBuild = await exec(`npm --prefix frontend run build`)
+	console.log(!frontEndBuild.stderr ? 'success' : frontEndBuild.stderr );
 
-	// Add the front end to the build
-	await fs.move('./frontend/build', './build/www');
+	console.info('Move the fronend files to the build directory.');
+	await fs.move('./frontend/build', './app-src/www');
 
-	// Build!
-	// console.log(await exec('npx electron-packager ./build daemon --platform=win32 --arch=x64 --out dist/ --overwrite'))
 	try{
-		// console.log(await exec('npx electron-builder install-app-deps
-		console.log(await exec('node ./node_modules/electron-builder/cli.js -wl'))
+		// console.info('Install build Dependencies');
+		// console.log(await exec('npm --prefix app-src install'));
+		// console.log(await exec('./app-src/node_modules/.bin/electron-builder install-app-deps'));
+
+		console.info('Building')
+		console.log(await exec('./node_modules/.bin/electron-builder -wl'));
 	}catch(error){
 		console.log('builder error', error)
 	}
