@@ -27,17 +27,16 @@ function startBackend(){
 			console.error('Wxpress failed, killing dev server');
 			console.error('Wxpress exited with code: ' + code);
 			killAll();
-			// process.exit(1);
 		});
 	}catch(error){
 		console.error('backend died', error);
 		killAll();
-		// process.exit(1);
 	}
 };
 
 function startReact(){
 	let eleteronLock = false
+	let doKill = true
 	try{
 		let child = spawn('npm', ['start'], {
 			cwd: BASE_DIR+'/frontend',
@@ -50,27 +49,31 @@ function startReact(){
 		tasks.push(child);
 
 		child.stdout.on('data', function(data){
-		 	console.log(data.toString());
+		 	console.log('std', data.toString());
 		 	if(!eleteronLock && data.toString().includes('Compiled successfully!')){
 		 		startElectron();
 		 		eleteronLock = true;
 		 	}	
+		 	if(!eleteronLock && data.toString().includes('Something is already running on port')){
+		 		startElectron();
+		 		doKill = false;
+		 		eleteronLock = true;
+		 		child.kill();
+		 	}
 		});
 
 		child.stderr.on('data', function(data){
-		 	console.error(data.toString());
+		 	console.error('error', data.toString());
 		});
 
 		child.on('exit', function(code){
-			console.error('Webpack failed, killing dev server');
-			console.error('Webpack exited with code: ' + code);
-			killAll();
-			// process.exit(1);
+			console.error('React exited with code'. code,);
+			if(doKill) killAll();
+
 		});
 	}catch(error){
 		console.error('React died', error);
 		killAll();
-		// process.exit(1);
 	}
 };
 
@@ -101,7 +104,7 @@ function startElectron(){
 			console.error('Webpack exited with code: ' + code);
 
 			killAll();
-			// process.exit(1);
+
 		});	
 	}catch(error){
 		console.error('electron died')
@@ -114,6 +117,7 @@ function killAll(){
 	for(let task of tasks){
 		task.kill();
 	}
+	process.exit(1);
 }
 
 startBackend();
