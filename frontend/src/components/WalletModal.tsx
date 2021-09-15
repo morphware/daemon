@@ -4,19 +4,14 @@ import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
 // import { useSpring, animated } from "react-spring/web.cjs"; // web.cjs is required for IE 11 support
-import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  TextField,
-  Typography,
-} from "@material-ui/core";
+import { Box, Button, Grid, IconButton, Typography } from "@material-ui/core";
 import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
 import { useSpring, animated } from "react-spring";
 import { DaemonContext } from "../providers/ServiceProviders";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import { Form } from "react-final-form";
+import { TextField } from "mui-rff";
+import { SendMWTRequestProps } from "../service/DaemonService";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -94,14 +89,46 @@ const WalletModal = () => {
       navigator.clipboard.writeText(daemonService.walletAddress);
   };
 
-  const sendMWT = () => {};
+  const sendMWT = async (values: SendMWTRequestProps) => {
+    console.log("values: ", values);
+    const transaction = await daemonService.sendMWT(values);
+  };
 
-  const historyTransaction = () => {};
+  const historyTransaction = async () => {
+    daemonService.sendMWT;
+  };
 
   const SendMWTForm = () => {
     return (
       <Form
         onSubmit={sendMWT}
+        validate={(values: SendMWTRequestProps) => {
+          const errors = {} as SendMWTRequestProps;
+          const amount = parseFloat(values.amount);
+          // const gas = values.gas parseFloat(values.gas);
+          var gas;
+          if (values.gas) {
+            gas = parseFloat(values.gas);
+          }
+          const walletBalance = daemonService.walletBalance
+            ? parseFloat(daemonService.walletBalance)
+            : 0;
+
+          if (!values.address) {
+            //Check if a valid address
+          }
+          if (amount <= 0) {
+            errors.amount = "Invalid amount";
+          }
+          if (amount > walletBalance) {
+            errors.amount = "Insufficient Funds";
+          }
+          if (gas && gas <= 0) {
+            errors.gas = "Invalid amount";
+          }
+
+          return errors;
+        }}
         render={({ handleSubmit, form, submitting, pristine }) => (
           <form
             className="frm_upload"
@@ -122,14 +149,18 @@ const WalletModal = () => {
               >
                 Recipient
               </Grid>
-              <Grid item justifyContent="center" style={{ display: "flex" }}>
+              <Grid
+                item
+                justifyContent="center"
+                style={{ display: "flex", width: "100%" }}
+              >
                 <TextField
-                  name="recipient"
+                  name="address"
                   required={true}
                   type="text"
                   variant="outlined"
                   style={{
-                    width: "95%",
+                    width: "100%",
                     display: "flex",
                     justifyContent: "center",
                   }}
@@ -143,40 +174,48 @@ const WalletModal = () => {
               >
                 Amount
               </Grid>
-              <Grid item justifyContent="center" style={{ display: "flex" }}>
+              <Grid
+                item
+                justifyContent="center"
+                style={{ display: "flex", width: "100%" }}
+              >
                 <TextField
-                  name="biddingTime"
+                  name="amount"
                   required={true}
                   type="number"
                   variant="outlined"
                   style={{
-                    width: "95%",
+                    width: "100%",
                     display: "flex",
                     justifyContent: "center",
                   }}
                 />
-              </Grid>{" "}
+              </Grid>
               <Grid
                 container
                 xs={12}
                 style={{ marginTop: 5 }}
                 justifyContent="center"
               >
-                Gas
+                Gas Limit
               </Grid>
-              <Grid item justifyContent="center" style={{ display: "flex" }}>
+              <Grid
+                item
+                justifyContent="center"
+                style={{ display: "flex", width: "100%" }}
+              >
                 <TextField
                   name="gas"
-                  required={true}
+                  // required={true}
                   type="number"
                   variant="outlined"
                   style={{
-                    width: "95%",
+                    width: "100%",
                     display: "flex",
                     justifyContent: "center",
                     textAlign: "center",
                   }}
-                  placeholder="optional"
+                  placeholder="optional (gwei)"
                 />
               </Grid>
               <Grid
@@ -189,7 +228,14 @@ const WalletModal = () => {
                   textAlign: "center",
                 }}
               >
-                <Button>Send</Button>
+                <Button
+                  type="submit"
+                  variant="contained"
+                  color="primary"
+                  disabled={submitting}
+                >
+                  SUBMIT
+                </Button>
               </Grid>
             </Grid>
           </form>
@@ -224,6 +270,7 @@ const WalletModal = () => {
                 justifyContent: "center",
                 alignItems: "center",
               }}
+              // spacing
             >
               <Grid item xs={12} style={{ textAlign: "center" }}>
                 <Typography variant="body2">Account1</Typography>
@@ -241,26 +288,45 @@ const WalletModal = () => {
                 MWT
               </Grid>
               <Grid
-                item
-                xs={6}
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
+                container
+                xs={12}
+                style={{ display: "flex", justifyContent: "space-between" }}
               >
-                <Button color="primary">Activity</Button>
-              </Grid>
-              <Grid
-                item
-                xs={6}
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
-              >
-                <Button>Send</Button>
+                <Grid
+                  item
+                  xs={6}
+                  // style={{
+                  //   display: "flex",
+                  //   justifyContent: "center",
+                  //   alignItems: "center",
+                  // }}
+                >
+                  <Button
+                    variant={toggleModal ? "contained" : "outlined"}
+                    color={toggleModal ? "primary" : "secondary"}
+                    style={{ width: "60%" }}
+                  >
+                    Activity
+                  </Button>
+                </Grid>
+                <Grid
+                  item
+                  xs={6}
+                  style={{
+                    display: "flex",
+                    justifyContent: "flex-end",
+                    alignItems: "center",
+                  }}
+                >
+                  <Button
+                    type="submit"
+                    variant="contained"
+                    color={toggleModal ? "secondary" : "primary"}
+                    style={{ width: "60%" }}
+                  >
+                    Send
+                  </Button>
+                </Grid>
               </Grid>
               <Box>
                 <SendMWTForm />

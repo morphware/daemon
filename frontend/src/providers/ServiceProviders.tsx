@@ -36,7 +36,7 @@ const ServiceProviders: React.FC = ({ children }) => {
 
   const getTorrents = async () => {
     const torrents = await daemonService.getActiveTorrents();
-    console.log("getting torernts");
+    // console.log("getting torernts");
     setTorrents(torrents);
   };
 
@@ -56,7 +56,17 @@ const ServiceProviders: React.FC = ({ children }) => {
   };
 
   const sendMWT = async (sendMWTRequest: SendMWTRequestProps) => {
-    const transaction = await daemonService.sendMWT(sendMWTRequest);
+    const MWTAmount = Web3.utils.toWei(sendMWTRequest.amount, "ether");
+    const newRequest = {} as SendMWTRequestProps;
+    newRequest.address = sendMWTRequest.address;
+    newRequest.amount = MWTAmount;
+    if (sendMWTRequest.gas) {
+      // newRequest.gas = Web3.utils.toWei(sendMWTRequest.gas, "ether");
+      newRequest.gas = Web3.utils.toWei(sendMWTRequest.gas, "gwei");
+      // newRequest.gas = sendMWTRequest.gas;
+    }
+    console.log("Req : ", newRequest);
+    const transaction = await daemonService.sendMWT(newRequest);
     return transaction;
   };
 
@@ -90,7 +100,6 @@ const ServiceProviders: React.FC = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    console.log("Getting torrents, balance");
     getTorrents();
     getBalance();
     getWalletHistory();

@@ -52,7 +52,7 @@ export interface WalletHistoryProps {
 export interface SendMWTRequestProps {
   address: string;
   amount: string;
-  gas: string;
+  gas?: string;
 }
 
 interface ConnectionStatusProps {
@@ -67,12 +67,17 @@ export interface IDaemonService {
   getConnectionStatus(): Promise<ConnectionStatusProps>;
 }
 export class DaemonService implements IDaemonService {
-  private readonly baseUrl: string = "http://" + window.localStorage.getItem("url") || "127.0.0.1:3001";
+  // private readonly baseUrl: string =
+  //   "http://" + window.localStorage.getItem("url") || "127.0.0.1:3001";
+
+  private readonly baseUrl: string = "http://127.0.0.1:3001";
 
   constructor() {}
 
   public getConnectionStatus = async (): Promise<ConnectionStatusProps> => {
     const url = `${this.baseUrl}/api/V0/network`;
+
+    console.log(this.baseUrl);
 
     const requestOptions = {
       method: "GET",
@@ -90,7 +95,10 @@ export class DaemonService implements IDaemonService {
   public sendMWT = async (
     sendMWTRequest: SendMWTRequestProps
   ): Promise<any> => {
-    const url = `${this.baseUrl}/wallet/send`;
+    const url = `${this.baseUrl}/api/V0/wallet/send`;
+
+    console.log("Url: ", url);
+    console.log("Body: ", sendMWTRequest);
 
     const requestOptions = {
       method: "POST",
@@ -101,6 +109,7 @@ export class DaemonService implements IDaemonService {
     const response = await fetch(url, requestOptions);
     const transaction: TransactionProps = await response.json();
 
+    // console.log("response: ", response);
     console.log("transaction: ", transaction);
 
     return transaction;
