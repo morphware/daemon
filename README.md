@@ -21,25 +21,25 @@ back end express.js project for the business logic and the electron project we
 use mostly as a multi platform build system. Here is a general overview of the 
 files and folders:
 
-* deamon *project root*
-  * app-src/ *temporary directory that is built during the build process. This
+* deamon - *project root*
+  * app-src/ - *temporary directory that is built during the build process. This
     is not tracked*
-  * backend/ *express.js project*
-    * conf/ *holds the configuration for the whole project. See
+  * backend/ - *express.js project*
+    * conf/ - *holds the configuration for the whole project. See
       [conf docs](docs/conf.md)*
-  * dist/ *outputted files from the build process. This is not tracked*
-  * docs/ *project documentation*
-  * frontend/ *react UI project*
-  * node_modules/ *node dependencies for the electron and the build process.
+  * dist/ - *outputted files from the build process. This is not tracked*
+  * docs/ - *project documentation*
+  * frontend/ - *react UI project*
+  * node_modules/ - *node dependencies for the electron and the build process.
     This is not tracked*
-  * build.js *script to execute the build process*
-  * devRun.js *script to execute the various development environments for all
+  * build.js - *script to execute the build process*
+  * devRun.js - *script to execute the various development environments for all
     sub projects*
-  * electron-prod.js *main file that lunches electron in a build*
-  * electron *main file that lunches electron in during dev*
-  * preload.js *data to be preloaded in the electron UI. This file is not
+  * electron-prod.js - *main file that lunches electron in a build*
+  * electron - *main file that lunches electron in during dev*
+  * preload.js - *data to be preloaded in the electron UI. This file is not
     required, built at runtime and not tracked*
-  * package.json *Manages build and electron dependencies. Contains npm scrips*
+  * package.json - *Manages build and electron dependencies. Contains npm scrips*
 
 ## Local development
 
@@ -75,10 +75,11 @@ mode.
 
 The project uses [electron-build](https://www.electron.build/) to compile the
 app. The build conf is stored in `project.json` under the `build` key. Building
-has only been executed under Linux.@wmantly is putting together a build document
+has only been executed under Linux. @wmantly is putting together a build document
 and is coming soon.
 
 **This requires alot of system packages, run with care**
+
 To execute a build, run:
 
 `npm run build`
