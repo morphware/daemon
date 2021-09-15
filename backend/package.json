@@ -4,7 +4,7 @@
   "description": "Morphware desktop daemon",
   "main": "express.js",
   "scripts": {
-    "start": "node express.js",
+    "start": "nodemon express.js --",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": {
@@ -19,5 +19,8 @@
     "fs-extra": "^10.0.0",
     "web3": "^1.3.6",
     "webtorrent": "^1.5.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
   }
 }
