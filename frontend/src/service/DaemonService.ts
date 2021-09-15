@@ -35,17 +35,37 @@ export interface SendMWTRequestProps {
   gas: string;
 }
 
+interface ConnectionStatusProps {
+  status: boolean;
+}
 export interface IDaemonService {
   submitTrainModelRequest(modelRequest: ITrainingModelValuesV2): Promise<void>;
   getActiveTorrents(): Promise<ActiveTorrents>;
   getMWTBalance(): Promise<WalletBalanceProps>;
   getWalletHistory(): Promise<WalletHistoryProps>;
   sendMWT(sendMWTRequest: SendMWTRequestProps): Promise<TransactionProps>;
+  getConnectionStatus(): Promise<ConnectionStatusProps>;
 }
 export class DaemonService implements IDaemonService {
   private readonly baseUrl: string = "http://127.0.0.1:3001";
 
   constructor() {}
+
+  public getConnectionStatus = async (): Promise<ConnectionStatusProps> => {
+    const url = `${this.baseUrl}/api/V0/network`;
+
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const status: ConnectionStatusProps = await response.json();
+
+    console.log("status: ", status);
+
+    return status;
+  };
 
   public sendMWT = async (
     sendMWTRequest: SendMWTRequestProps
