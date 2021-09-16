@@ -82,4 +82,6 @@ and is coming soon.
 
 To execute a build, run:
 
-`npm run build`
+```bash
+npm run build
+```
