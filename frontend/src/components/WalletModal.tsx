@@ -76,7 +76,7 @@ const Fade = React.forwardRef<HTMLDivElement, FadeProps>(function Fade(
 const WalletModal = () => {
   const classes = useStyles();
   const [open, setOpen] = useState(false);
-  const [toggleModal, setTogalModal] = useState<boolean>(false);
+  const [toggleModal, setTogalModal] = useState<boolean>(true);
   const daemonService = useContext(DaemonContext);
 
   const shortenedAddressStart = daemonService.walletAddress?.slice(0, 7);
