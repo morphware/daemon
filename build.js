@@ -30,7 +30,7 @@ const exec = util.promisify(require('child_process').exec);
 	await fs.copy('./electron-prod.js', './app-src/electron-prod.js');
 
 	console.info('Build the frontend');
-	let frontEndBuild = await exec(`cd frontend npm run build`)
+	// let frontEndBuild = await exec(`cd frontend npm run build`)
 	console.log(!frontEndBuild.stderr ? 'success' : frontEndBuild.stderr );
 
 	console.info('Move the fronend files to the build directory.');
