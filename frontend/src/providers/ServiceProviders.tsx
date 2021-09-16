@@ -12,6 +12,7 @@ import Web3 from "web3";
 export const DaemonContext = React.createContext({} as daemonServiceProps);
 
 interface daemonServiceProps {
+  MWTAddress: string;
   daemonService: DaemonService;
   torrents?: ActiveTorrents;
   walletBalance?: string;
@@ -26,6 +27,8 @@ interface daemonServiceProps {
   getConnectionStatus(): Promise<void>;
 }
 
+const MWSBalance = "0xbc40e97e6d665ce77e784349293d716b030711bc";
+
 const ServiceProviders: React.FC = ({ children }) => {
   const daemonService = new DaemonService();
   const [torrents, setTorrents] = useState<ActiveTorrents>();
@@ -34,9 +37,47 @@ const ServiceProviders: React.FC = ({ children }) => {
   const [walletHistory, setWalletHistory] = useState<WalletHistoryProps>();
   const [connectionStatus, setConnectionStatus] = useState<boolean>(false);
 
+  const mockTorrents = () => {
+    const mockTorrents: ActiveTorrents = {
+      download: 10,
+      port: 3001,
+      upload: 10,
+      torrents: [
+        {
+          name: "jupyter-notebook.ipymb",
+          progress: 13,
+          downloadSpeed: 23,
+          numPeers: 51,
+          timeRemaining: 21,
+          magnetURI:
+            "magnet:?xt=urn:btih:f35be570c19b5e026930e97a9533ac7207f960a4&dn=jupyter-notebook.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
+        },
+        {
+          name: "training-data.html",
+          progress: 42,
+          downloadSpeed: 74,
+          numPeers: 74,
+          timeRemaining: 25,
+          magnetURI:
+            "magnet:?xt=urn:btih:7948a0c8a8407274fa5bc63219eaa061b495e5db&dn=training-data.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
+        },
+        {
+          name: "testing-data.md",
+          progress: 52,
+          downloadSpeed: 57,
+          numPeers: 47,
+          timeRemaining: 32,
+          magnetURI:
+            "magnet:?xt=urn:btih:c38689c760a42c2f4060935ebfbf6e55d42350f9&dn=testing-data.md&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
+        },
+      ],
+    };
+    return mockTorrents;
+  };
+
   const getTorrents = async () => {
     const torrents = await daemonService.getActiveTorrents();
-    // console.log("getting torernts");
+    // const torrents = mockTorrents();
     setTorrents(torrents);
   };
 
@@ -77,6 +118,7 @@ const ServiceProviders: React.FC = ({ children }) => {
   };
 
   const daemonServicContext: daemonServiceProps = {
+    MWTAddress: MWSBalance,
     daemonService: daemonService,
     torrents: torrents,
     walletBalance: walletBalance,
@@ -95,6 +137,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     const interval = setInterval(async () => {
       await getConnectionStatus();
       await getBalance();
+      await getWalletHistory();
     }, 10000);
     return () => clearInterval(interval);
   }, []);

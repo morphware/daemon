@@ -116,7 +116,7 @@ export class DaemonService implements IDaemonService {
   };
 
   public getWalletHistory = async (): Promise<WalletHistoryProps> => {
-    const url = `${this.baseUrl}/wallet/history`;
+    const url = `${this.baseUrl}/api/v0/wallet/history`;
 
     const requestOptions = {
       method: "GET",
