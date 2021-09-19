@@ -19,7 +19,7 @@ const exec = util.promisify(require('child_process').exec);
 	await fs.copy('./backend', './app-src/');
 
 	console.info('Grab the build resources')
-	await fs.copy('./build', './app-src/build');
+	await fs.copy('./resources', './app-src/resources');
 	
 	console.info('Clean up build directory ')
 	await fs.remove('./app-src/node_modules');

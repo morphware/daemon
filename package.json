@@ -42,7 +42,7 @@
     "copyright": "Copyright © 2021 Morphware, LLC",
     "icon": "resources/icon/logo-light.png",
     "directories": {
-      "buildResources": "build",
+      "buildResources": "resources",
       "app": "app-src",
       "output": "dist"
     },
