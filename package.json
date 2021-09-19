@@ -40,7 +40,9 @@
     "appId": "com.electron.morphware",
     "productName": "MorphwareWallet",
     "copyright": "Copyright © 2021 Morphware, LLC",
+    "icon": "resources/icon/logo-light.png",
     "directories": {
+      "buildResources": "build",
       "app": "app-src",
       "output": "dist"
     },
@@ -51,11 +53,15 @@
       ]
     },
     "linux": {
+      "category":"Science",
       "target": [
         "AppImage",
         "deb",
         "rpm"
       ]
+    },
+    "mac":{
+      "icon": "build/icon/icon.icns"
     }
   }
 }

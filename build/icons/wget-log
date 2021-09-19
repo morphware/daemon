@@ -1,0 +1,6 @@
+--2021-09-18 23:44:25--  https://storage.cloudconvert.com/tasks/9b4a7dc1-9560-4926-b701-ca8c7e3afc9f/icon.png?AWSAccessKeyId=cloudconvert-production
+Resolving storage.cloudconvert.com (storage.cloudconvert.com)... 51.195.5.198, 51.89.41.108, 51.195.5.148, ...
+Connecting to storage.cloudconvert.com (storage.cloudconvert.com)|51.195.5.198|:443... connected.
+HTTP request sent, awaiting response... 403 Forbidden
+2021-09-18 23:44:26 ERROR 403: Forbidden.
+

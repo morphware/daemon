@@ -17,7 +17,7 @@ module.exports = {
 	// ethAddress: 'wss://geth.vm42.us',
 
 	// Turn on chrome dev tools from electron app. 
-	eletronDev: false,
+	electronDev: false,
 };
 
 
