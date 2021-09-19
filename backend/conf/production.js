@@ -1,6 +1,8 @@
 module.exports = {
-	morphwareTokenABIPath: 'MorphwareToken',
-	morphwareTokenContractAddress: '0xbc40e97e6d665ce77e784349293d716b030711bc',
+
+	// https://etherscan.io/address/0x5f80d31044d8b15acffa3454dffda9f022453461#code
+	morphwareTokenABIPath: 'MorphwareToken-MainnetABI',
+	morphwareTokenContractAddress: '0x5f80d31044d8b15acffa3454dffda9f022453461',
 	
 	// https://ropsten.etherscan.io/address/0x0f96cf29c8d9f65f83e6992cad3ebbe9a395f332#code
 	auctionFactoryABIPath: 'VickreyAuction-RopstenABI',
