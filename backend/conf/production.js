@@ -11,11 +11,11 @@ module.exports = {
 	jobFactoryAbiPath: 'JobFactory-RopstenABI',
 	jobFactoryContractAddress: '0xb2da7fcc212fe1c747048d7c7caca6a2bd8ec0bc',
 	
-	ethAddress: 'wss://ropsten.infura.io/ws/v3/dc53ba9a23564600bfbe5f8c2f345d1d',
+	ethAddress: 'wss://mainnet.infura.io/ws/v3/b953c0b0ccd34ab69751fb492c9c5f04',
 	// ethAddress: 'wss://geth.vm42.us',
 
 	// Turn on chrome dev tools from electron app. 
-	eletronDev: true
+	eletronDev: false,
 };
 
 

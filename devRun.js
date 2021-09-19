@@ -6,11 +6,16 @@ const fs = require('fs');
 const conf =require('./backend/conf')
 var tasks = []
 
+process.env.NODE_ENV = 'development';
 
 function startBackend(){
 	try{
 		let child = spawn('npm', ['start', '--',...process.argv],{
 			cwd: BASE_DIR+'/backend',
+			env:{
+				...process.env
+			},
+			script: true
 		});
 
 		tasks.push(child);
@@ -24,8 +29,8 @@ function startBackend(){
 		});
 
 		child.on('exit', function(code){
-			console.error('Wxpress failed, killing dev server');
-			console.error('Wxpress exited with code: ' + code);
+			console.error('Express failed, killing dev server');
+			console.error('Express exited with code: ' + code);
 			killAll();
 		});
 	}catch(error){
@@ -35,7 +40,7 @@ function startBackend(){
 };
 
 function startReact(){
-	let eleteronLock = false
+	let electronLock = false
 	let doKill = true
 	try{
 		let child = spawn('npm', ['start'], {
@@ -43,21 +48,22 @@ function startReact(){
 			env:{
 				BROWSER: "none",
 				...process.env
-			}
+			},
+			script:true,
 		});
 
 		tasks.push(child);
 
 		child.stdout.on('data', function(data){
 		 	console.log('std', data.toString());
-		 	if(!eleteronLock && data.toString().includes('Compiled successfully!')){
+		 	if(!electronLock && data.toString().includes('Compiled successfully!')){
 		 		startElectron();
-		 		eleteronLock = true;
+		 		electronLock = true;
 		 	}	
-		 	if(!eleteronLock && data.toString().includes('Something is already running on port')){
+		 	if(!electronLock && data.toString().includes('Something is already running on port')){
 		 		startElectron();
 		 		doKill = false;
-		 		eleteronLock = true;
+		 		electronLock = true;
 		 		child.kill();
 		 	}
 		});
@@ -69,7 +75,6 @@ function startReact(){
 		child.on('exit', function(code){
 			console.error('React exited with code'. code,);
 			if(doKill) killAll();
-
 		});
 	}catch(error){
 		console.error('React died', error);
@@ -85,8 +90,10 @@ function startElectron(){
 		let child = spawn('npx', ['nodemon', '-w', 'electron.js', '--exec', 'electron', '.'], {
 			cwd: BASE_DIR,
 			env:{
+				ELECTON_DEV: 1,
 				...process.env
-			}
+			},
+			script: true
 		});
 
 		tasks.push(child);
@@ -104,7 +111,6 @@ function startElectron(){
 			console.error('Webpack exited with code: ' + code);
 
 			killAll();
-
 		});	
 	}catch(error){
 		console.error('electron died')
