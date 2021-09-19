@@ -9,7 +9,7 @@ export interface ITrainingModelValuesV2 {
   trainingTime: number;
   errorRate: number;
   biddingTime: number;
-  workerReward: number;
+  workerReward: number | string;
   testModel: boolean;
 }
 

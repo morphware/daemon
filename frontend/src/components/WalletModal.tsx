@@ -137,12 +137,11 @@ const WalletModal = () => {
   };
 
   const GenerateHistoryItems = () => {
-    // const transactions = daemonService.walletHistory?.transactions
-    //   ? daemonService.walletHistory?.transactions
-    //   : [];
+    const transactions = daemonService.walletHistory?.transactions
+      ? daemonService.walletHistory?.transactions
+      : [];
 
     console.log(daemonService.walletHistory?.transactions);
-    const transactions: Array<any> = [];
 
     const historyLessThanFive =
       transactions.length < 5 ? transactions : transactions.slice(-4);
@@ -195,7 +194,6 @@ const WalletModal = () => {
         validate={(values: SendMWTRequestProps) => {
           const errors = {} as SendMWTRequestProps;
           const amount = parseFloat(values.amount);
-          // const gas = values.gas parseFloat(values.gas);
           var gas;
           if (values.gas) {
             gas = parseFloat(values.gas);

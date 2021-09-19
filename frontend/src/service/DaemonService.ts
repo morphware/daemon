@@ -43,7 +43,6 @@ export interface TransactionProps {
   };
 }
 
-//TODO: write out entire transaction interface
 export interface WalletHistoryProps {
   transactions: Array<TransactionProps>;
   address: string;
