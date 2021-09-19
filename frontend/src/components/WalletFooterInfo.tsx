@@ -3,6 +3,7 @@ import {
   Box,
   createStyles,
   Grid,
+  IconButton,
   makeStyles,
   Typography,
 } from "@material-ui/core";
@@ -12,6 +13,8 @@ import { theme } from "../providers/MorphwareTheme";
 import { DaemonContext } from "../providers/ServiceProviders";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import CancelIcon from "@material-ui/icons/Cancel";
+import { copyToClipBoard, roundBalance, walletShortener } from "../utils";
+import FileCopyIcon from "@material-ui/icons/FileCopy";
 
 const styles = makeStyles(() =>
   createStyles({
@@ -25,20 +28,23 @@ const styles = makeStyles(() =>
 
 interface ConnectionStatusProps {
   connected: boolean;
+  network: string;
 }
 
-const ConnectionStatus = (connected: ConnectionStatusProps) => {
+const ConnectionStatus = ({ connected, network }: ConnectionStatusProps) => {
   return connected ? (
     <Box display="flex">
-      <Typography variant="body2">Connection :</Typography>
+      <Typography variant="body2">
+        Connection:&nbsp;&nbsp;&nbsp;{network}&nbsp;
+      </Typography>
       <CheckCircleIcon
         style={{ fontSize: 25, color: "green" }}
         color="secondary"
       />
     </Box>
   ) : (
-    <Box>
-      <Typography variant="body2">Connection</Typography>
+    <Box display="flex">
+      <Typography variant="body2">Connection:&nbsp;&nbsp;&nbsp;</Typography>
       <CancelIcon style={{ fontSize: 25, color: "red" }} color="secondary" />
     </Box>
   );
@@ -47,6 +53,8 @@ const ConnectionStatus = (connected: ConnectionStatusProps) => {
 const WalletInfo = () => {
   const classes = styles();
   const daemonService = useContext(DaemonContext);
+  const roundedBalance = roundBalance(daemonService.walletBalance);
+  const shortenedAddress = walletShortener(daemonService.walletAddress, 5);
 
   return (
     <Grid container className={classes.root}>
@@ -59,7 +67,14 @@ const WalletInfo = () => {
           justifyContent: "center",
         }}
       >
-        <Typography variant="body2">{daemonService.walletAddress}</Typography>
+        <Typography variant="body2">
+          Address:&nbsp;&nbsp;&nbsp;{shortenedAddress}
+        </Typography>
+        <IconButton
+          onClick={() => copyToClipBoard(daemonService.walletAddress)}
+        >
+          <FileCopyIcon fontSize="small" color="secondary" />
+        </IconButton>
       </Grid>
       <Grid
         xs={4}
@@ -71,7 +86,7 @@ const WalletInfo = () => {
         }}
       >
         <Typography variant="body2">
-          {daemonService.walletBalance} MWT
+          {roundedBalance}&nbsp;&nbsp;&nbsp;MWT
         </Typography>
       </Grid>
       <Grid
@@ -83,10 +98,10 @@ const WalletInfo = () => {
           justifyContent: "center",
         }}
       >
-        {daemonService.connectionStatus ? (
-          <ConnectionStatus connected={true} />
+        {daemonService.connectionStatus && daemonService.network ? (
+          <ConnectionStatus connected={true} network={daemonService.network} />
         ) : (
-          <ConnectionStatus connected={false} />
+          <ConnectionStatus connected={false} network={""} />
         )}
       </Grid>
     </Grid>
