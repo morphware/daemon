@@ -47,12 +47,13 @@ Status about connection to an eth node
 
 	Response fields:
 	* `status` *BOOL* connection to eth node
+	* `network` *STRING* which network it's connected to
 
 	Example
 
 	``` bash
-	curl 127.0.0.1:3000/api/V0/network
-	{"status":true}
+	curl 127.0.0.1:3001/api/V0/network
+	{"status":true,"network":"Mainnet"}
 	```
 
 * To do
@@ -78,7 +79,7 @@ Torrents the client is currently interacting with
 	Example
 
 	```bash
-	curl 127.0.0.1:3000/api/V0/torrent
+	curl 127.0.0.1:3001/api/V0/torrent
 	{
 	  "download": 0,
 	  "upload": 0,
@@ -136,7 +137,7 @@ View and send MWT associated with the current wallet
 	Example
 
 	``` bash
-	curl 127.0.0.1:3000/api/v0/wallet/
+	curl 127.0.0.1:3001/api/v0/wallet/
   {
   		"balance":"100000452999999999999899970",
   		"address":"0x5733592919406a356192bA957E7DFfb74fb62d1a"
@@ -156,7 +157,7 @@ View and send MWT associated with the current wallet
 	Example
 
 	``` bash
-  curl 127.0.0.1:3000/api/v0/wallet/history
+  curl 127.0.0.1:3001/api/v0/wallet/history
   {
   	"transactions":[
   		{"address":
@@ -204,7 +205,7 @@ View and send MWT associated with the current wallet
 	Example
 
 	``` bash
-	curl -H "Content-Type: application/json" -X POST -d '{"address": "0x0cf9D6185AFc49027b9Daddbd2ec2aBf24f432e1", "amount":1000}' 127.0.0.1:3000/api/v0/wallet/send
+	curl -H "Content-Type: application/json" -X POST -d '{"address": "0x0cf9D6185AFc49027b9Daddbd2ec2aBf24f432e1", "amount":1000}' 127.0.0.1:3001/api/v0/wallet/send
   {
   	"transactions":{
   		"blockHash":"0x5e952ed704b2221df8ce52aea40835e00c972cfe3958a8756a7eda840916c486",

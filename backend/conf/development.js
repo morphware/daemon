@@ -1,5 +1,5 @@
 module.exports = {
-	morphwareTokenABIPath: 'MorphwareToken',
+	morphwareTokenABIPath: 'MorphwareToken-RopstenABI',
 	morphwareTokenContractAddress: '0xbc40e97e6d665ce77e784349293d716b030711bc',
 	
 	// https://ropsten.etherscan.io/address/0x0f96cf29c8d9f65f83e6992cad3ebbe9a395f332#code
@@ -15,7 +15,7 @@ module.exports = {
 	// ethAddress: 'wss://geth.vm42.us',
 
 	// Turn on chrome dev tools from electron app. 
-	eletronDev: true
+	electronDev: true
 };
 
 

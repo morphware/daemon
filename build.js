@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 const fs = require('fs-extra');
 const extend = require('extend');
@@ -17,6 +17,9 @@ const exec = util.promisify(require('child_process').exec);
 
 	console.info('Grab the backend')
 	await fs.copy('./backend', './app-src/');
+
+	console.info('Grab the build resources')
+	await fs.copy('./resources', './app-src/resources');
 	
 	console.info('Clean up build directory ')
 	await fs.remove('./app-src/node_modules');

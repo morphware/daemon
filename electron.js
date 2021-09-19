@@ -23,6 +23,7 @@ function createWindow() {
     "autoHideMenuBar": true,
     "minWidth": 1540,
     "minHeight": 850,
+    icon: `${__dirname}/resources/icons/512x512.png`,
     webPreferences: {
       nativeWindowOpen: true,
       nodeIntegration: true,
@@ -40,7 +41,7 @@ function createWindow() {
   );
 
   // Open the DevTools.
-  if(conf.eletronDev) {
+  if(conf.electronDev) {
     win.webContents.openDevTools({ mode: 'detach' });
   }
 
@@ -56,39 +57,40 @@ function createWindow() {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(createWindow);
 
-// app.whenReady().then(() => {
-//   try{
-//     tray = new Tray('/home/william/Downloads/logo-light.png');
-//       var contextMenu = Menu.buildFromTemplate([
-//         {
-//             label: 'Show App', click: function () {
-//                 win.show()
-//             }
-//         },
-//         {
-//             label: 'Quit', click: function () {
-//                 app.isQuiting = true
-//                 app.quit()
-//             }
-//         }
-//     ])
+app.whenReady().then(() => {
+  try{
+    tray = new Tray(`${__dirname}/resources/icons/logo-light.png`);
+      var contextMenu = Menu.buildFromTemplate([
+        {
+            label: 'Show App', click: function () {
+                win.show()
+            }
+        },
+        {
+            label: 'Quit', click: function () {
+                app.isQuiting = true
+                app.quit()
+                process.exit(0);
+            }
+        }
+    ])
 
-//     tray.setToolTip('Morphware Wallet')
+    tray.setToolTip('Morphware Wallet')
 
-//     tray.on('click', function(e){
-//       console.log('clicked!')
-//       if(!win.isVisible()) {
-//         win.show()
-//       }
-//     });
+    tray.on('click', function(e){
+      console.log('clicked!')
+      if(!win.isVisible()) {
+        win.show()
+      }
+    });
 
-//     tray.setContextMenu(contextMenu)
+    tray.setContextMenu(contextMenu)
 
 
-//   }catch(error){
-//     console.log('tray error', error);
-//   }
-// })
+  }catch(error){
+    console.log('tray error', error);
+  }
+})
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits

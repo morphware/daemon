@@ -143,8 +143,6 @@ frontendClient/npm-debug.log*
 frontendClient/yarn-debug.log*
 frontendClient/yarn-error.log*
 
-build/
-
 app-src/
 
 // eletron preload file is used to inject settings into react at runtime
