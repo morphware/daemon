@@ -1,7 +1,6 @@
 'use strict';
 
 const path = require('path');
-
 const { app, BrowserWindow } = require('electron');
 const isDev = require('electron-is-dev');
 
@@ -14,9 +13,12 @@ function createWindow() {
     "minWidth": 1540,
     "minHeight": 850,
     webPreferences: {
+      nativeWindowOpen: true,
       nodeIntegration: true,
       webSecurity: false,
-      plugins: true
+      plugins: true,
+      enableRemoteModule: false,
+      preload: `${__dirname}/preload.js`
     },
   });
 

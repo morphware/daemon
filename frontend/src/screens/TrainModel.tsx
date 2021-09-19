@@ -8,8 +8,7 @@ const styles = makeStyles(() =>
   createStyles({
     root: {
       backgroundColor: theme.background?.main,
-      height: "calc(100vh - 50px)",
-      width: "90vw",
+      height: "calc(100vh - 120px)",
       padding: "50px 50px 0px",
     },
   })

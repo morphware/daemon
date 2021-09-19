@@ -1,9 +1,14 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
 import logo from "../assets/logoV2.png";
 import homeNav from "../assets/train.png";
+import torrentsNav from "../assets/torrents.png";
+import settings from "../assets/settings.png";
 import { Link } from "react-router-dom";
 import { theme } from "../providers/MorphwareTheme";
-import { makeStyles, Typography } from "@material-ui/core";
+import { Grid, IconButton, makeStyles, Typography } from "@material-ui/core";
+import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
+import WalletModal from "../components/WalletModal";
 
 enum navOptions {
   Train = "Train",
@@ -22,7 +27,14 @@ interface NavLinkProps {
 }
 
 const styles = makeStyles({
-  root: {},
+  root: {
+    flexGrow: 1,
+  },
+  paper: {
+    // padding: theme.spacing(2),
+    textAlign: "center",
+    // color: theme.palette.text.secondary,
+  },
   navContainer: {
     backgroundColor: theme.navBar?.main,
     height: "100vh",
@@ -57,6 +69,7 @@ const styles = makeStyles({
   logoContainer: {
     paddingTop: "20px",
     paddingBottom: "20px",
+    width: "100%",
   },
 });
 
@@ -71,7 +84,13 @@ const NavLink = ({ to, icon, title, setSelected, selected }: NavLinkProps) => {
     <Link className={classes.itemLink} to={to}>
       <div className={className} onClick={() => setSelected(title)}>
         <div>
-          <img src={icon} alt={title} width="20%" height="20%" />
+          <img
+            style={{ color: "white" }}
+            src={icon}
+            alt={title}
+            width="35%"
+            height="35%"
+          />
         </div>
         <div className={classes.navText}>
           <Typography variant="h6">{title}</Typography>
@@ -89,36 +108,55 @@ const NavBar = () => {
   const classes = styles();
 
   return (
-    <div className={classes.navContainer}>
-      <div className={classes.logoContainer}>
+    <Grid container direction="column" className={classes.navContainer}>
+      <Grid item className={classes.logoContainer}>
         <img src={logo} alt="Morphware Logo" width="80%" />
-      </div>
-      <div className="navbar-content">
-        <div className="nav-links-container">
-          <NavLink
-            title={navOptions.Train}
-            icon={homeNav}
-            to="/"
-            setSelected={setSelectedNavItem}
-            selected={navOptions.Train === selectedNavItem}
-          ></NavLink>
-          <NavLink
-            title={navOptions.Torrents}
-            icon={homeNav}
-            to="/torrents"
-            setSelected={setSelectedNavItem}
-            selected={navOptions.Torrents === selectedNavItem}
-          ></NavLink>
-          <NavLink
-            title={navOptions.Settings}
-            icon={homeNav}
-            to="/settings"
-            setSelected={setSelectedNavItem}
-            selected={navOptions.Settings === selectedNavItem}
-          ></NavLink>
-        </div>
-      </div>
-    </div>
+      </Grid>
+      <Grid item className="navbar-content">
+        <NavLink
+          title={navOptions.Train}
+          icon={homeNav}
+          to="/"
+          setSelected={setSelectedNavItem}
+          selected={navOptions.Train === selectedNavItem}
+        ></NavLink>
+        <NavLink
+          title={navOptions.Torrents}
+          icon={torrentsNav}
+          to="/torrents"
+          setSelected={setSelectedNavItem}
+          selected={navOptions.Torrents === selectedNavItem}
+        ></NavLink>
+        <NavLink
+          title={navOptions.Settings}
+          icon={settings}
+          to="/settings"
+          setSelected={setSelectedNavItem}
+          selected={navOptions.Settings === selectedNavItem}
+        ></NavLink>
+      </Grid>
+      <Grid
+        container
+        style={{
+          flexGrow: 1,
+          flexDirection: "column",
+          justifyContent: "flex-end",
+          alignContent: "center",
+          padding: "20px",
+        }}
+      >
+        {/* <IconButton
+          style={{ width: "fit-content" }}
+          // onClick={updateTorrents} disabled={fetchingTorrents}
+        >
+          <AccountBalanceWalletIcon
+            style={{ fontSize: 48 }}
+            color="secondary"
+          />
+        </IconButton> */}
+        <WalletModal />
+      </Grid>
+    </Grid>
   );
 };
 

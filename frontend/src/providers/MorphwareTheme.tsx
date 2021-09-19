@@ -76,6 +76,11 @@ export const theme: ThemeProps = createTheme({
       fontFamily: ['"Ubuntu"', "Open Sans"].join(","),
       fontSize: "17px",
     },
+    body2: {
+      // eslint-disable-next-line quotes
+      fontFamily: ['"Ubuntu"', "Open Sans"].join(","),
+      fontSize: "18px",
+    },
   },
   navBar: {
     main: "#ffffff",
