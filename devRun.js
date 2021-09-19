@@ -1,24 +1,23 @@
 #!/usr/bin/env node
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 const {spawn} = require('child_process');
-const BASE_DIR = __dirname
 const fs = require('fs');
-const conf =require('./backend/conf')
-var tasks = []
+const conf =require('./backend/conf');
+var pids = []
 
-process.env.NODE_ENV = 'development';
 
 function startBackend(){
 	try{
 		let child = spawn('npm', ['start', '--',...process.argv],{
-			cwd: BASE_DIR+'/backend',
+			cwd: __dirname+'/backend',
 			env:{
 				...process.env
 			},
 			shell: true
 		});
 
-		tasks.push(child);
+		pids.push(child);
 
 		child.stdout.on('data', function(data){
 		 	console.log(data.toString());
@@ -44,7 +43,7 @@ function startReact(){
 	let doKill = true
 	try{
 		let child = spawn('npm', ['start'], {
-			cwd: BASE_DIR+'/frontend',
+			cwd: __dirname+'/frontend',
 			env:{
 				BROWSER: "none",
 				...process.env
@@ -52,7 +51,7 @@ function startReact(){
 			shell: true,
 		});
 
-		tasks.push(child);
+		pids.push(child);
 
 		child.stdout.on('data', function(data){
 		 	console.log('std', data.toString());
@@ -85,18 +84,20 @@ function startReact(){
 function startElectron(){
 	try{
 		// Inject conf for react to read.
-		fs.writeFileSync('preload.js', `localStorage.setItem('url', "${conf.httpAddress}:${conf.httpPort}")`);
+		fs.writeFileSync('preload.js', `
+			localStorage.setItem('url', "${conf.httpAddress}:${conf.httpPort}")
+			localStorage.setItem('environment', "${conf.environment}")
+		`);
 		
 		let child = spawn('npx', ['nodemon', '-w', 'electron.js', '--exec', 'electron', '.'], {
-			cwd: BASE_DIR,
+			cwd: __dirname,
 			env:{
-				ELECTON_DEV: 1,
 				...process.env
 			},
 			shell: true
 		});
 
-		tasks.push(child);
+		pids.push(child);
 
 		child.stdout.on('data', function(data){
 		 	console.log(data.toString());
@@ -120,8 +121,8 @@ function startElectron(){
 };
 
 function killAll(){
-	for(let task of tasks){
-		task.kill();
+	for(let pid of pids){
+		pid.kill();
 	}
 	process.exit(1);
 }
