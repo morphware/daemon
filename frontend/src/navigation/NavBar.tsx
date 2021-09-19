@@ -1,12 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useState } from "react";
-import logo from "../assets/LogoLightV2.png";
+import logo from "../assets/logoV2.png";
 import homeNav from "../assets/train.png";
 import torrentsNav from "../assets/torrents.png";
 import settings from "../assets/settings.png";
 import { Link } from "react-router-dom";
 import { theme } from "../providers/MorphwareTheme";
-import { Grid, makeStyles, Typography } from "@material-ui/core";
+import { Grid, IconButton, makeStyles, Typography } from "@material-ui/core";
+import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
 import WalletModal from "../components/WalletModal";
 
 enum navOptions {
@@ -109,7 +110,7 @@ const NavBar = () => {
   return (
     <Grid container direction="column" className={classes.navContainer}>
       <Grid item className={classes.logoContainer}>
-        <img src={logo} alt="Morphware Logo" width="85%" />
+        <img src={logo} alt="Morphware Logo" width="80%" />
       </Grid>
       <Grid item className="navbar-content">
         <NavLink
