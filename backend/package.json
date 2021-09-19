@@ -1,6 +1,6 @@
 {
   "name": "Morphware-Wallet",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Morphware desktop daemon",
   "main": "express.js",
   "scripts": {

@@ -23,7 +23,7 @@ function createWindow() {
     "autoHideMenuBar": true,
     "minWidth": 1540,
     "minHeight": 850,
-    icon: `${__dirname}/resources/icons/512x512.png`,
+    icon: `${__dirname}/resources/icons/64x64.png`,
     webPreferences: {
       nativeWindowOpen: true,
       nodeIntegration: true,
@@ -59,7 +59,7 @@ app.whenReady().then(createWindow);
 
 app.whenReady().then(() => {
   try{
-    tray = new Tray(`${__dirname}/resources/icons/logo-light.png`);
+    tray = new Tray(`${__dirname}/resources/icons/512x512.png`);
       var contextMenu = Menu.buildFromTemplate([
         {
             label: 'Show App', click: function () {
