@@ -68,7 +68,7 @@ class Job{
 
 		/*
 		we want to get to the object that holds `returnValues`. Sometime its in the
-		event, and sometimes there is next in a `evens` object.
+		event, and sometimes there is returnValue in a `events` object.
 		*/
 		if(event.events && event.events[name]){
 			event = event.events[name]
@@ -85,7 +85,7 @@ class Job{
 			// Save this transaction to the instances job history
 			job.transactions.push(event);
 
-			// Call the relevant job method, of it exists
+			// Call the relevant job method, if it exists
 			if(job[event.event]) job[event.event](parseEvent(event));
 
 			return;
