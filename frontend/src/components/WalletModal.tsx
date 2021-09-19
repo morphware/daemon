@@ -32,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
       width: "350px",
-      height: "520px",
+      height: "530px",
     },
   })
 );
