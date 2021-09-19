@@ -8,7 +8,6 @@ var conf;
 
 try{
 
-
 	function load(filePath, required){
 		try {
 			return require(filePath);
@@ -48,6 +47,7 @@ try{
 	args
 	  .option('httpPort', 'http port')
 	  .option('electronDev', 'Load chrome dev tools')
+	  .option('acceptWork', 'Accepting jobs')
 	  .option('wallet', 'Wallet Object', undefined, value=>{
 	  	return JSON.parse(value);
 	  })

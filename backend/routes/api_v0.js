@@ -6,5 +6,6 @@ router.use('/contract', require('./contract'));
 router.use('/network', require('./network'));
 router.use('/torrent', require('./torrent'));
 router.use('/wallet', require('./wallet'));
+router.use('/job', require('./job'));
 
 module.exports = router;
