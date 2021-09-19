@@ -114,12 +114,12 @@ const WalletModal = () => {
         >
           <Box padding={1}>
             {recieving ? (
-              <CallMadeIcon color="primary" style={{ fontSize: 30 }} />
-            ) : (
               <VerticalAlignBottomIcon
                 color="primary"
                 style={{ fontSize: 30 }}
               />
+            ) : (
+              <CallMadeIcon color="primary" style={{ fontSize: 30 }} />
             )}
           </Box>
           <Box padding={1}>
