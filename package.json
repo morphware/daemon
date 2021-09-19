@@ -9,8 +9,8 @@
     "build": "node build.js",
     "dev": "node devRun.js",
     "dev-old": "concurrently -k \"BROWSER=none npm run start-frontend\" \"npm:electron\" \"npm run start-backend\" --",
-    "electron": "wait-on tcp:3000 && electron .",
     "windev": "concurrently -k \"cross-env BROWSER=none npm run start-frontend\" \"npm:electron\" \"npm run start-backend\"",
+    "electron": "wait-on tcp:3000 && electron .",
     "postinstall": "npm --prefix backend install && npm --prefix frontend install"
   },
   "repository": {
@@ -30,7 +30,6 @@
     "electron": "^14.0.1",
     "electron-builder": "^22.11.7",
     "electron-is-dev": "^2.0.0",
-    "eletcron": "^0.0.1-security",
     "extend": "^3.0.2",
     "fs-extra": "^10.0.0",
     "node-gyp": "^8.2.0",
@@ -47,6 +46,7 @@
     },
     "win": {
       "target": [
+        "nsis",
         "portable"
       ]
     },

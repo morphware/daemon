@@ -31,7 +31,7 @@ try{
 	conf = {...load('./base', true), environment};
 
 
-	if(!fs.pathExistsSync('./secrets.js')){
+	if(!fs.pathExistsSync('./conf/secrets.js')){
 		var appDataPath = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
 		appDataPath += `/${conf.appName}/${environment}/local.json`
 		
@@ -51,11 +51,6 @@ try{
 	  .option('wallet', 'Wallet Object', undefined, value=>{
 	  	return JSON.parse(value);
 	  })
-
-	// Depending on how this file is execute, the file may not be included in the
-	// calling args, and that breaks args parser.
-	if(process.argv.length <2) process.argv.push('.')
-
 
 	// Create the exported conf object
 	module.exports = extend(
