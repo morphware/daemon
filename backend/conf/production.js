@@ -1,6 +1,8 @@
 module.exports = {
-	morphwareTokenABIPath: 'MorphwareToken-RopstenABI',
-	morphwareTokenContractAddress: '0xbc40e97e6d665ce77e784349293d716b030711bc',
+
+	// https://etherscan.io/address/0x5f80d31044d8b15acffa3454dffda9f022453461#code
+	morphwareTokenABIPath: 'MorphwareToken-MainnetABI',
+	morphwareTokenContractAddress: '0x5f80d31044d8b15acffa3454dffda9f022453461',
 	
 	// https://ropsten.etherscan.io/address/0x0f96cf29c8d9f65f83e6992cad3ebbe9a395f332#code
 	auctionFactoryABIPath: 'VickreyAuction-RopstenABI',
@@ -11,11 +13,11 @@ module.exports = {
 	jobFactoryAbiPath: 'JobFactory-RopstenABI',
 	jobFactoryContractAddress: '0xb2da7fcc212fe1c747048d7c7caca6a2bd8ec0bc',
 	
-	ethAddress: 'wss://ropsten.infura.io/ws/v3/dc53ba9a23564600bfbe5f8c2f345d1d',
+	ethAddress: 'wss://mainnet.infura.io/ws/v3/b953c0b0ccd34ab69751fb492c9c5f04',
 	// ethAddress: 'wss://geth.vm42.us',
 
 	// Turn on chrome dev tools from electron app. 
-	electronDev: true
+	electronDev: false,
 };
 
 

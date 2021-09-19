@@ -50,6 +50,10 @@
       document.addEventListener("deviceready", onDeviceReady, false);
       function onDeviceReady() {
       }
+      if(localStorage.getItem('environment')){
+        window.document.title += ' -- ' + localStorage.getItem('environment')
+      }
+
     </script>
     <script src="index.js"></script>
   </body>

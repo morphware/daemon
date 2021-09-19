@@ -1,19 +1,23 @@
 #!/usr/bin/env node
+process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 const {spawn} = require('child_process');
-const BASE_DIR = __dirname
 const fs = require('fs');
-const conf =require('./backend/conf')
-var tasks = []
+const conf =require('./backend/conf');
+var pids = []
 
 
 function startBackend(){
 	try{
 		let child = spawn('npm', ['start', '--',...process.argv],{
-			cwd: BASE_DIR+'/backend',
+			cwd: __dirname+'/backend',
+			env:{
+				...process.env
+			},
+			shell: true
 		});
 
-		tasks.push(child);
+		pids.push(child);
 
 		child.stdout.on('data', function(data){
 		 	console.log(data.toString());
@@ -24,69 +28,76 @@ function startBackend(){
 		});
 
 		child.on('exit', function(code){
-			console.error('Wxpress failed, killing dev server');
-			console.error('Wxpress exited with code: ' + code);
+			console.error('Express failed, killing dev server');
+			console.error('Express exited with code: ' + code);
 			killAll();
-			// process.exit(1);
 		});
 	}catch(error){
 		console.error('backend died', error);
 		killAll();
-		// process.exit(1);
 	}
 };
 
 function startReact(){
-	let eleteronLock = false
+	let electronLock = false
+	let doKill = true
 	try{
 		let child = spawn('npm', ['start'], {
-			cwd: BASE_DIR+'/frontend',
+			cwd: __dirname+'/frontend',
 			env:{
 				BROWSER: "none",
 				...process.env
-			}
+			},
+			shell: true,
 		});
 
-		tasks.push(child);
+		pids.push(child);
 
 		child.stdout.on('data', function(data){
-		 	console.log(data.toString());
-		 	if(!eleteronLock && data.toString().includes('Compiled successfully!')){
+		 	console.log('std', data.toString());
+		 	if(!electronLock && data.toString().includes('Compiled successfully!')){
 		 		startElectron();
-		 		eleteronLock = true;
+		 		electronLock = true;
 		 	}	
+		 	if(!electronLock && data.toString().includes('Something is already running on port')){
+		 		startElectron();
+		 		doKill = false;
+		 		electronLock = true;
+		 		child.kill();
+		 	}
 		});
 
 		child.stderr.on('data', function(data){
-		 	console.error(data.toString());
+		 	console.error('error', data.toString());
 		});
 
 		child.on('exit', function(code){
-			console.error('Webpack failed, killing dev server');
-			console.error('Webpack exited with code: ' + code);
-			killAll();
-			// process.exit(1);
+			console.error('React exited with code'. code,);
+			if(doKill) killAll();
 		});
 	}catch(error){
 		console.error('React died', error);
 		killAll();
-		// process.exit(1);
 	}
 };
 
 function startElectron(){
 	try{
 		// Inject conf for react to read.
-		fs.writeFileSync('preload.js', `localStorage.setItem('url', "${conf.httpAddress}:${conf.httpPort}")`);
+		fs.writeFileSync('preload.js', `
+			localStorage.setItem('url', "${conf.httpAddress}:${conf.httpPort}")
+			localStorage.setItem('environment', "${conf.environment}")
+		`);
 		
 		let child = spawn('npx', ['nodemon', '-w', 'electron.js', '--exec', 'electron', '.'], {
-			cwd: BASE_DIR,
+			cwd: __dirname,
 			env:{
 				...process.env
-			}
+			},
+			shell: true
 		});
 
-		tasks.push(child);
+		pids.push(child);
 
 		child.stdout.on('data', function(data){
 		 	console.log(data.toString());
@@ -101,7 +112,6 @@ function startElectron(){
 			console.error('Webpack exited with code: ' + code);
 
 			killAll();
-			// process.exit(1);
 		});	
 	}catch(error){
 		console.error('electron died')
@@ -111,9 +121,10 @@ function startElectron(){
 };
 
 function killAll(){
-	for(let task of tasks){
-		task.kill();
+	for(let pid of pids){
+		pid.kill();
 	}
+	process.exit(1);
 }
 
 startBackend();

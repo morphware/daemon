@@ -57,6 +57,7 @@ export interface SendMWTRequestProps {
 
 interface ConnectionStatusProps {
   status: boolean;
+  network: string;
 }
 export interface IDaemonService {
   submitTrainModelRequest(modelRequest: ITrainingModelValuesV2): Promise<void>;
