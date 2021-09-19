@@ -19,6 +19,7 @@ import {
 import VerticalAlignBottomIcon from "@material-ui/icons/VerticalAlignBottom";
 import Web3 from "web3";
 import CallMadeIcon from "@material-ui/icons/CallMade";
+import { copyToClipBoard, roundBalance, walletShortener } from "../utils";
 
 const useStyles = makeStyles((theme: Theme) =>
   createStyles({
@@ -79,9 +80,7 @@ const WalletModal = () => {
   const [toggleModal, setTogalModal] = useState<boolean>(true);
   const daemonService = useContext(DaemonContext);
 
-  const shortenedAddressStart = daemonService.walletAddress?.slice(0, 7);
-  const shortenedAddressEnd = daemonService.walletAddress?.slice(39, 43);
-  const shortenedAddress = `${shortenedAddressStart}...${shortenedAddressEnd}`;
+  const shortenedAddress = walletShortener(daemonService.walletAddress);
 
   const handleOpen = () => {
     setOpen(true);
@@ -91,128 +90,9 @@ const WalletModal = () => {
     setOpen(false);
   };
 
-  const copyToClipBoard = () => {
-    if (daemonService.walletAddress)
-      navigator.clipboard.writeText(daemonService.walletAddress);
-  };
-
   const sendMWT = async (values: SendMWTRequestProps) => {
     console.log("values: ", values);
     const transaction = await daemonService.sendMWT(values);
-  };
-
-  const mockHistoryV2: WalletHistoryProps = {
-    transactions: [
-      {
-        address: "0xbc40E97E6d665CE77E784349293D716B030711bC",
-        blockHash:
-          "0x9bb1abc6d4979fe7c0b1e107b14934cb4ea6bf05ba6d8ae6dbafd041404057bf",
-        blockNumber: 10966492,
-        data: "0x00000000000000000000000000000000000000000000003635c9adc5dea00000",
-        logIndex: 0,
-        removed: false,
-        topics: [
-          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
-          "0x0000000000000000000000008989a5c6aea7d677e61fa95e5824de7b7c74e38d",
-          "0x0000000000000000000000005733592919406a356192ba957e7dffb74fb62d1a",
-        ],
-        transactionHash:
-          "0x3a4261ad350e6e006bd04a8dafc06ed97b8a58ee9b9367f58957bf90468e5696",
-        transactionIndex: 3,
-        id: "log_5bb63534",
-        returnValues: {
-          "0": "0x8989a5C6AEA7D677e61Fa95E5824De7B7C74e38d",
-          "1": "0x5733592919406a356192bA957E7DFfb74fb62d1a",
-          "2": "1000000000000000000000",
-          __length__: 3,
-          from: "0x8989a5C6AEA7D677e61Fa95E5824De7B7C74e38d",
-          to: "0x5733592919406a356192bA957E7DFfb74fb62d1a",
-          value: "1000000000000000000000",
-        },
-      },
-      {
-        address: "0xbc40E97E6d665CE77E784349293D716B030711bC",
-        blockHash:
-          "0x9bb1abc6d4979fe7c0b1e107b14934cb4ea6bf05ba6d8ae6dbafd041404057bf",
-        blockNumber: 10966492,
-        data: "0x00000000000000000000000000000000000000000000003635c9adc5dea00000",
-        logIndex: 0,
-        removed: false,
-        topics: [
-          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
-          "0x0000000000000000000000008989a5c6aea7d677e61fa95e5824de7b7c74e38d",
-          "0x0000000000000000000000005733592919406a356192ba957e7dffb74fb62d1a",
-        ],
-        transactionHash:
-          "0x3a4261ad350e6e006bd04a8dafc06ed97b8a58ee9b9367f58957bf90468e5696",
-        transactionIndex: 3,
-        id: "log_5bb63534",
-        returnValues: {
-          "0": "0x8989a5C6AEA7D677e61Fa95E5824De7B7C74e38d",
-          "1": "0x5733592919406a356192bA957E7DFfb74fb62d1a",
-          "2": "1000000000000000000000",
-          __length__: 3,
-          from: "0x8989a5C6AEA7D677e61Fa95E5824De7B7C74e38d",
-          to: "0x5733592919406a356192bA957E7DFfb74fb62d1a",
-          value: "1000000000000000000000",
-        },
-      },
-      {
-        address: "0xbc40E97E6d665CE77E784349293D716B030711bC",
-        blockHash:
-          "0x9bb1abc6d4979fe7c0b1e107b14934cb4ea6bf05ba6d8ae6dbafd041404057bf",
-        blockNumber: 10966492,
-        data: "0x00000000000000000000000000000000000000000000003635c9adc5dea00000",
-        logIndex: 0,
-        removed: false,
-        topics: [
-          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
-          "0x0000000000000000000000008989a5c6aea7d677e61fa95e5824de7b7c74e38d",
-          "0x0000000000000000000000005733592919406a356192ba957e7dffb74fb62d1a",
-        ],
-        transactionHash:
-          "0x3a4261ad350e6e006bd04a8dafc06ed97b8a58ee9b9367f58957bf90468e5696",
-        transactionIndex: 3,
-        id: "log_5bb63534",
-        returnValues: {
-          "0": "0x8989a5C6AEA7D677e61Fa95E5824De7B7C74e38d",
-          "1": "0x5733592919406a356192bA957E7DFfb74fb62d1a",
-          "2": "1000000000000000000000",
-          __length__: 3,
-          from: "0x8989a5C6AEA7D677e61Fa95E5824De7B7C74e38d",
-          to: "0x5733592919406a356192bA957E7DFfb74fb62d1a",
-          value: "1000000000000000000000",
-        },
-      },
-      {
-        address: "0xbc40E97E6d665CE77E784349293D716B030711bC",
-        blockHash:
-          "0x9bb1abc6d4979fe7c0b1e107b14934cb4ea6bf05ba6d8ae6dbafd041404057bf",
-        blockNumber: 10966492,
-        data: "0x00000000000000000000000000000000000000000000003635c9adc5dea00000",
-        logIndex: 0,
-        removed: false,
-        topics: [
-          "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
-          "0x0000000000000000000000008989a5c6aea7d677e61fa95e5824de7b7c74e38d",
-          "0x0000000000000000000000005733592919406a356192ba957e7dffb74fb62d1a",
-        ],
-        transactionHash:
-          "0x3a4261ad350e6e006bd04a8dafc06ed97b8a58ee9b9367f58957bf90468e5696",
-        transactionIndex: 3,
-        id: "log_5bb63534",
-        returnValues: {
-          "0": "0x8989a5C6AEA7D677e61Fa95E5824De7B7C74e38d",
-          "1": "0x5733592919406a356192bA957E7DFfb74fb62d1a",
-          "2": "1000000000000000000000",
-          __length__: 3,
-          from: "0x8989a5C6AEA7D677e61Fa95E5824De7B7C74e38d",
-          to: "0x5733592919406a356192bA957E7DFfb74fb62d1a",
-          value: "1000000000000000000000",
-        },
-      },
-    ],
-    address: "123",
   };
 
   const HistoryTransaction = (historyTransactionItem: TransactionProps) => {
@@ -450,11 +330,7 @@ const WalletModal = () => {
     );
   };
 
-  const balance = daemonService.walletBalance
-    ? daemonService.walletBalance
-    : "0";
-
-  const roundedBalance = parseFloat(balance).toFixed(4);
+  const roundedBalance = roundBalance(daemonService.walletBalance);
 
   return (
     <div>
@@ -489,7 +365,9 @@ const WalletModal = () => {
               <Box display="flex" alignItems="center">
                 <Typography variant="body2">{shortenedAddress}</Typography>
               </Box>
-              <IconButton onClick={copyToClipBoard}>
+              <IconButton
+                onClick={() => copyToClipBoard(daemonService.walletAddress)}
+              >
                 <FileCopyIcon fontSize="small" color="secondary" />
               </IconButton>
               <Grid item xs={12} style={{ textAlign: "center" }}>

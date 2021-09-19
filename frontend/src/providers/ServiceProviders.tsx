@@ -19,6 +19,7 @@ interface daemonServiceProps {
   walletHistory?: WalletHistoryProps;
   walletAddress?: string;
   connectionStatus: boolean;
+  network?: string;
   getTorrents: () => Promise<void>;
   submitTrainModelRequest(modelRequest: ITrainingModelValuesV2): Promise<void>;
   getBalance(): Promise<void>;
@@ -36,6 +37,7 @@ const ServiceProviders: React.FC = ({ children }) => {
   const [walletBalance, setWalletBalance] = useState<string>();
   const [walletHistory, setWalletHistory] = useState<WalletHistoryProps>();
   const [connectionStatus, setConnectionStatus] = useState<boolean>(false);
+  const [network, setNetwork] = useState<string>();
 
   const mockTorrents = () => {
     const mockTorrents: ActiveTorrents = {
@@ -102,9 +104,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     newRequest.address = sendMWTRequest.address;
     newRequest.amount = MWTAmount;
     if (sendMWTRequest.gas) {
-      // newRequest.gas = Web3.utils.toWei(sendMWTRequest.gas, "ether");
       newRequest.gas = Web3.utils.toWei(sendMWTRequest.gas, "gwei");
-      // newRequest.gas = sendMWTRequest.gas;
     }
     console.log("Req : ", newRequest);
     const transaction = await daemonService.sendMWT(newRequest);
@@ -114,7 +114,9 @@ const ServiceProviders: React.FC = ({ children }) => {
   const getConnectionStatus = async () => {
     const statusResponse = await daemonService.getConnectionStatus();
     const status = statusResponse.status;
+    const network = statusResponse.network;
     setConnectionStatus(status);
+    setNetwork(network);
   };
 
   const daemonServicContext: daemonServiceProps = {
@@ -125,6 +127,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     walletHistory: walletHistory,
     walletAddress: walletAddress,
     connectionStatus: connectionStatus,
+    network: network,
     getTorrents: getTorrents,
     submitTrainModelRequest: daemonService.submitTrainModelRequest,
     getBalance: getBalance,
