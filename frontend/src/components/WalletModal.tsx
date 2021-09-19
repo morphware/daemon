@@ -3,7 +3,6 @@ import React, { useContext, useState } from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
-// import { useSpring, animated } from "react-spring/web.cjs"; // web.cjs is required for IE 11 support
 import { Box, Button, Grid, IconButton, Typography } from "@material-ui/core";
 import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
 import { useSpring, animated } from "react-spring";
@@ -14,7 +13,6 @@ import { TextField } from "mui-rff";
 import {
   SendMWTRequestProps,
   TransactionProps,
-  WalletHistoryProps,
 } from "../service/DaemonService";
 import VerticalAlignBottomIcon from "@material-ui/icons/VerticalAlignBottom";
 import Web3 from "web3";
@@ -139,11 +137,12 @@ const WalletModal = () => {
   };
 
   const GenerateHistoryItems = () => {
-    const transactions = daemonService.walletHistory?.transactions
-      ? daemonService.walletHistory?.transactions
-      : [];
+    // const transactions = daemonService.walletHistory?.transactions
+    //   ? daemonService.walletHistory?.transactions
+    //   : [];
 
     console.log(daemonService.walletHistory?.transactions);
+    const transactions: Array<any> = [];
 
     const historyLessThanFive =
       transactions.length < 5 ? transactions : transactions.slice(-4);
@@ -160,18 +159,25 @@ const WalletModal = () => {
         padding={1}
       >
         {historyLessThanFive.map((item) => HistoryTransaction(item))}
-        <Button
-          style={{
-            padding: "15px",
-            borderTop: "15px",
-            border: "1px solid black",
-          }}
-          color="primary"
-          variant="outlined"
-          onClick={viewAllTransactions}
-        >
-          View All Transactions
-        </Button>
+        {transactions.length >= 4 && (
+          <Button
+            style={{
+              padding: "15px",
+              borderTop: "15px",
+              border: "1px solid black",
+            }}
+            color="primary"
+            variant="outlined"
+            onClick={viewAllTransactions}
+          >
+            View All Transactions
+          </Button>
+        )}
+        {transactions.length === 0 && (
+          <Box display="flex" justifyContent="center" paddingTop="20px">
+            <Typography variant="body2">No Transactions Completed</Typography>
+          </Box>
+        )}
       </Box>
     );
   };
