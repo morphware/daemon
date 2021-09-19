@@ -194,6 +194,8 @@ const WalletModal = () => {
         validate={(values: SendMWTRequestProps) => {
           const errors = {} as SendMWTRequestProps;
           const amount = parseFloat(values.amount);
+          const validAddress = Web3.utils.isAddress(values.address);
+
           var gas;
           if (values.gas) {
             gas = parseFloat(values.gas);
@@ -202,8 +204,8 @@ const WalletModal = () => {
             ? parseFloat(daemonService.walletBalance)
             : 0;
 
-          if (!values.address) {
-            //Check if a valid address
+          if (!validAddress) {
+            errors.address = "Invalid address";
           }
           if (amount <= 0) {
             errors.amount = "Invalid amount";

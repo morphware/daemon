@@ -266,6 +266,7 @@ const TrainModelForm = () => {
     console.log("legacy fields: ", formFields);
     await daemonService.submitTrainModelRequest(formFields);
     await daemonService.getTorrents();
+    await daemonService.getWalletHistory();
   };
 
   return (
@@ -273,6 +274,7 @@ const TrainModelForm = () => {
       onSubmit={onSubmit}
       validate={(values: formFields) => {
         const errors = {} as formFieldsErrors;
+
         if (!values.jupyterNotebook) {
           errors.jupyterNotebook = "Required";
         }
