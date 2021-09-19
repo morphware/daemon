@@ -15,7 +15,7 @@ function startBackend(){
 			env:{
 				...process.env
 			},
-			script: true
+			shell: true
 		});
 
 		tasks.push(child);
@@ -49,7 +49,7 @@ function startReact(){
 				BROWSER: "none",
 				...process.env
 			},
-			script:true,
+			shell: true,
 		});
 
 		tasks.push(child);
@@ -93,7 +93,7 @@ function startElectron(){
 				ELECTON_DEV: 1,
 				...process.env
 			},
-			script: true
+			shell: true
 		});
 
 		tasks.push(child);
