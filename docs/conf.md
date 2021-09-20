@@ -25,6 +25,7 @@ will look for (and make if need) a `local.json` file in the user app data
 location.
 
 On Linux this is `/home/<USER>/.local/share/MorphwareWallet/<environment>/`
+	
 On Windows `C:\Users\<USER>\AppData\Roaming\MorphwareWallet\<environment>\` or
 	where ever `APPDATA` is configure for that system
 
