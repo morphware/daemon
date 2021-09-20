@@ -86,7 +86,7 @@ class Job{
 			job.transactions.push(event);
 
 			// Call the relevant job method, if it exists
-			if(job[event.event]) job[event.event](parseEvent(event));
+			if(job[name]) job[name](event);
 
 			return;
 		}

@@ -31,12 +31,31 @@ class JobWorker extends Job{
 		}
 	}
 
+	static __process_event(event){
+
+		console.log('JobWorker event')
+		let name = event.event;
+
+		/*
+		we want to get to the object that holds `returnValues`. Sometime its in the
+		event, and sometimes there is returnValue in a `events` object.
+		*/
+		if(event.events && event.events[name]){
+			event = event.events[name]
+		}
+
+		// If the current client is accepting new jobs, start a new worker
+		if(name === 'JobDescriptionPosted'){
+			this.workerCreator(event);
+		}
+	}
+
 	// Contract actions
 	async bid(){
 
 		this.bid = {
-			bidAmount: 11 // How do we figure out the correct bid?
-			fakeBid: false // How do we know when to fake bid?
+			bidAmount: 11, // How do we figure out the correct bid?
+			fakeBid: false, // How do we know when to fake bid?
 			secret: '0x6d6168616d000000000000000000000000000000000000000000000000000000' // What is this made from?
 		}
 
@@ -58,11 +77,11 @@ class JobWorker extends Job{
 
 	async reveal(){
 		let action = this.auctionContract.methods.reveal(
-			job.jobPoster,
-			parseInt(job.id),
-			[bidAmount],
-			[fakeBid],
-			[secret]
+			this.jobPoster,
+			parseInt(this.id),
+			[this.bid.bidAmount],
+			[this.bid.fakeBid],
+			[this.bid.secret]
 		);
 
 		let receipt = await action.send({
@@ -96,8 +115,7 @@ class JobWorker extends Job{
 
 }
 
-
-// Inject
-Job.workerCreator = JobWorker.new
+// Listen for new posted jobs
+JobWorker.events();
 
 module.exports = {JobWorker};

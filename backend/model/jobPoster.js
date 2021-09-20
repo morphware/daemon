@@ -225,7 +225,8 @@ class JobPoster extends Job{
 	        console.error('ERROR!!! `JobApproved`', error);
 	    }
 	}
-
 }
+
+
 
 module.exports = {JobPoster};
