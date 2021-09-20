@@ -17,6 +17,17 @@ export a object.
 A `secrets.js` template file can simply be copied and edited to your needs.
 `cp conf/secrets.js.template conf/secrets.js`
 
+## Local settings on built packages
+
+When the application is packaged by electron and ran as a distrusted executable
+the `conf` folder is not accessible. If the `conf` object detects this state, it
+will look for (and make if need) a `local.json` file in the user app data
+location.
+
+On Linux this is `/home/<USER>/.local/share/MorphwareWallet/<environment>/`
+On Windows `C:\Users\<USER>\AppData\Roaming\MorphwareWallet\<environment>\` or
+	where ever `APPDATA` is configure for that system
+
 ## Conf fields
 
 The following fields are used in the conf object during execution and can be
@@ -28,7 +39,8 @@ on.
 the following fields:
 	* `privateKey` *STRING* **REQUIRED** The private key for the Etherum account
 	. This should be stored in `secrets.js`
-* `isGPUnode` *BOOL* If the current node is a accepting jobs.
+* `acceptWork` *BOOL* If the current node is a accepting jobs.
+
 
 
 ### Conf fields users should not mess with
