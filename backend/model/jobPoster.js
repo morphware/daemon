@@ -227,6 +227,4 @@ class JobPoster extends Job{
 	}
 }
 
-
-
 module.exports = {JobPoster};

@@ -4,7 +4,7 @@ const conf = require('../conf');
 const {web3} = require('./contract');
 const webtorrent = require('../controller/torrent');
 const {Job} = require('./job');
-
+const {wallet} = require('./morphware')
 class JobWorker extends Job{
 	constructor(data){
 		super(data)
@@ -13,10 +13,19 @@ class JobWorker extends Job{
 	static async new(event){
 		if(conf.acceptWork){
 			// Make new job instance
-			let job = new this({jobData: event.returnValue});
+			let job = new this({
+				jobData: event.returnValue,
+				wallet: wallet
+			});
+
+			// Hold new instance in the jump table
 			Job.jobs[job.id] = job;
+
+			// Start the transaction history
 			job.transactions.push(event);
-			let jobData = await job.JobDescriptionPosted();
+
+			// Kick off the job
+			await job.JobDescriptionPosted();
 		}
 	}
 
@@ -80,6 +89,23 @@ class JobWorker extends Job{
 		return receipt;
 	}
 
+	async shareTrainedModel(){
+		let action = jobFactoryContract.methods.shareTrainedModel(
+            this.jobData.jobPoster,
+            parseInt(this.id),
+            trainedModelMagnetLink, // get this data
+            parseInt(trainingErrorRate) // get this data
+        );
+
+		let receipt = await action.send({
+			gas: await action.estimateGas()
+		});
+
+		this.transactions.push(receipt);
+
+		return receipt;
+	}
+
 	// Contract events
 	async JobDescriptionPosted(event){
 		console.log('Inside JobWorker JobDescriptionPosted...');
@@ -98,6 +124,27 @@ class JobWorker extends Job{
 		setTimeout(()=>{
 			this.reveal();
 		}, 1000);
+	}
+
+	async AuctionEnded(event){
+		try{
+			console.log('Inside JobWorker procAuctionEnded...', event); // XXX
+
+			var results = event.returnValues;
+
+			if(results.winner !== this.wallet.address){
+				// Remove this job from the job jump table if we did not win
+				delete this.constructor.jobs[this.id]
+			}
+
+		}catch(error){
+			console.error('ERROR!!! `AuctionEnded`', error)
+		}
+	}
+
+	async UntrainedModelAndTrainingDatasetShared(event){
+		// get files and do work
+		// when the work is done, share the results
 	}
 }
 
