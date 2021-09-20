@@ -91,18 +91,9 @@ class Job{
 			return;
 		}
 
-		// If the current client is accepting new jobs, start a new worker
-		if(this.workerCreator && name === 'JobDescriptionPosted'){
-
-			this.workerCreator(event);
-
-			return ;
-		}
-
-		// Do something with job events the this client doesn't care about
+		// Do something with job events this client doesn't care about
 		// Maybe stream them to the front end, idk.
 	}
-
 }
 
 // Listen for job events

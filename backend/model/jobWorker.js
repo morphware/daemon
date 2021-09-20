@@ -5,35 +5,22 @@ const {web3} = require('./contract');
 const webtorrent = require('../controller/torrent');
 const {Job} = require('./job');
 
-let jobFactoryAbi = require(`./../abi/${conf.jobFactoryAbiPath}`);
-let jobFactoryContract = new web3.eth.Contract(jobFactoryAbi, conf.jobFactoryContractAddress);
-
-var auctionFactoryAbi = require(`./../abi/${conf.auctionFactoryABIPath}`);
-var auctionFactoryContract = new web3.eth.Contract(auctionFactoryAbi,conf.auctionFactoryContractAddress);
-
 class JobWorker extends Job{
 	constructor(data){
 		super(data)
 	}
 
 	static async new(event){
-		try{
-			if(conf.acceptWork){
-				// Make new job instance
-				let job = new this({jobData: event.returnValue});
-				Job.jobs[job.id] = job;
-				job.transactions.push(event);
-				let jobData = await job.JobDescriptionPosted();
-			}
-
-		}catch(error){
-			throw error;
+		if(conf.acceptWork){
+			// Make new job instance
+			let job = new this({jobData: event.returnValue});
+			Job.jobs[job.id] = job;
+			job.transactions.push(event);
+			let jobData = await job.JobDescriptionPosted();
 		}
 	}
 
 	static __process_event(event){
-
-		console.log('JobWorker event')
 		let name = event.event;
 
 		/*
@@ -46,7 +33,7 @@ class JobWorker extends Job{
 
 		// If the current client is accepting new jobs, start a new worker
 		if(name === 'JobDescriptionPosted'){
-			this.workerCreator(event);
+			this.new(event);
 		}
 	}
 
@@ -112,7 +99,6 @@ class JobWorker extends Job{
 			this.reveal();
 		}, 1000);
 	}
-
 }
 
 // Listen for new posted jobs
