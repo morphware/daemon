@@ -3,6 +3,7 @@
 const extend = require('extend');
 const fs = require('fs-extra');
 var args = require('args');
+const packageJSON = require('../package');
 
 
 // Throw errors letting users know if required conf files are missing
@@ -64,6 +65,10 @@ var runtimeConf = args.parse(process.argv, {
 })
 
 
+// Include the current version
+runtimeConf.version = packageJSON.version;
+
+
 // Set the correct `NODE_ENV`
 const environment = process.env.NODE_ENV || (isPackaged ? 'production' : 'development');
 
@@ -119,5 +124,6 @@ var conf = extend(
 	{environment}
 );
 
+console.info('Local path is', runtimeConf.appDataPath);
 
 module.exports = {conf, localConf, editLocalConf}

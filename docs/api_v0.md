@@ -255,8 +255,93 @@ View and send MWT associated with the current wallet
   }
 
 	```
-## Configuration **Coming soon!**
+## Settings 
 
-`api/v0/conf`
+`api/v0/settings`
 
-View and manage runtime and persistent conf file
+View and edit settings
+
+* **GET**
+	
+	Returns the current settings and what keys can be edited
+
+	Query **none**
+
+	Response fields:
+	* `conf` *OBJEECT* Current configuration object.
+	* `editKeys` *Object* What keys can be edited.
+		* `key` *STRING* The key name
+		* `type` *STRING* The type the key can take.
+
+	Example
+
+	```bash
+
+		{
+	  "conf": {
+	    "httpAddress": "127.0.0.1",
+	    "httpPort": 3099,
+	    "appName": "MorphwareWallet",
+	    "morphwareTokenABIPath": "MorphwareToken-RopstenABI",
+	    "morphwareTokenContractAddress": "0xbc40e97e6d665ce77e784349293d716b030711bc",
+	    "auctionFactoryABIPath": "VickreyAuction-RopstenABI",
+	    "auctionFactoryContractAddress": "0x0f96cf29c8d9f65f83e6992cad3ebbe9a395f332",
+	    "jobFactoryAbiPath": "JobFactory-RopstenABI",
+	    "jobFactoryContractAddress": "0xb2da7fcc212fe1c747048d7c7caca6a2bd8ec0bc",
+	    "ethAddress": "wss://ropsten.infura.io/ws/v3/dc53ba9a23564600bfbe5f8c2f345d1d",
+	    "electronDev": true,
+	    "privateKey": [
+	      "0x6644308f8abe578c3598f9749c52e"
+	    ],
+	    "h": 3099,
+	    "version": "0.0.11",
+	    "appDataPath": "/home/william/.local/share/MorphwareWallet-development/",
+	    "appDataLocal": "/home/william/.local/share/MorphwareWallet-development/local.json",
+	    "environment": "development"
+	  },
+	  "editKeys": {
+	    "httpBindAddress": {
+	      "type": "string"
+	    },
+	    "httpPort": {
+	      "type": "number"
+	    },
+	    "privateKey": {
+	      "type": "array"
+	    },
+	    "acceptWork": {
+	      "type": "boolean"
+	    },
+	    "torrentListenPort": {
+	      "type": "number"
+	    },
+	    "dataPath": {
+	      "type": "string"
+	    }
+	  }
+	}
+	```
+
+	**POST** `settings/`
+
+	Post the new local settings to the client. **THE CHANGES WILL NOT TAKE EFFECT
+	UNTIL THE CLIENT IS RESTARTED**
+
+	Query **none**
+	Body fields:
+		See `editKeys` from *GET*
+
+	Response fields:
+		The response will be the new local settings object
+
+	Example
+	```bash
+	curl  -H "Content-Type: application/json" -X POST -d '{"privateKey":["0x66443098f9749c52e"]}' 127.0.0.1:3099/api/v0/settings
+	{"privateKey":["0x66443098f9749c52e"]}
+	```
+
+	Example Error
+	```bash
+	curl  -H "Content-Type: application/json" -X POST -d '{"privateKeys":["0x66443098f9749c52e"]}' 127.0.0.1:3099/api/v0/settings
+  {"error":"Can not edit privateKeys"}
+	```

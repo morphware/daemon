@@ -23,8 +23,7 @@ router.get('/', async function(req, res, next){
 router.post('/', async function(req, res, next) {
 	try{
 		for(let key in req.body){
-			if(!Objecy.keys(editKeys).includes(key)) throw `Can not edit ${key}`
-			if(typeof res.body[key] !== editKeys[key].type) throw `${key} is incorrect type`
+			if(!Object.keys(editKeys).includes(key)) throw `Can not edit ${key}`
 		}
 
 		return res.json(editLocalConf(req.body));
