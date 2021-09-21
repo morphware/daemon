@@ -98,8 +98,12 @@ The CLI is meant to assist in development work and production build debugging. I
 would like to allow all conf options to be set via the CLI.
 
 ```bash
-william$ node express.js --help
-  Usage: express.js [options] [command]
+08:41 PM william$ npm run dev -- --help
+
+> Morphware-Wallet@0.0.1 dev
+> node devRun.js "--help"
+
+  Usage: devRun.js [options] [command]
   
   Commands:
     help     Display help
