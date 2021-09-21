@@ -1,6 +1,6 @@
 'use strict';
 
-const conf = require('../conf');
+const {conf, editLocalConf} = require('../conf');
 const {web3} = require('./contract');
 var wallet = null
 
@@ -118,32 +118,26 @@ MorphwareWallet.tokenContract.events.Transfer((error, event)=>{
 
 
 // Set up the default wallet and use it as the default.
-if(conf.wallet && conf.wallet.privateKey){
-	let account = web3.eth.accounts.privateKeyToAccount(conf.wallet.privateKey);
+if(conf.privateKey && conf.privateKey.length){
+	let account = web3.eth.accounts.privateKeyToAccount(conf.privateKey[0]);
 	console.info(`Account found for ${account.address}`);
 	web3.eth.accounts.wallet.add(account);
 	web3.eth.defaultAccount = account.address;
 	wallet = MorphwareWallet.add(account);
 
-}else if(conf.localAppData !== './secrets.js'){
-	const fs = require('fs-extra');
-
+// If no private key is found, make a new one
+}else{
 	console.log('Adding address on first app run...');
 	let account = web3.eth.accounts.create();
-	console.info(`Account found for ${account.address}`);
+	console.info(`Making account with address ${account.address}`);
 	web3.eth.accounts.wallet.add(account);
 	web3.eth.defaultAccount = account.address;
 	wallet = MorphwareWallet.add(account);
-	fs.writeJsonSync(conf.localAppData, {
-		wallet:{
-			privateKey: account.privateKey
-		}
-	}, {spaces: '  '});
-}else{
-	console.error('Private key not found!!!');
-	console.error('Please add this private key to your secrets.js file\n');
-	console.error(web3.eth.accounts.create().privateKey);
-	process.exit(1);
+
+	// Save the new account to the local settings file
+	editLocalConf({
+		privateKey: [account.privateKey]
+	})
 }
 
 module.exports = {MorphwareWallet, wallet};

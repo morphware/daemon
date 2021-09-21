@@ -98,6 +98,7 @@ The CLI is meant to assist in development work and production build debugging. I
 would like to allow all conf options to be set via the CLI.
 
 ```bash
+william$ node express.js --help
   Usage: express.js [options] [command]
   
   Commands:
@@ -106,11 +107,13 @@ would like to allow all conf options to be set via the CLI.
   
   Options:
     -a, --acceptWork   Accepting jobs
+    -A, --appDataPath  Path where local data is held
     -e, --electronDev  Load chrome dev tools
+    -E, --ethAddress   Remote etherum node
     -H, --help         Output usage information
     -h, --httpPort     http port
+    -p, --privateKey   Wallet Object
     -v, --version      Output the version number
-    -w, --wallet       Wallet Object
-
 
 ```
+

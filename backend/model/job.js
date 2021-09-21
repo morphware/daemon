@@ -1,6 +1,6 @@
 'use static';
 
-const conf = require('../conf');
+const {conf} = require('../conf');
 const {web3} = require('./contract');
 
 const jobFactoryAbi = require(`./../abi/${conf.jobFactoryAbiPath}`);

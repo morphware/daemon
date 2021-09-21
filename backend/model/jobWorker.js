@@ -1,13 +1,19 @@
 'use strict';
 
-const conf = require('../conf');
+const {conf} = require('../conf');
 const {web3} = require('./contract');
 const webtorrent = require('../controller/torrent');
 const {Job} = require('./job');
-const {wallet} = require('./morphware')
+const {wallet} = require('./morphware');
+
+
 class JobWorker extends Job{
 	constructor(data){
 		super(data)
+	}
+
+	get jobType(){
+		return 'worker';
 	}
 
 	static async new(event){
@@ -49,7 +55,7 @@ class JobWorker extends Job{
 	// Contract actions
 	async bid(){
 
-		this.bid = {
+		this.auctionContract.bid = {
 			bidAmount: 11, // How do we figure out the correct bid?
 			fakeBid: false, // How do we know when to fake bid?
 			secret: '0x6d6168616d000000000000000000000000000000000000000000000000000000' // What is this made from?

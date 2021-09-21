@@ -1,13 +1,18 @@
 'use strict';
 
 const {web3} = require('./contract');
-const conf = require('../conf');
+const {conf} = require('../conf');
 const {Job} = require('./job');
 const webtorrent = require('../controller/torrent');
+
 
 class JobPoster extends Job{
 	constructor(data){
 		super(data);
+	}
+
+	get jobType(){
+		return 'poster';
 	}
 
 	// Wrapper for creating a new job

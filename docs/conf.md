@@ -34,6 +34,7 @@ On Windows `C:\Users\<USER>\AppData\Roaming\MorphwareWallet\<environment>\` or
 The following fields are used in the conf object during execution and can be
 placed in any file file that makes sense.
 
+* `httpBindAddress` *STRING* **REQUIRED** IP for the HTTP server to bind
 * `httpPort` *NUMBER* **REQUIRED** The TCP port for the HTTP interface to listen
 on.
 * `wallet` *OBJECT* **REQUIRED** Configuration of the Etherum account. It take
@@ -50,6 +51,8 @@ The following fields should not be edited unless you fully understand what they
 do. Little to no error checking can be done to determine if valid but wrong
 settings are applied.
 
+* ``appName` *STRING* **REQUIRED** App name used for making conf paths. Changing
+	this will change where local settings files are held.
 * `ethAddress` *STRING* **REQUIRED** The remote Etherum node to connect to.
 * `jobFactoryContractAddress` *STRING* **REQUIRED** The contract address
 * `auctionFactoryContractAddress` *STRING* **REQUIRED** The auction address
@@ -73,5 +76,4 @@ Changes made to the conf object during run time are not persistent.
 ## Settings to add
 
 * `dataPath` *STRING* Path the app will use for data
-* `httpBindAddress` *STRING* IP for the HTTP server to bind
 * `torrentListenPort` *STRING* TCP port for the torrent client to listen on
