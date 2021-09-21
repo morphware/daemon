@@ -2,7 +2,7 @@
 
 const bodyParser = require('body-parser');
 const express    = require('express');
-const conf       = require('./conf');
+const {conf}       = require('./conf');
 const cors       = require('cors')
 
 const app  = express();
@@ -36,7 +36,7 @@ app.use(function(err, req, res, next) {
   }
   
   res.status(err.status || 500);
-  res.json({error: err});
+  res.json({error: err.message || err});
 });
 
 module.exports = app;

@@ -12,23 +12,42 @@ Each time a file is load, its over layed onto the conf object. A environment or
 Any valid Java Script can be placed in each conf file. `module.exports` must
 export a object.
 
-## Setting up the `secrets.js` file
 
-A `secrets.js` template file can simply be copied and edited to your needs.
-`cp conf/secrets.js.template conf/secrets.js`
+## Local settings on built packages
+
+When the application is packaged by electron and ran as a distrusted executable
+the `conf` folder is not accessible. If the `conf` object detects this state, it
+will look for (and make if need) a `local.json` file in the user app data
+location.
+
+On Linux this is `/home/<USER>/.local/share/MorphwareWallet[-environment]/`
+	
+On Windows `C:\Users\<USER>\AppData\Roaming\MorphwareWallet[-environment]\` or
+	where ever `APPDATA` is configure for that system
+
+On OSX `/home/<USER>/Library/Preferences/MorphwareWallet[-environment]/`
+
+`-environment` will only be added if its not production
 
 ## Conf fields
 
 The following fields are used in the conf object during execution and can be
 placed in any file file that makes sense.
 
+* `httpBindAddress` *STRING* **REQUIRED** IP for the HTTP server to bind
 * `httpPort` *NUMBER* **REQUIRED** The TCP port for the HTTP interface to listen
 on.
-* `wallet` *OBJECT* **REQUIRED** Configuration of the Etherum account. It take
-the following fields:
-	* `privateKey` *STRING* **REQUIRED** The private key for the Etherum account
-	. This should be stored in `secrets.js`
-* `isGPUnode` *BOOL* If the current node is a accepting jobs.
+* `privateKey` *ARRAY* **REQUIRED** The private key for the Etherum account
+  . This should be stored in `secrets.js`
+* `acceptWork` *BOOL* If the current node is a accepting jobs.
+* `electronDev` *BOOL* Bring up the chrome dev tools in electron.
+
+## Dev fields
+User may edit these fields, but they are mostly meant for dev issues.
+
+* `appDataPath` *STRING* path where local data will be stored, including
+  local settings file and downloaded data. See
+  `Local settings on built packages` for there this will be set automatically.
 
 
 ### Conf fields users should not mess with
@@ -37,6 +56,8 @@ The following fields should not be edited unless you fully understand what they
 do. Little to no error checking can be done to determine if valid but wrong
 settings are applied.
 
+* ``appName` *STRING* **REQUIRED** App name used for making conf paths. Changing
+	this will change where local settings files are held.
 * `ethAddress` *STRING* **REQUIRED** The remote Etherum node to connect to.
 * `jobFactoryContractAddress` *STRING* **REQUIRED** The contract address
 * `auctionFactoryContractAddress` *STRING* **REQUIRED** The auction address
@@ -48,7 +69,7 @@ settings are applied.
 Simply require the conf directory relative to the current file;
 
 ```js
-const conf = require('./conf');
+const {conf} = require('./conf');
 
 console.log(conf.httpPort)
 // 3000
@@ -60,5 +81,4 @@ Changes made to the conf object during run time are not persistent.
 ## Settings to add
 
 * `dataPath` *STRING* Path the app will use for data
-* `httpBindAddress` *STRING* IP for the HTTP server to bind
 * `torrentListenPort` *STRING* TCP port for the torrent client to listen on

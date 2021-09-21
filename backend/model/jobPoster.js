@@ -1,50 +1,41 @@
 'use strict';
 
-const conf = require('../conf');
 const {web3} = require('./contract');
+const {conf} = require('../conf');
+const {Job} = require('./job');
 const webtorrent = require('../controller/torrent');
 
-let jobFactoryAbi = require(`./../abi/${conf.jobFactoryAbiPath}`);
-let jobFactoryContract = new web3.eth.Contract(jobFactoryAbi, conf.jobFactoryContractAddress);
 
-var auctionFactoryAbi = require(`./../abi/${conf.auctionFactoryABIPath}`);
-var auctionFactoryContract = new web3.eth.Contract(auctionFactoryAbi,conf.auctionFactoryContractAddress);
-
-
-class JobPoster{
+class JobPoster extends Job{
 	constructor(data){
-		this.wallet = data.wallet;
-		this.data = data;
-
-		this.jobContract = jobFactoryContract.clone();
-		this.jobContract.options.from = this.wallet.address;
-
-		this.auctionContract = auctionFactoryContract.clone();
-		this.auctionContract.options.from = this.wallet.address;
-
-		this.jobID = null;
-		this.jobData = {};
-		this.transactions = [];
-		this.lastEvent = null;
+		super(data);
 	}
-	static jobs = {}
 
+	get jobType(){
+		return 'poster';
+	}
+
+	// Wrapper for creating a new job
+	// This only exists because a proper constructor can not be async and we
+	// have to wait for the job id
 	static async new(data){
 		try{
-			let job = new JobPoster(data)
+			let job = new this(data)
 
 			let jobData = await job.post();
 
-			JobPoster.jobs[jobData.returnValues.id] = job;
+			Job.jobs[job.id] = job;
 
 			return job;
 		}catch(error){
 			throw error;
 		}
-
 	}
 
+
+	// Helpers
 	async __parsePostFile(data){
+		/* parse the passed file paths from the passed instance data*/
 		try{
 			this.data.files = {};
 			let fileFields = [
@@ -62,11 +53,13 @@ class JobPoster{
 			}
 
 		}catch(error){
-			console.log(' error __parsePostFile', error)
+			console.log('error __parsePostFile', error)
 			throw error;
 		}
 	}
 
+
+	// Contact actions
 	async post(){
 		try{
 
@@ -82,6 +75,8 @@ class JobPoster{
 			this.__parsePostFile(this.data);
 
 			// Calculate the auction timing
+			// This is a hack to deal with block timing. All timing will be
+			// reworked soon and this is the last we will speak of it...
 			var biddingDeadline = Math.floor(new Date().getTime() / 1000) + parseInt(this.data.biddingTime)
 			var revealDeadline = biddingDeadline+30  // TODO Replace this
 
@@ -100,12 +95,9 @@ class JobPoster{
 				gas: await action.estimateGas()
 			});
 
-			// Listen for events related to this job
-			this.events();
-
 			// Gather data about the job
+			// This should be done in the new method or with getters...
 			this.jobData = receipt.events.JobDescriptionPosted
-			this.jobID = receipt.events.JobDescriptionPosted.returnValues.id
 
 			// End the auction later
 			this.auctionEnd((this.data.biddingTime+30)*1000);
@@ -118,8 +110,6 @@ class JobPoster{
 		}
 	}
 
-
-	// Contact actions
 	async auctionEnd(time){
 		setTimeout(async function(job){
 			try{
@@ -144,7 +134,7 @@ class JobPoster{
 		try{
 
 			let action = this.jobContract.methods.shareUntrainedModelAndTrainingDataset(
-				this.jobID,
+				this.id,
 				this.data.files['jupyterNotebook'].magnetURI,
 				this.data.files['trainingData'].magnetURI
 			);
@@ -161,7 +151,7 @@ class JobPoster{
 	async shareTesting(){
 		try{
 			let action = this.jobContract.methods.shareTestingDataset(
-				this.jobID,
+				this.id,
 				this.files.trainedModel.magnetURI,
 				this.data.files.testingData.magnetURI
 			);
@@ -177,7 +167,7 @@ class JobPoster{
 
 	async payout(){
 		try{
-			console.log('Inside jodPosterpayout', this.jobID)
+			console.log('Inside jodPosterpayout', this.id)
 			let action = this.auctionContract.methods.payout(
 				this.wallet.address,
 				job.id
@@ -192,39 +182,8 @@ class JobPoster{
 		}
 	}
 
-	// Listen events 
-	events(){
-		console.log('Listening for all events');
 
-		let filter = {
-			returnValues:{
-				id: this.jobID
-			}
-		};
-
-		this.auctionContract.events.allEvents(filter, (error, event)=>{
-			try{
-				console.info(`event ${event.event} from auctionContract.`);
-				this.lastEvent = event.event;
-				this.transactions.push(event);
-				if(this[event.event]) this[event.event](parseEvent(event));
-			}catch(error){
-				console.error('job', this, 'event', event);
-			}
-		});
-
-		this.jobContract.events.allEvents(filter, (error, event)=>{
-			try{
-				console.info(`event ${event.event} from jobContract.`);
-				this.lastEvent = event.event;
-				this.transactions.push(event);
-				if(this[event.event]) this[event.event](parseEvent(event));
-			}catch(error){
-				console.error('job', this, 'event', event);
-			}
-		});
-	}
-
+	// Contract events
 	async AuctionEnded(event){
 		try{
 			console.log('Inside procAuctionEnded...', event); // XXX
@@ -247,7 +206,7 @@ class JobPoster{
 
 	async TrainedModelShared(event){
 		try{
-	        console.log('Inside JobPoster TrainedModelShared', this.jobID, event); // XXX
+	        console.log('Inside JobPoster TrainedModelShared', this.id, event); // XXX
 
 	        this.files.trainedModel = {
 	        	magnetURI: event.returnValues.trainedModelMagnetLink
@@ -261,7 +220,7 @@ class JobPoster{
 
 	async JobApproved(event){
 		try{
-	        console.log('Inside JobPoster TrainedModelShared', this.jobID, event); // XXX
+	        console.log('Inside JobPoster TrainedModelShared', this.id, event); // XXX
 
 	        let receipt = await this.payout();
 
@@ -271,20 +230,6 @@ class JobPoster{
 	        console.error('ERROR!!! `JobApproved`', error);
 	    }
 	}
-
-}
-
-// Helpers
-function parseEvent(event){
-	/*
-	we want to get to the object that holds `returnValues`. Sometime its in the
-	event, and sometimes there is next in a `evens` object.
-	*/
-	let name = event.event;
-	if(event.events && event.events[name]){
-		return event.events[name]
-	}
-	return event;
 }
 
 module.exports = {JobPoster};

@@ -3,68 +3,127 @@
 const extend = require('extend');
 const fs = require('fs-extra');
 var args = require('args');
-const environment = process.env.NODE_ENV || 'production';
-var conf;
-
-try{
+const packageJSON = require('../package');
 
 
-	function load(filePath, required){
-		try {
-			return require(filePath);
-		} catch(error){
-			if(error.name === 'SyntaxError'){
-				console.error(`Loading ${filePath} file failed!\n`, error);
+// Throw errors letting users know if required conf files are missing
+function load(filePath, required){
+	try {
+		return require(filePath);
+	} catch(error){
+		if(error.name === 'SyntaxError'){
+			console.error(`Loading ${filePath} file failed!\n`, error);
+			process.exit(1);
+		} else if (error.code === 'MODULE_NOT_FOUND'){
+			console.warn(`No config file ${filePath}! This may cause issues...`);
+			if (required){
 				process.exit(1);
-			} else if (error.code === 'MODULE_NOT_FOUND'){
-				console.warn(`No config file ${filePath}! This may cause issues...`);
-				if (required){
-					process.exit(1);
-				}
-				return {};
-			}else{
-				console.dir(`Unknown error in loading ${filePath} config file.\n`, error);
 			}
-		}
-	};
-
-	conf = {...load('./base', true), environment};
-
-
-	if(!fs.pathExistsSync('./conf/secrets.js')){
-		var appDataPath = process.env.APPDATA || (process.platform == 'darwin' ? process.env.HOME + '/Library/Preferences' : process.env.HOME + "/.local/share")
-		appDataPath += `/${conf.appName}/${environment}/local.json`
-		
-		conf.localAppData = appDataPath;
-
-		if(!fs.pathExistsSync(appDataPath)){
-			console.log('making appData file ', appDataPath);
-			fs.ensureDirSync(appDataPath.replace('/local.json', ''));
-			fs.writeJsonSync(appDataPath, {});
+			return {};
+		}else{
+			console.dir(`Unknown error in loading ${filePath} config file.\n`, error);
 		}
 	}
-
-	// Set the command line argument options
-	args
-	  .option('httpPort', 'http port')
-	  .option('electronDev', 'Load chrome dev tools')
-	  .option('wallet', 'Wallet Object', undefined, value=>{
-	  	return JSON.parse(value);
-	  })
-
-	// Create the exported conf object
-	module.exports = extend(
-		true, // enable deep copy
-		conf, // Base conf gets loaded fist
-		load(`./${environment}`), // Load any environment settings
-		load(conf.localAppData || './secrets'), // Load local settings
-		args.parse(process.argv), // Settings applied at runtime trump all!
-	);
-
-}catch(error){
-	console.error('ERROR in conf loading', environment, error)
-	console.error(conf)
-	console.error(process.argv)
-	process.exit(1);
 }
 
+
+// Apply changes to local conf
+function editLocalConf(args){
+	localConf = {...localConf, ...args};
+	fs.writeJsonSync(runtimeConf.appDataLocal, localConf);
+
+	return localConf;
+}
+
+
+// Determine if this is being called from a packages electron app;
+try{
+	const { app } = require('electron');
+	var isPackaged = app.isPackaged;
+}catch(error){
+	var isPackaged = false;
+}
+
+
+// Set the command line argument options
+args
+  .option('httpPort', 'http port')
+  .option('electronDev', 'Load chrome dev tools')
+  .option('ethAddress', 'Remote etherum node')
+  .option('acceptWork', 'Accepting jobs')
+  .option('appDataPath', 'Path where local data is held')
+  .option('privateKey', 'Wallet Object', undefined, value=>{
+	return [value];
+  })
+
+
+// Parse command line arguments
+var runtimeConf = args.parse(process.argv, {
+	mri: {
+		string: ['p', 'privateKey']
+	}
+})
+
+
+// Include the current version
+runtimeConf.version = packageJSON.version;
+
+
+// Set the correct `NODE_ENV`
+const environment = process.env.NODE_ENV || (isPackaged ? 'production' : 'development');
+
+
+// Grab the base conf, we will need it for the rest of the file
+var baseConf = load('./base', true);
+
+
+// Set the correct local data path based platform
+if(!runtimeConf.appDataPath){
+	switch (process.platform){
+		case 'linux':
+			console.log('')
+			runtimeConf.appDataPath = `${process.env.HOME}/.local/share/`;
+			break;
+		case 'darwin':
+			runtimeConf.appDataPath = `${process.env.HOME}/Library/Preferences/`;
+			break;
+		case 'win32':
+			runtimeConf.appDataPath = process.env.APPDATA;
+			break;
+	}
+}
+
+
+// Set a unique path for Morphware
+runtimeConf.appDataPath += `${baseConf.appName}${environment === 'production' ? '': '-'+environment}/`;
+runtimeConf.appDataLocal = `${runtimeConf.appDataPath}local.json`;
+
+
+// Create the `appDataPath` if it doesnt exist
+fs.ensureDirSync(runtimeConf.appDataPath);
+
+
+// Create `local.json` if it doesnt exist
+if(!fs.pathExistsSync(runtimeConf.appDataLocal)){
+	console.log('making appData file ', runtimeConf.appDataLocal);
+	fs.writeJsonSync(runtimeConf.appDataLocal, {});
+}
+
+
+// Grab local config
+var localConf = load(runtimeConf.appDataLocal);
+
+
+// Build the complete conf object
+var conf = extend(
+	true, // enable deep copy
+	baseConf, // Base conf gets loaded fist
+	load(`./${environment}`), // Load any environment settings
+	localConf, // Load local settings
+	runtimeConf, // Settings applied at runtime trump all!
+	{environment}
+);
+
+console.info('Local path is', runtimeConf.appDataPath);
+
+module.exports = {conf, localConf, editLocalConf}

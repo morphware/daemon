@@ -5,6 +5,7 @@ const { app, BrowserWindow, Tray, Menu } = require('electron');
 let win = null
 let tray = null;
 
+
 if(app.isPackaged){
 
   // Pad arvg to comply with the args package.
@@ -13,7 +14,9 @@ if(app.isPackaged){
   const expressApp = require('./express');
 }
 
-const conf = require(`./${app.isPackaged ?'': 'backend/'}conf`);
+const {conf} = require(`./${app.isPackaged ?'': 'backend/'}conf`);
+
+console.info(`${conf.appName}, ${conf.environment} version ${app.getVersion()}`)
 
 function createWindow() {
   // Create the browser window.
