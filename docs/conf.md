@@ -12,10 +12,6 @@ Each time a file is load, its over layed onto the conf object. A environment or
 Any valid Java Script can be placed in each conf file. `module.exports` must
 export a object.
 
-## Setting up the `secrets.js` file
-
-A `secrets.js` template file can simply be copied and edited to your needs.
-`cp conf/secrets.js.template conf/secrets.js`
 
 ## Local settings on built packages
 
@@ -24,10 +20,14 @@ the `conf` folder is not accessible. If the `conf` object detects this state, it
 will look for (and make if need) a `local.json` file in the user app data
 location.
 
-On Linux this is `/home/<USER>/.local/share/MorphwareWallet/<environment>/`
+On Linux this is `/home/<USER>/.local/share/MorphwareWallet[-environment]/`
 	
-On Windows `C:\Users\<USER>\AppData\Roaming\MorphwareWallet\<environment>\` or
+On Windows `C:\Users\<USER>\AppData\Roaming\MorphwareWallet[-environment]\` or
 	where ever `APPDATA` is configure for that system
+
+On OSX `/home/<USER>/Library/Preferences/MorphwareWallet[-environment]/`
+
+`-environment` will only be added if its not production
 
 ## Conf fields
 
@@ -37,12 +37,17 @@ placed in any file file that makes sense.
 * `httpBindAddress` *STRING* **REQUIRED** IP for the HTTP server to bind
 * `httpPort` *NUMBER* **REQUIRED** The TCP port for the HTTP interface to listen
 on.
-* `wallet` *OBJECT* **REQUIRED** Configuration of the Etherum account. It take
-the following fields:
-	* `privateKey` *STRING* **REQUIRED** The private key for the Etherum account
-	. This should be stored in `secrets.js`
+* `privateKey` *ARRAY* **REQUIRED** The private key for the Etherum account
+  . This should be stored in `secrets.js`
 * `acceptWork` *BOOL* If the current node is a accepting jobs.
+* `electronDev` *BOOL* Bring up the chrome dev tools in electron.
 
+## Dev fields
+User may edit these fields, but they are mostly meant for dev issues.
+
+* `appDataPath` *STRING* path where local data will be stored, including
+  local settings file and downloaded data. See
+  `Local settings on built packages` for there this will be set automatically.
 
 
 ### Conf fields users should not mess with
@@ -64,7 +69,7 @@ settings are applied.
 Simply require the conf directory relative to the current file;
 
 ```js
-const conf = require('./conf');
+const {conf} = require('./conf');
 
 console.log(conf.httpPort)
 // 3000
