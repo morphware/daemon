@@ -18,6 +18,7 @@ import { DaemonContext } from "../providers/ServiceProviders";
 import { formFieldsMapper } from "../mappers/TrainModelFormMappers";
 import { theme } from "../providers/MorphwareTheme";
 import { makeStyles } from "@material-ui/core";
+import PositionedSnackbar from "./PositionedSnackbar";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;
@@ -54,6 +55,11 @@ interface formFieldsErrors {
   biddingTime: string;
   bounty: string;
   testModel: string;
+}
+
+interface snackBarProps {
+  text?: string;
+  severity?: "error" | "warning" | "info" | "success";
 }
 
 const styles = makeStyles({
@@ -259,12 +265,28 @@ const FileField = ({
 const TrainModelForm = () => {
   const daemonService = useContext(DaemonContext);
   const [removeFilesSignal, setRemoveFilesSignal] = useState<boolean>(true);
+  const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
 
   const onSubmit = async (values: formFields) => {
     console.log("values ", values);
     const formFields = formFieldsMapper(values);
     console.log("legacy fields: ", formFields);
-    await daemonService.submitTrainModelRequest(formFields);
+    const response = await daemonService.submitTrainModelRequest(formFields);
+
+    if (response.status === "success") {
+      setSnackBarProps({
+        text: `Training request recieved. JobId: ${response.job}`,
+        severity: "success",
+      });
+    } else {
+      setSnackBarProps({
+        //Need to simulate this and find a better err message
+        text: "Error occured when creating training reques",
+        severity: "error",
+      });
+    }
+
+    console.log("response: ", response);
     await daemonService.getTorrents();
     await daemonService.getWalletHistory();
   };
@@ -308,6 +330,12 @@ const TrainModelForm = () => {
           style={{ height: "100%" }}
         >
           <Grid container alignItems="flex-start" spacing={2}>
+            {snackBarProps.text && snackBarProps.severity && (
+              <PositionedSnackbar
+                text={snackBarProps.text}
+                severity={snackBarProps.severity}
+              />
+            )}
             <Paper
               style={{
                 padding: 30,

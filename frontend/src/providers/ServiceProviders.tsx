@@ -5,11 +5,14 @@ import {
   ActiveTorrents,
   DaemonService,
   SendMWTRequestProps,
+  SubmitTrainingModelResponse,
   WalletBalanceProps,
   WalletHistoryProps,
 } from "../service/DaemonService";
 import Web3 from "web3";
 export const DaemonContext = React.createContext({} as daemonServiceProps);
+
+// interface trainingModel
 
 interface daemonServiceProps {
   MWTAddress: string;
@@ -21,7 +24,9 @@ interface daemonServiceProps {
   connectionStatus: boolean;
   network?: string;
   getTorrents: () => Promise<void>;
-  submitTrainModelRequest(modelRequest: ITrainingModelValuesV2): Promise<void>;
+  submitTrainModelRequest(
+    modelRequest: ITrainingModelValuesV2
+  ): Promise<SubmitTrainingModelResponse>;
   getBalance(): Promise<void>;
   getWalletHistory(): Promise<void>;
   sendMWT(sendMWTRequest: SendMWTRequestProps): Promise<void>;
@@ -123,7 +128,7 @@ const ServiceProviders: React.FC = ({ children }) => {
       values.workerReward.toString(),
       "ether"
     );
-    await daemonService.submitTrainModelRequest(values);
+    return await daemonService.submitTrainModelRequest(values);
   };
 
   const daemonServicContext: daemonServiceProps = {

@@ -1,6 +1,5 @@
 import { createStyles, makeStyles } from "@material-ui/core";
 import React from "react";
-import JobCreationAlert from "../components/JobCreationAlert";
 import TrainModelForm from "../components/trainModelForm";
 import { theme } from "../providers/MorphwareTheme";
 
@@ -19,7 +18,6 @@ const TrainModel = () => {
 
   return (
     <>
-      <JobCreationAlert />
       <div className={classes.root}>
         <TrainModelForm />
       </div>
