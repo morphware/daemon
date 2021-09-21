@@ -2,7 +2,7 @@
 
 const path = require('path');
 const { app, BrowserWindow, Tray, Menu } = require('electron');
-let win = null
+let win = null;
 let tray = null;
 
 
@@ -16,7 +16,7 @@ if(app.isPackaged){
 
 const {conf} = require(`./${app.isPackaged ?'': 'backend/'}conf`);
 
-console.info(`${conf.appName}, ${conf.environment} version ${app.getVersion()}`)
+console.info(`${conf.appName}, ${conf.environment} version ${app.getVersion()}`);
 
 function createWindow() {
   // Create the browser window.
@@ -66,28 +66,27 @@ app.whenReady().then(() => {
       var contextMenu = Menu.buildFromTemplate([
         {
             label: 'Show App', click: function () {
-                win.show()
+                win.show();
             }
         },
         {
             label: 'Quit', click: function () {
-                app.isQuiting = true
-                app.quit()
+                app.isQuiting = true;
+                app.quit();
                 process.exit(0);
             }
         }
     ])
 
-    tray.setToolTip('Morphware Wallet')
+    tray.setToolTip('Morphware Wallet');
 
     tray.on('click', function(e){
-      console.log('clicked!')
       if(!win.isVisible()) {
-        win.show()
+        win.show();
       }
     });
 
-    tray.setContextMenu(contextMenu)
+    tray.setContextMenu(contextMenu);
 
 
   }catch(error){

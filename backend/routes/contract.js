@@ -8,15 +8,15 @@ const {wallet} = require('../model/morphware');
 
 
 router.post('/', async function (req, res, next) {
-    try{
+	try{
 
-        let job = await JobPoster.new({...req.body, wallet});
+		let job = await JobPoster.new({...req.body, wallet});
 
-        return res.json({status: 'success', job: job.jobID});
+		return res.json({status: 'success', job: job.jobID});
 
-    }catch(error){
-        next(error)
-    }
+	}catch(error){
+		next(error);
+	}
 });
 
 module.exports = router;

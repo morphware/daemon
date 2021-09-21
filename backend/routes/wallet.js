@@ -27,7 +27,6 @@ router.get('/history', async function(req, res, next) {
 
 router.post('/send', async function(req, res, next){
 	try{
-		console.log(req.body)
 		return res.json({
 			transactions: await wallet.send(req.body.address, req.body.amount, req.body.gas)
 		});
@@ -39,7 +38,7 @@ router.post('/send', async function(req, res, next){
 router.post('/sign', async function(req, res, next){
 	try{
 		if(!req.body.message){
-			throw 'Message is messing'
+			throw 'Message is messing';
 		}
 
 		return res.json(wallet.sign(req.body.message));

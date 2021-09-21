@@ -20,7 +20,7 @@ class JobPoster extends Job{
 	// have to wait for the job id
 	static async new(data){
 		try{
-			let job = new this(data)
+			let job = new this(data);
 
 			let jobData = await job.post();
 
@@ -49,11 +49,11 @@ class JobPoster extends Job{
 				this.data.files[field] = {
 					path: data[field],
 					magnetURI: magnetURI
-				}
+				};
 			}
 
 		}catch(error){
-			console.log('error __parsePostFile', error)
+			console.log('error __parsePostFile', error);
 			throw error;
 		}
 	}
@@ -95,9 +95,10 @@ class JobPoster extends Job{
 				gas: await action.estimateGas()
 			});
 
+			this.transactions.push(receipt);
+
 			// Gather data about the job
-			// This should be done in the new method or with getters...
-			this.jobData = receipt.events.JobDescriptionPosted
+			this.jobData = receipt.events.JobDescriptionPosted;
 
 			// End the auction later
 			this.auctionEnd((this.data.biddingTime+30)*1000);
@@ -113,7 +114,6 @@ class JobPoster extends Job{
 	async auctionEnd(time){
 		setTimeout(async function(job){
 			try{
-				console.log('Inside JobPoster auctionEnd') // XXX
 				let action = job.auctionContract.methods.auctionEnd(
 					job.wallet.address,
 					parseInt(job.jobID)
@@ -123,7 +123,10 @@ class JobPoster extends Job{
 					gas: await action.estimateGas()
 				});
 
-				console.log('JobPoster auctionEnd receipt', receipt)
+				this.transactions.push(receipt);
+
+				return receipt;
+
 			}catch(error){
 				console.log('JobPoster auctionEnd error', error, 'job', job);
 			}
@@ -139,9 +142,13 @@ class JobPoster extends Job{
 				this.data.files['trainingData'].magnetURI
 			);
 
-			return await action.send(
+			let receipt = await action.send(
 				{gas: await action.estimateGas()
 			});
+
+			this.transactions.push(receipt);
+
+			return receipt;
 
 		}catch(error){
 			throw error;
@@ -156,9 +163,13 @@ class JobPoster extends Job{
 				this.data.files.testingData.magnetURI
 			);
 
-			return await action.send({
+			let receipt = await action.send({
 				gas: await action.estimateGas()
 			});
+
+			this.transactions.push(receipt);
+
+			return receipt;
 
 		}catch(error){
 			throw error;
@@ -167,15 +178,18 @@ class JobPoster extends Job{
 
 	async payout(){
 		try{
-			console.log('Inside jodPosterpayout', this.id)
 			let action = this.auctionContract.methods.payout(
 				this.wallet.address,
 				job.id
-			)
+			);
 
-			return await action.send({
+			let receipt = await action.send({
 				gas: await action.estimateGas()
-			})
+			});
+
+			this.transactions.push(receipt);
+
+			return receipt;
 
 		}catch(error){
 			throw error;
@@ -186,49 +200,43 @@ class JobPoster extends Job{
 	// Contract events
 	async AuctionEnded(event){
 		try{
-			console.log('Inside procAuctionEnded...', event); // XXX
-
 			var results = event.returnValues;
 
 			if(results.winner === '0x0000000000000000000000000000000000000000'){
 				console.log('No one won...');
 				let receipt =  await this.payout();
-				console.log('payout receipt', receipt)
+				console.log('payout receipt', receipt);
 				return false;
 			}
 
 			await this.shareData();
 			
 		}catch(error){
-			console.error('ERROR!!! `AuctionEnded`', error)
+			console.error('ERROR!!! `AuctionEnded`', error);
 		}
 	}
 
 	async TrainedModelShared(event){
 		try{
-	        console.log('Inside JobPoster TrainedModelShared', this.id, event); // XXX
+			this.files.trainedModel = {
+				magnetURI: event.returnValues.trainedModelMagnetLink
+			};
 
-	        this.files.trainedModel = {
-	        	magnetURI: event.returnValues.trainedModelMagnetLink
-	        }
-
-	        await this.shareTesting();
-	    }catch(error){
-	        console.error('ERROR!!! `TrainedModelShared`', error);
-	    }
+			await this.shareTesting();
+		}catch(error){
+			console.error('ERROR!!! `TrainedModelShared`', error);
+		}
 	}
 
 	async JobApproved(event){
 		try{
-	        console.log('Inside JobPoster TrainedModelShared', this.id, event); // XXX
+			let receipt = await this.payout();
 
-	        let receipt = await this.payout();
+			console.log('JobPoster JobApproved payout receipt', receipt);
 
-	        console.log('JobPoster JobApproved payout receipt', receipt);
-
-	    }catch(error){
-	        console.error('ERROR!!! `JobApproved`', error);
-	    }
+		}catch(error){
+			console.error('ERROR!!! `JobApproved`', error);
+		}
 	}
 }
 

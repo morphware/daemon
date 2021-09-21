@@ -20,4 +20,3 @@ webtorrent.findOrSeed = function(path){
 
 
 module.exports = webtorrent;
-
