@@ -2,28 +2,28 @@
 
 const {conf, editLocalConf} = require('../conf');
 const {web3} = require('./contract');
-var wallet = null
+var wallet = null;
 
 class MorphwareWallet{
 	constructor(privateKeyOrAccount){
 		if(typeof(privateKeyOrAccount) === 'string'){
-			this.account = web3.eth.accounts.privateKeyToAccount(privateKeyOrAccount)
+			this.account = web3.eth.accounts.privateKeyToAccount(privateKeyOrAccount);
 		}else if(typeof(privateKeyOrAccount) === 'object' && privateKeyOrAccount.address){
 			// A web3 account isnt an instance of anything...
-			this.account = privateKeyOrAccount
+			this.account = privateKeyOrAccount;
 		}else{
-			throw 'Account or private key not provided.'
+			throw 'Account or private key not provided.';
 		}
 		
 		this.address = this.account.address;
 		this.sign = this.account.sign;
 		this.privateKey = this.account.privateKey;
-		this.transactions = []
+		this.transactions = [];
 
 		// Assign this wallets address to a contract do the contract can sign
 		// transactions.
-		this.contract = this.constructor.tokenContract.clone()
-		this.contract.options.from = this.address
+		this.contract = this.constructor.tokenContract.clone();
+		this.contract.options.from = this.address;
 
 		this.getTransactionHistory();
 	}
@@ -40,18 +40,18 @@ class MorphwareWallet{
 	}
 
 	async getBalance(){
-		return await this.contract.methods.balanceOf(this.address).call()
+		return await this.contract.methods.balanceOf(this.address).call();
 	}
 
 	async send(address, amount, gas) {
 		try{
 
 			if(!web3.utils.isAddress(address)){
-				throw 'Invalid address provided'
+				throw 'Invalid address provided';
 			}
 
 			if(Number.isNaN(Number(amount))){
-				throw 'Invalid amount provided'
+				throw 'Invalid amount provided';
 			}
 
 			let transfer = this.contract.methods.transfer(
@@ -71,7 +71,10 @@ class MorphwareWallet{
 
 	async getTransactionHistory(){
 		try{
-			let logs = await web3.eth.getPastLogs({fromBlock:'0x0', address: conf.morphwareTokenContractAddress})
+			let logs = await web3.eth.getPastLogs({
+				fromBlock:'0x0',
+				address: conf.morphwareTokenContractAddress
+			});
 
 			for(let log of logs){
 				let data = `${log.topics[1]}${log.topics[2].replace('0x', '')}${log.data.replace('0x', '')}`
@@ -89,7 +92,7 @@ class MorphwareWallet{
 			return true;
 
 		}catch(error){
-			console.log('get hist error', error)
+			console.log('Transaction history error, please report this', error);
 			return false
 		}
 	}
@@ -112,7 +115,7 @@ MorphwareWallet.tokenContract.events.Transfer((error, event)=>{
 			MorphwareWallet.wallets[event.returnValues.from].transactions.push(event);
 		}		
 	}catch(error){
-		console.error("Error `MorphwareWallet.tokenContract.events.Transfer`", error, event)
+		console.error("Error `MorphwareWallet.tokenContract.events.Transfer`", error, event);
 	}
 });
 

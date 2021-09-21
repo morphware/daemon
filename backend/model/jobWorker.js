@@ -43,7 +43,7 @@ class JobWorker extends Job{
 		event, and sometimes there is returnValue in a `events` object.
 		*/
 		if(event.events && event.events[name]){
-			event = event.events[name]
+			event = event.events[name];
 		}
 
 		// If the current client is accepting new jobs, start a new worker
@@ -59,7 +59,7 @@ class JobWorker extends Job{
 			bidAmount: 11, // How do we figure out the correct bid?
 			fakeBid: false, // How do we know when to fake bid?
 			secret: '0x6d6168616d000000000000000000000000000000000000000000000000000000' // What is this made from?
-		}
+		};
 
 		let action = this.auctionContract.methods.bid(
 			this.jobdata.jobPoster, // why do we need this?
@@ -97,11 +97,11 @@ class JobWorker extends Job{
 
 	async shareTrainedModel(){
 		let action = jobFactoryContract.methods.shareTrainedModel(
-            this.jobData.jobPoster,
-            parseInt(this.id),
-            trainedModelMagnetLink, // get this data
-            parseInt(trainingErrorRate) // get this data
-        );
+			this.jobData.jobPoster,
+			parseInt(this.id),
+			trainedModelMagnetLink, // get this data
+			parseInt(trainingErrorRate) // get this data
+		);
 
 		let receipt = await action.send({
 			gas: await action.estimateGas()
@@ -114,7 +114,6 @@ class JobWorker extends Job{
 
 	// Contract events
 	async JobDescriptionPosted(event){
-		console.log('Inside JobWorker JobDescriptionPosted...');
 		if(!conf.acceptWork) return;
 
 		var job = event.returnValues;
@@ -134,17 +133,15 @@ class JobWorker extends Job{
 
 	async AuctionEnded(event){
 		try{
-			console.log('Inside JobWorker procAuctionEnded...', event); // XXX
-
 			var results = event.returnValues;
 
 			if(results.winner !== this.wallet.address){
 				// Remove this job from the job jump table if we did not win
-				delete this.constructor.jobs[this.id]
+				delete this.constructor.jobs[this.id];
 			}
 
 		}catch(error){
-			console.error('ERROR!!! `AuctionEnded`', error)
+			console.error('ERROR!!! `AuctionEnded`', error);
 		}
 	}
 

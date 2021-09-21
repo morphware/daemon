@@ -10,7 +10,7 @@ const editKeys = {
 	'acceptWork':{ type: 'boolean'},
 	'torrentListenPort':{ type: 'number'},
 	'dataPath': {type: 'string'}
-}
+};
 
 router.get('/', async function(req, res, next){
 	try{
@@ -29,7 +29,7 @@ router.post('/', async function(req, res, next) {
 		return res.json(editLocalConf(req.body));
 
 	}catch(error){
-		next(error)
+		next(error);
 	}
 });
 

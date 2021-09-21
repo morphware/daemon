@@ -29,12 +29,11 @@ class Job{
 	}
 
 	get id(){
-		this.jobData.id
+		this.jobData.id;
 	}
 
-
 	// Jump table for jobs this client is currently apart of
-	static jobs = {}
+	static jobs = {};
 
 	// Listen for all events and call the correct instance 
 	static events(){
@@ -71,10 +70,10 @@ class Job{
 		event, and sometimes there is returnValue in a `events` object.
 		*/
 		if(event.events && event.events[name]){
-			event = event.events[name]
+			event = event.events[name];
 		}
 
-		console.log(`Look for an instance with job id ${event.returnValues.id}`)
+		console.log(`Look for an instance with job id ${event.returnValues.id}`);
 
 		// Check to see if we are tracking the job tied to this event
 		if(Object.keys(this.jobs).includes(event.returnValues.id)){
@@ -99,4 +98,4 @@ class Job{
 // Listen for job events
 Job.events();
 
-module.exports = {Job}
+module.exports = {Job};
