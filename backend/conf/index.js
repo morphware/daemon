@@ -59,7 +59,7 @@ args
 // Parse command line arguments
 var runtimeConf = args.parse(process.argv, {
 	mri: {
-		string: 'privateKey'
+		string: ['p', 'privateKey']
 	}
 })
 

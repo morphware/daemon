@@ -3,7 +3,7 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 const {spawn} = require('child_process');
 const fs = require('fs');
-const conf =require('./backend/conf');
+const {conf} =require('./backend/conf');
 var pids = []
 
 
