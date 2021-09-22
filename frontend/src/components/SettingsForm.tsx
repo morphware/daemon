@@ -9,6 +9,17 @@ import { Switches, SwitchData } from "mui-rff";
 import FileField from "./FileUploadComponent";
 import { DaemonContext } from "../providers/ServiceProviders";
 import { SettingsRequestProps } from "../service/DaemonService";
+import Web3 from "web3";
+import { ethers } from "ethers";
+
+interface SettingsRequestPropsErrors {
+  httpBindAddress?: string;
+  httpPort?: string;
+  privateKey?: string;
+  acceptWork?: string;
+  torrentListenPort?: string;
+  dataPath?: string;
+}
 
 const SettingsForm = () => {
   const daemonService = useContext(DaemonContext);
@@ -26,8 +37,21 @@ const SettingsForm = () => {
     <div>
       <Form
         onSubmit={updateConfigurations}
-        validate={() => {
-          return {};
+        validate={(values) => {
+          const errors = {} as SettingsRequestPropsErrors;
+
+          try {
+            if (values.privateKey) {
+              const validPrivateKey = new ethers.Wallet(values.privateKey);
+            }
+          } catch (e) {
+            errors.privateKey = "Invalid Private Key";
+          }
+
+          if (values.torrentListenPort && values.torrentListenPort <= 0) {
+            errors.torrentListenPort = "Invalid Port";
+          }
+          if (values.privateKey) return errors;
         }}
         render={({ handleSubmit, form, submitting, pristine }) => (
           <form

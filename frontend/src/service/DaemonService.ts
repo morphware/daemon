@@ -81,8 +81,8 @@ export interface SettingsRequestProps {
   httpBindAddress?: string;
   httpPort?: string;
   privateKey?: string;
-  acceptWork?: string;
-  torrentListenPort?: string;
+  acceptWork?: boolean;
+  torrentListenPort?: number;
   dataPath?: string;
 }
 
