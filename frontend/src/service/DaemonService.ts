@@ -43,7 +43,6 @@ export interface TransactionProps {
   };
 }
 
-//TODO: write out entire transaction interface
 export interface WalletHistoryProps {
   transactions: Array<TransactionProps>;
   address: string;
@@ -59,8 +58,16 @@ interface ConnectionStatusProps {
   status: boolean;
   network: string;
 }
+
+export interface SubmitTrainingModelResponse {
+  error?: string;
+  status: string;
+  job: string;
+}
 export interface IDaemonService {
-  submitTrainModelRequest(modelRequest: ITrainingModelValuesV2): Promise<void>;
+  submitTrainModelRequest(
+    modelRequest: ITrainingModelValuesV2
+  ): Promise<SubmitTrainingModelResponse>;
   getActiveTorrents(): Promise<ActiveTorrents>;
   getMWTBalance(): Promise<WalletBalanceProps>;
   getWalletHistory(): Promise<WalletHistoryProps>;
@@ -144,7 +151,7 @@ export class DaemonService implements IDaemonService {
 
   public submitTrainModelRequest = async (
     trainModelRequest: ITrainingModelValuesV2
-  ): Promise<void> => {
+  ): Promise<SubmitTrainingModelResponse> => {
     const url = `${this.baseUrl}/api/v0/contract`;
 
     console.log("request: ", trainModelRequest);
@@ -155,7 +162,10 @@ export class DaemonService implements IDaemonService {
       body: JSON.stringify(trainModelRequest),
     };
 
-    await fetch(url, requestOptions);
+    const response = await fetch(url, requestOptions);
+    const trainModelResponse: SubmitTrainingModelResponse =
+      await response.json();
+    return trainModelResponse;
   };
 
   public getActiveTorrents = async (): Promise<ActiveTorrents> => {

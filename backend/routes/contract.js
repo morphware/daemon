@@ -12,7 +12,7 @@ router.post('/', async function (req, res, next) {
 
 		let job = await JobPoster.new({...req.body, wallet});
 
-		return res.json({status: 'success', job: job.jobID});
+		return res.json({status: 'success', job: job.jobData.returnValues.id});
 
 	}catch(error){
 		next(error);

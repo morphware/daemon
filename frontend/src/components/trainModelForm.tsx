@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useRef, useState, useContext, useEffect } from "react";
 import { Form, Field } from "react-final-form";
 import {
@@ -18,6 +19,8 @@ import { DaemonContext } from "../providers/ServiceProviders";
 import { formFieldsMapper } from "../mappers/TrainModelFormMappers";
 import { theme } from "../providers/MorphwareTheme";
 import { makeStyles } from "@material-ui/core";
+import PositionedSnackbar from "./PositionedSnackbar";
+import { snackBarProps } from "../components/PositionedSnackbar";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;
@@ -259,13 +262,29 @@ const FileField = ({
 const TrainModelForm = () => {
   const daemonService = useContext(DaemonContext);
   const [removeFilesSignal, setRemoveFilesSignal] = useState<boolean>(true);
+  const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
 
   const onSubmit = async (values: formFields) => {
     console.log("values ", values);
     const formFields = formFieldsMapper(values);
     console.log("legacy fields: ", formFields);
-    await daemonService.submitTrainModelRequest(formFields);
+    const responseV2 = await daemonService.submitTrainModelRequest(formFields);
+
+    if (Object.keys(responseV2).includes("status")) {
+      setSnackBarProps({
+        text: `Training request recieved. JobID: ${responseV2.job}`,
+        severity: "success",
+      });
+    } else if (Object.keys(responseV2).includes("error")) {
+      setSnackBarProps({
+        //TODO: Update when failed requests return error message
+        text: `${responseV2.error}`,
+        severity: "error",
+      });
+    }
+
     await daemonService.getTorrents();
+    await daemonService.getWalletHistory();
   };
 
   return (
@@ -273,6 +292,7 @@ const TrainModelForm = () => {
       onSubmit={onSubmit}
       validate={(values: formFields) => {
         const errors = {} as formFieldsErrors;
+
         if (!values.jupyterNotebook) {
           errors.jupyterNotebook = "Required";
         }
@@ -306,6 +326,13 @@ const TrainModelForm = () => {
           style={{ height: "100%" }}
         >
           <Grid container alignItems="flex-start" spacing={2}>
+            {snackBarProps.text && snackBarProps.severity && (
+              <PositionedSnackbar
+                text={snackBarProps.text}
+                severity={snackBarProps.severity}
+                setSnackBarProps={setSnackBarProps}
+              />
+            )}
             <Paper
               style={{
                 padding: 30,

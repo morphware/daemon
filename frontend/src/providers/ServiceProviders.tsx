@@ -5,11 +5,14 @@ import {
   ActiveTorrents,
   DaemonService,
   SendMWTRequestProps,
+  SubmitTrainingModelResponse,
   WalletBalanceProps,
   WalletHistoryProps,
 } from "../service/DaemonService";
 import Web3 from "web3";
 export const DaemonContext = React.createContext({} as daemonServiceProps);
+
+// interface trainingModel
 
 interface daemonServiceProps {
   MWTAddress: string;
@@ -21,7 +24,9 @@ interface daemonServiceProps {
   connectionStatus: boolean;
   network?: string;
   getTorrents: () => Promise<void>;
-  submitTrainModelRequest(modelRequest: ITrainingModelValuesV2): Promise<void>;
+  submitTrainModelRequest(
+    modelRequest: ITrainingModelValuesV2
+  ): Promise<SubmitTrainingModelResponse>;
   getBalance(): Promise<void>;
   getWalletHistory(): Promise<void>;
   sendMWT(sendMWTRequest: SendMWTRequestProps): Promise<void>;
@@ -79,7 +84,6 @@ const ServiceProviders: React.FC = ({ children }) => {
 
   const getTorrents = async () => {
     const torrents = await daemonService.getActiveTorrents();
-    // const torrents = mockTorrents();
     setTorrents(torrents);
   };
 
@@ -119,6 +123,14 @@ const ServiceProviders: React.FC = ({ children }) => {
     setNetwork(network);
   };
 
+  const submitTrainModelRequest = async (values: ITrainingModelValuesV2) => {
+    values.workerReward = Web3.utils.toWei(
+      values.workerReward.toString(),
+      "ether"
+    );
+    return await daemonService.submitTrainModelRequest(values);
+  };
+
   const daemonServicContext: daemonServiceProps = {
     MWTAddress: MWSBalance,
     daemonService: daemonService,
@@ -129,7 +141,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     connectionStatus: connectionStatus,
     network: network,
     getTorrents: getTorrents,
-    submitTrainModelRequest: daemonService.submitTrainModelRequest,
+    submitTrainModelRequest: submitTrainModelRequest,
     getBalance: getBalance,
     getWalletHistory: getWalletHistory,
     sendMWT: sendMWT,

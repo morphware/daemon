@@ -2,7 +2,6 @@ import { createStyles, makeStyles } from "@material-ui/core";
 import React from "react";
 import TrainModelForm from "../components/trainModelForm";
 import { theme } from "../providers/MorphwareTheme";
-import "./TrainModel.css";
 
 const styles = makeStyles(() =>
   createStyles({
@@ -18,9 +17,11 @@ const TrainModel = () => {
   const classes = styles();
 
   return (
-    <div className={classes.root}>
-      <TrainModelForm />
-    </div>
+    <>
+      <div className={classes.root}>
+        <TrainModelForm />
+      </div>
+    </>
   );
 };
 

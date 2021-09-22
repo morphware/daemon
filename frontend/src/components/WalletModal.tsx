@@ -3,7 +3,6 @@ import React, { useContext, useState } from "react";
 import { makeStyles, Theme, createStyles } from "@material-ui/core/styles";
 import Modal from "@material-ui/core/Modal";
 import Backdrop from "@material-ui/core/Backdrop";
-// import { useSpring, animated } from "react-spring/web.cjs"; // web.cjs is required for IE 11 support
 import { Box, Button, Grid, IconButton, Typography } from "@material-ui/core";
 import AccountBalanceWalletIcon from "@material-ui/icons/AccountBalanceWallet";
 import { useSpring, animated } from "react-spring";
@@ -14,7 +13,6 @@ import { TextField } from "mui-rff";
 import {
   SendMWTRequestProps,
   TransactionProps,
-  WalletHistoryProps,
 } from "../service/DaemonService";
 import VerticalAlignBottomIcon from "@material-ui/icons/VerticalAlignBottom";
 import Web3 from "web3";
@@ -34,7 +32,7 @@ const useStyles = makeStyles((theme: Theme) =>
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
       width: "350px",
-      height: "520px",
+      height: "530px",
     },
   })
 );
@@ -116,12 +114,12 @@ const WalletModal = () => {
         >
           <Box padding={1}>
             {recieving ? (
-              <CallMadeIcon color="primary" style={{ fontSize: 30 }} />
-            ) : (
               <VerticalAlignBottomIcon
                 color="primary"
                 style={{ fontSize: 30 }}
               />
+            ) : (
+              <CallMadeIcon color="primary" style={{ fontSize: 30 }} />
             )}
           </Box>
           <Box padding={1}>
@@ -160,18 +158,25 @@ const WalletModal = () => {
         padding={1}
       >
         {historyLessThanFive.map((item) => HistoryTransaction(item))}
-        <Button
-          style={{
-            padding: "15px",
-            borderTop: "15px",
-            border: "1px solid black",
-          }}
-          color="primary"
-          variant="outlined"
-          onClick={viewAllTransactions}
-        >
-          View All Transactions
-        </Button>
+        {transactions.length >= 4 && (
+          <Button
+            style={{
+              padding: "15px",
+              borderTop: "15px",
+              border: "1px solid black",
+            }}
+            color="primary"
+            variant="outlined"
+            onClick={viewAllTransactions}
+          >
+            View All Transactions
+          </Button>
+        )}
+        {transactions.length === 0 && (
+          <Box display="flex" justifyContent="center" paddingTop="20px">
+            <Typography variant="body2">No Transactions Completed</Typography>
+          </Box>
+        )}
       </Box>
     );
   };
@@ -189,7 +194,8 @@ const WalletModal = () => {
         validate={(values: SendMWTRequestProps) => {
           const errors = {} as SendMWTRequestProps;
           const amount = parseFloat(values.amount);
-          // const gas = values.gas parseFloat(values.gas);
+          const validAddress = Web3.utils.isAddress(values.address);
+
           var gas;
           if (values.gas) {
             gas = parseFloat(values.gas);
@@ -198,8 +204,8 @@ const WalletModal = () => {
             ? parseFloat(daemonService.walletBalance)
             : 0;
 
-          if (!values.address) {
-            //Check if a valid address
+          if (!validAddress) {
+            errors.address = "Invalid address";
           }
           if (amount <= 0) {
             errors.amount = "Invalid amount";
