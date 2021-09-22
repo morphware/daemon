@@ -12,8 +12,6 @@ import {
 import Web3 from "web3";
 export const DaemonContext = React.createContext({} as daemonServiceProps);
 
-// interface trainingModel
-
 interface daemonServiceProps {
   MWTAddress: string;
   daemonService: DaemonService;

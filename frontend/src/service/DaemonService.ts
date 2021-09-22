@@ -64,6 +64,27 @@ export interface SubmitTrainingModelResponse {
   status: string;
   job: string;
 }
+
+interface SettingsResponseProps {
+  conf: any;
+  editKeys: {
+    httpBindAddress: string;
+    httpPort: string;
+    privateKey: string;
+    acceptWork: string;
+    torrentListenPort: string;
+    dataPath: string;
+  };
+}
+
+interface SettingsRequestProps {
+  httpBindAddress: string;
+  httpPort: string;
+  privateKey: string;
+  acceptWork: string;
+  torrentListenPort: string;
+  dataPath: string;
+}
 export interface IDaemonService {
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -73,6 +94,8 @@ export interface IDaemonService {
   getWalletHistory(): Promise<WalletHistoryProps>;
   sendMWT(sendMWTRequest: SendMWTRequestProps): Promise<TransactionProps>;
   getConnectionStatus(): Promise<ConnectionStatusProps>;
+  getSettings(): Promise<SettingsResponseProps>;
+  updateSettings(requestValues: SettingsRequestProps): Promise<any>;
 }
 export class DaemonService implements IDaemonService {
   private readonly baseUrl: string =
@@ -181,5 +204,38 @@ export class DaemonService implements IDaemonService {
     console.log("Response2: ", torrentData);
 
     return torrentData;
+  };
+
+  public getSettings = async (): Promise<SettingsResponseProps> => {
+    const url = `${this.baseUrl}/api/v0/settings`;
+
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const settingsConfig: SettingsResponseProps = await response.json();
+
+    console.log("settings: ", settingsConfig);
+
+    return settingsConfig;
+  };
+
+  public updateSettings = async (
+    requestValues: SettingsRequestProps
+  ): Promise<any> => {
+    const url = `${this.baseUrl}/api/v0/settings`;
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestValues),
+    };
+
+    const response = await fetch(url, requestOptions);
+    const updatedSettingsResponse: any = await response.json();
+
+    return updatedSettingsResponse;
   };
 }
