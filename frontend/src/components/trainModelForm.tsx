@@ -275,10 +275,10 @@ const TrainModelForm = () => {
         text: `Training request recieved. JobID: ${responseV2.job}`,
         severity: "success",
       });
-    } else {
+    } else if (Object.keys(responseV2).includes("error")) {
       setSnackBarProps({
         //TODO: Update when failed requests return error message
-        text: "Error occured when creating request",
+        text: `${responseV2.error}`,
         severity: "error",
       });
     }

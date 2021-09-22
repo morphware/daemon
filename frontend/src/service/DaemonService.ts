@@ -60,6 +60,7 @@ interface ConnectionStatusProps {
 }
 
 export interface SubmitTrainingModelResponse {
+  error?: string;
   status: string;
   job: string;
 }
