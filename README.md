@@ -32,11 +32,13 @@ files and folders:
   * frontend/ - *react UI project*
   * node_modules/ - *node dependencies for the electron and the build process.
     This is not tracked*
+  * resources/ - *Static resources used in the electron build, mostly icons ATM*
+  * unsorted/ - *Random items from before the reactor. It will be removed at
+    some point...*
   * build.js - *script to execute the build process*
   * devRun.js - *script to execute the various development environments for all
     sub projects*
-  * electron-prod.js - *main file that lunches electron in a build*
-  * electron - *main file that lunches electron in during dev*
+  * electron - *Electron run file. This also starts express when packaged.*
   * preload.js - *data to be preloaded in the electron UI. This file is not
     required, built at runtime and not tracked*
   * package.json - *Manages build and electron dependencies. Contains npm scrips*
@@ -56,7 +58,7 @@ You will also need Git to clone and push the code.
 Once you have all the required system dependencies, clone this repo and move to
 it.
 
-This will call npm install for each of the sub projects in this repo.
+This will call npm install for each of the sub projects the repo.
 Install the node dependencies with the following command:
 
 ```bash
@@ -71,6 +73,10 @@ npm run dev
 You can also move into `forntend` or `backend` and just run each project in dev
 mode.
 
+```bash
+npm start
+```
+
 ## Build
 
 The project uses [electron-build](https://www.electron.build/) to compile the
@@ -78,8 +84,40 @@ app. The build conf is stored in `project.json` under the `build` key. Building
 has only been executed under Linux. @wmantly is putting together a build document
 and is coming soon.
 
+At some point soon, we will set up a CI/CD pipeline to build.
+
 **This requires alot of system packages, run with care**
 
 To execute a build, run:
 
 `npm run build`
+
+## CLI
+
+The CLI is meant to assist in development work and production build debugging. I
+would like to allow all conf options to be set via the CLI.
+
+```bash
+08:41 PM william$ npm run dev -- --help
+
+> Morphware-Wallet@0.0.1 dev
+> node devRun.js "--help"
+
+  Usage: devRun.js [options] [command]
+  
+  Commands:
+    help     Display help
+    version  Display version
+  
+  Options:
+    -a, --acceptWork   Accepting jobs
+    -A, --appDataPath  Path where local data is held
+    -e, --electronDev  Load chrome dev tools
+    -E, --ethAddress   Remote etherum node
+    -H, --help         Output usage information
+    -h, --httpPort     http port
+    -p, --privateKey   Wallet Object
+    -v, --version      Output the version number
+
+```
+

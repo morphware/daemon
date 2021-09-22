@@ -23,7 +23,7 @@ router.get('/', async function(req, res, next){
 			upload: webtorrent.uploadSpeed,
 			port: webtorrent.torrentPort,
 			torrents: torrents,
-		})
+		});
 
 	}catch(error){
 		next(error);

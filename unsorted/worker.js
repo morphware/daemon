@@ -80,37 +80,6 @@ function processPostedJob(job){
 }
 
 
-async function seedTrainedData(job){
-    try{
-        // FIXME  Seed `trained_model.h5`
-        let afterTrainingCount = 1;
-        // let webtorrent2 = new WebTorrent();
-        trainedModelPathname = `./datalake/worker_node/uploads/${job.jobPoster}/${job.id}/trained_model.h5`
-        
-        webtorrent.seed(trainedModelPathname, function (torrent) {
-            if (--afterTrainingCount == 0) {
-
-                // TODO Should this be re-factored as a new webtorrent object?
-                //      --> Is `trained_model.h5`'s magnet-link guaranteed to be in the third zero-based index-position?
-                var trainedModelMagnetLink = webtorrent.torrents[2].magnetURI;
-
-                console.log('trainedModelMagnetLink:',trainedModelMagnetLink)
-                console.log('trainingErrorRate:',trainingErrorRate);
-
-                jobFactoryContract.methods.shareTrainedModel(
-                    job.jobPoster,
-                    parseInt(job.id),
-                    trainedModelMagnetLink,
-                    parseInt(trainingErrorRate)
-                ).send(
-                    {from: account.address, gas:"3000000"}
-                );
-            }
-        })  
-    }catch(error){
-        console.log('ERROR!!! `seedTrainedData function`', error);
-    }
-}
 
 function executeNoteBook(){
     return new Promise((resolve, reject)=>{

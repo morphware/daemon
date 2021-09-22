@@ -3,8 +3,8 @@ process.env.NODE_ENV = process.env.NODE_ENV || 'development';
 
 const {spawn} = require('child_process');
 const fs = require('fs');
-const conf =require('./backend/conf');
-var pids = []
+const {conf} =require('./backend/conf');
+var pids = [];
 
 
 function startBackend(){
@@ -116,7 +116,6 @@ function startElectron(){
 	}catch(error){
 		console.error('electron died')
 		killAll();
-		// process.exit(1)
 	}
 };
 
@@ -129,7 +128,3 @@ function killAll(){
 
 startBackend();
 startReact();
-
-// "dev": "concurrently -k \"BROWSER=none npm run start-frontend\" \"npm:electron\" \"npm run start-backend\"",
-//     "electron": "wait-on tcp:3000 && electron .",
-//     "windev": "concurrently -k \"cross-env BROWSER=none npm run start-frontend\" \"npm:electron\" \"npm run start-backend\""

@@ -2,6 +2,8 @@
 
 const router = require('express').Router();
 const {JobPoster} = require('../model/jobPoster');
+const {JobWorker} = require('../model/jobWorker');
+const {Job} = require('../model/job');
 
 // The wallet should be injected into the req obj
 const {wallet} = require('../model/morphware');
