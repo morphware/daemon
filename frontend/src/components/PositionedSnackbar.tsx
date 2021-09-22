@@ -33,9 +33,6 @@ const PositionedSnackbar = ({
   severity,
   setSnackBarProps,
 }: PositionedSnackbarProps) => {
-  console.log("severityCAT: ", severity);
-  console.log("textCAT", text);
-
   const [state, setState] = React.useState<State>({
     open: openProp,
     vertical: verticalProp,

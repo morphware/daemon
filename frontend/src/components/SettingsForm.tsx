@@ -1,17 +1,31 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button, Grid, Paper, Typography } from "@material-ui/core";
-import React from "react";
+import React, { useContext } from "react";
 import { theme } from "../providers/MorphwareTheme";
 import { TextField } from "mui-rff";
 import { Form } from "react-final-form";
 import { Radios } from "./Radios";
 import { Switches, SwitchData } from "mui-rff";
+import FileField from "./FileUploadComponent";
+import { DaemonContext } from "../providers/ServiceProviders";
+import { SettingsRequestProps } from "../service/DaemonService";
 
 const SettingsForm = () => {
+  const daemonService = useContext(DaemonContext);
+
+  const updateConfigurations = async (values: SettingsRequestProps) => {
+    console.log("values: ", values);
+
+    const response = await daemonService.updateSettings(values);
+    console.log("Response: ", response);
+
+    //Show Modal to restart
+  };
+
   return (
     <div>
       <Form
-        onSubmit={() => {}}
+        onSubmit={updateConfigurations}
         validate={() => {
           return {};
         }}
@@ -48,19 +62,7 @@ const SettingsForm = () => {
                         }}
                       />
                     </Grid>
-                    <Grid item xs={6}>
-                      <TextField
-                        label="Data Path"
-                        name="dataPath"
-                        required={true}
-                        type="number"
-                        style={{
-                          width: "80%",
-                          display: "flex",
-                          justifyContent: "flex-start",
-                        }}
-                      />
-                    </Grid>
+
                     <Grid item xs={6}>
                       <TextField
                         label="Torrent Listening Port"
@@ -74,15 +76,23 @@ const SettingsForm = () => {
                         }}
                       />
                     </Grid>
-                    <Grid item xs={6}>
+                    <Grid item xs={12}>
                       <Switches
                         name="acceptWork"
-                        required={true}
+                        // required={true}
                         data={{ label: "Accept Work", value: true }}
                       />
-                      {/* @ts-expect-error  */}
-                      <input directory="" webkitdirectory="" type="file" />
                     </Grid>
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FileField
+                      name="DatePath"
+                      buttonText="Data Path"
+                      acceptedValues={[]}
+                      removeFilesSignal={false}
+                      webkitdirectory={true}
+                      directory={true}
+                    />
                   </Grid>
                 </Grid>
               </Paper>

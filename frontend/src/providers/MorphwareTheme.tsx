@@ -103,6 +103,19 @@ export const theme: ThemeProps = createTheme({
   metaDataContainer: {
     main: "#5B676D",
   },
+  overrides: {
+    MuiSwitch: {
+      track: {
+        // opacity: 0.2,
+        // backgroundColor: "#fffff",
+        "$checked$checked + &": {
+          opacity: 0.7,
+          backgroundColor: "green",
+          color: "white",
+        },
+      },
+    },
+  },
 });
 
 export const MorphwareTheme: React.FC = ({ children }) => {

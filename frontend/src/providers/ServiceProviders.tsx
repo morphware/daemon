@@ -5,6 +5,7 @@ import {
   ActiveTorrents,
   DaemonService,
   SendMWTRequestProps,
+  SettingsRequestProps,
   SubmitTrainingModelResponse,
   WalletBalanceProps,
   WalletHistoryProps,
@@ -21,6 +22,7 @@ interface daemonServiceProps {
   walletAddress?: string;
   connectionStatus: boolean;
   network?: string;
+  currentConfigs?: SubmitTrainingModelResponse;
   getTorrents: () => Promise<void>;
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -29,6 +31,9 @@ interface daemonServiceProps {
   getWalletHistory(): Promise<void>;
   sendMWT(sendMWTRequest: SendMWTRequestProps): Promise<void>;
   getConnectionStatus(): Promise<void>;
+  updateSettings(
+    requestValues: SettingsRequestProps
+  ): Promise<SubmitTrainingModelResponse>;
 }
 
 const MWSBalance = "0xbc40e97e6d665ce77e784349293d716b030711bc";
@@ -41,6 +46,7 @@ const ServiceProviders: React.FC = ({ children }) => {
   const [walletHistory, setWalletHistory] = useState<WalletHistoryProps>();
   const [connectionStatus, setConnectionStatus] = useState<boolean>(false);
   const [network, setNetwork] = useState<string>();
+  const [currentConfigs, setCurrentConfigs] = useState();
 
   const mockTorrents = () => {
     const mockTorrents: ActiveTorrents = {
@@ -100,13 +106,13 @@ const ServiceProviders: React.FC = ({ children }) => {
     setWalletHistory(walletBalanceProps);
   };
 
-  const sendMWT = async (sendMWTRequest: SendMWTRequestProps) => {
-    const MWTAmount = Web3.utils.toWei(sendMWTRequest.amount, "ether");
+  const sendMWT = async (request: SendMWTRequestProps) => {
+    const MWTAmount = Web3.utils.toWei(request.amount, "ether");
     const newRequest = {} as SendMWTRequestProps;
-    newRequest.address = sendMWTRequest.address;
+    newRequest.address = request.address;
     newRequest.amount = MWTAmount;
-    if (sendMWTRequest.gas) {
-      newRequest.gas = Web3.utils.toWei(sendMWTRequest.gas, "gwei");
+    if (request.gas) {
+      newRequest.gas = Web3.utils.toWei(request.gas, "gwei");
     }
     console.log("Req : ", newRequest);
     const transaction = await daemonService.sendMWT(newRequest);
@@ -121,12 +127,21 @@ const ServiceProviders: React.FC = ({ children }) => {
     setNetwork(network);
   };
 
-  const submitTrainModelRequest = async (values: ITrainingModelValuesV2) => {
-    values.workerReward = Web3.utils.toWei(
-      values.workerReward.toString(),
+  const submitTrainModelRequest = async (request: ITrainingModelValuesV2) => {
+    request.workerReward = Web3.utils.toWei(
+      request.workerReward.toString(),
       "ether"
     );
-    return await daemonService.submitTrainModelRequest(values);
+    return await daemonService.submitTrainModelRequest(request);
+  };
+
+  const updateSettings = async (request: any) => {
+    console.log("Sending Request");
+    console.log("request: ", request);
+    // return Promise.resolve({} as SubmitTrainingModelResponse);
+    const response = await daemonService.updateSettings(request);
+    setCurrentConfigs(response);
+    return response;
   };
 
   const daemonServicContext: daemonServiceProps = {
@@ -138,12 +153,14 @@ const ServiceProviders: React.FC = ({ children }) => {
     walletAddress: walletAddress,
     connectionStatus: connectionStatus,
     network: network,
+    currentConfigs: currentConfigs,
     getTorrents: getTorrents,
     submitTrainModelRequest: submitTrainModelRequest,
     getBalance: getBalance,
     getWalletHistory: getWalletHistory,
     sendMWT: sendMWT,
     getConnectionStatus: getConnectionStatus,
+    updateSettings: updateSettings,
   };
 
   useEffect(() => {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Box,
   Button,
@@ -17,6 +18,8 @@ interface FileFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   buttonText: string;
   acceptedValues: Array<string>;
   removeFilesSignal: boolean;
+  webkitdirectory?: boolean;
+  directory?: boolean;
 }
 
 const styles = makeStyles({
@@ -37,6 +40,8 @@ const FileField = ({
   buttonText,
   acceptedValues,
   removeFilesSignal,
+  webkitdirectory = false,
+  directory = false,
   ...props
 }: FileFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
@@ -87,6 +92,14 @@ const FileField = ({
   }, [removeFilesSignal]);
 
   const FileMetaData = () => {
+
+    console.log("TEST");
+    console.log("fileUploaded TEST: ", fileUploaded);
+    console.log("inputRef.current?.files TEST: ", inputRef.current?.files);
+    console.log("inputRef.current?.files CURRENT TEST: ", inputRef.current?.dirName);
+    console.log("inputRef.current?.files CURRENT TEST: ", inputRef);
+
+
     if (fileUploaded && inputRef.current?.files?.length === 1) {
       const classes = styles();
 
@@ -179,7 +192,8 @@ const FileField = ({
                   alignContent: "center",
                 }}
               >
-                <input
+                {/* @ts-expect-error  */}
+                <input webkitdirectory={webkitdirectory ? "" : false} directory={directory ? "" : false}
                   {...input}
                   type="file"
                   style={{ display: "none" }}

@@ -21,7 +21,7 @@ import { theme } from "../providers/MorphwareTheme";
 import { makeStyles } from "@material-ui/core";
 import PositionedSnackbar from "./PositionedSnackbar";
 import { snackBarProps } from "../components/PositionedSnackbar";
-import FileField from "./FIleUploadComponent";
+import FileField from "./FileUploadComponent";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;
@@ -66,9 +66,7 @@ const TrainModelForm = () => {
   const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
 
   const onSubmit = async (values: formFields) => {
-    console.log("values ", values);
     const formFields = formFieldsMapper(values);
-    console.log("legacy fields: ", formFields);
     const responseV2 = await daemonService.submitTrainModelRequest(formFields);
 
     if (Object.keys(responseV2).includes("status")) {

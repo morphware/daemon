@@ -77,14 +77,15 @@ interface SettingsResponseProps {
   };
 }
 
-interface SettingsRequestProps {
-  httpBindAddress: string;
-  httpPort: string;
-  privateKey: string;
-  acceptWork: string;
-  torrentListenPort: string;
-  dataPath: string;
+export interface SettingsRequestProps {
+  httpBindAddress?: string;
+  httpPort?: string;
+  privateKey?: string;
+  acceptWork?: string;
+  torrentListenPort?: string;
+  dataPath?: string;
 }
+
 export interface IDaemonService {
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -95,7 +96,9 @@ export interface IDaemonService {
   sendMWT(sendMWTRequest: SendMWTRequestProps): Promise<TransactionProps>;
   getConnectionStatus(): Promise<ConnectionStatusProps>;
   getSettings(): Promise<SettingsResponseProps>;
-  updateSettings(requestValues: SettingsRequestProps): Promise<any>;
+  updateSettings(
+    requestValues: SettingsRequestProps
+  ): Promise<SettingsResponseProps>;
 }
 export class DaemonService implements IDaemonService {
   private readonly baseUrl: string =
@@ -113,8 +116,6 @@ export class DaemonService implements IDaemonService {
 
     const response = await fetch(url, requestOptions);
     const status: ConnectionStatusProps = await response.json();
-
-    console.log("status: ", status);
 
     return status;
   };
@@ -152,7 +153,6 @@ export class DaemonService implements IDaemonService {
 
     const response = await fetch(url, requestOptions);
     const history: WalletHistoryProps = await response.json();
-    console.log("History: ", history);
 
     return history;
   };
@@ -167,7 +167,6 @@ export class DaemonService implements IDaemonService {
 
     const response = await fetch(url, requestOptions);
     const balance: WalletBalanceProps = await response.json();
-    console.log("Balance: ", balance);
 
     return balance;
   };
@@ -232,6 +231,8 @@ export class DaemonService implements IDaemonService {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(requestValues),
     };
+
+    console.log("Sending request: ", requestValues);
 
     const response = await fetch(url, requestOptions);
     const updatedSettingsResponse: any = await response.json();
