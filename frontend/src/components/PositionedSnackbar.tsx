@@ -1,10 +1,15 @@
 import * as React from "react";
 import Snackbar, { SnackbarOrigin } from "@mui/material/Snackbar";
 import { Alert } from "@mui/material";
-import { Typography } from "@material-ui/core";
-
+import { Slide, Typography } from "@material-ui/core";
+import { TransitionProps } from "@material-ui/core/transitions";
 export interface State extends SnackbarOrigin {
   open: boolean;
+}
+
+export interface snackBarProps {
+  text?: string;
+  severity?: "error" | "warning" | "info" | "success";
 }
 
 interface PositionedSnackbarProps {
@@ -13,6 +18,11 @@ interface PositionedSnackbarProps {
   severity: "error" | "warning" | "info" | "success";
   text: string;
   openProp?: boolean;
+  setSnackBarProps: React.Dispatch<React.SetStateAction<snackBarProps>>;
+}
+
+function TransitionRight(props: TransitionProps) {
+  return <Slide {...props} direction="left" />;
 }
 
 const PositionedSnackbar = ({
@@ -21,7 +31,11 @@ const PositionedSnackbar = ({
   openProp = true,
   text,
   severity,
+  setSnackBarProps,
 }: PositionedSnackbarProps) => {
+  console.log("severityCAT: ", severity);
+  console.log("textCAT", text);
+
   const [state, setState] = React.useState<State>({
     open: openProp,
     vertical: verticalProp,
@@ -31,23 +45,28 @@ const PositionedSnackbar = ({
 
   const handleClose = () => {
     setState({ ...state, open: false });
+    setSnackBarProps({});
   };
 
   return (
-    <div>
-      <Snackbar
-        anchorOrigin={{ vertical, horizontal }}
-        open={open}
-        onClose={handleClose}
-        key={vertical + horizontal}
-        autoHideDuration={8000}
-        style={{ color: "#2e7d32" }}
-      >
-        <Alert severity={severity} variant="filled" elevation={6}>
-          <Typography variant="body2"> {text}</Typography>
-        </Alert>
-      </Snackbar>
-    </div>
+    <Snackbar
+      anchorOrigin={{ vertical, horizontal }}
+      open={open}
+      onClose={handleClose}
+      key={vertical + horizontal}
+      autoHideDuration={8000}
+      style={{ color: "#2e7d32" }}
+      TransitionComponent={TransitionRight}
+    >
+      <Alert severity={severity} variant="filled" elevation={6}>
+        <Typography variant="body2">
+          {text}
+          {/* <IconButton color="inherit">
+                  <CloseIcon />
+                </IconButton> */}
+        </Typography>
+      </Alert>
+    </Snackbar>
   );
 };
 

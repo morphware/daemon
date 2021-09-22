@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useRef, useState, useContext, useEffect } from "react";
 import { Form, Field } from "react-final-form";
 import {
@@ -19,6 +20,7 @@ import { formFieldsMapper } from "../mappers/TrainModelFormMappers";
 import { theme } from "../providers/MorphwareTheme";
 import { makeStyles } from "@material-ui/core";
 import PositionedSnackbar from "./PositionedSnackbar";
+import { snackBarProps } from "../components/PositionedSnackbar";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;
@@ -55,11 +57,6 @@ interface formFieldsErrors {
   biddingTime: string;
   bounty: string;
   testModel: string;
-}
-
-interface snackBarProps {
-  text?: string;
-  severity?: "error" | "warning" | "info" | "success";
 }
 
 const styles = makeStyles({
@@ -271,22 +268,21 @@ const TrainModelForm = () => {
     console.log("values ", values);
     const formFields = formFieldsMapper(values);
     console.log("legacy fields: ", formFields);
-    const response = await daemonService.submitTrainModelRequest(formFields);
+    const responseV2 = await daemonService.submitTrainModelRequest(formFields);
 
-    if (response.status === "success") {
+    if (Object.keys(responseV2).includes("status")) {
       setSnackBarProps({
-        text: `Training request recieved. JobId: ${response.job}`,
+        text: `Training request recieved. JobID: ${responseV2.job}`,
         severity: "success",
       });
     } else {
       setSnackBarProps({
-        //Need to simulate this and find a better err message
-        text: "Error occured when creating training reques",
+        //TODO: Update when failed requests return error message
+        text: "Error occured when creating request",
         severity: "error",
       });
     }
 
-    console.log("response: ", response);
     await daemonService.getTorrents();
     await daemonService.getWalletHistory();
   };
@@ -334,6 +330,7 @@ const TrainModelForm = () => {
               <PositionedSnackbar
                 text={snackBarProps.text}
                 severity={snackBarProps.severity}
+                setSnackBarProps={setSnackBarProps}
               />
             )}
             <Paper
