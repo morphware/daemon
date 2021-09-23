@@ -1,5 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Button, Grid, Paper, Typography } from "@material-ui/core";
+import {
+  Box,
+  Button,
+  Grid,
+  IconButton,
+  Paper,
+  Typography,
+} from "@material-ui/core";
 import React, { useContext } from "react";
 import { theme } from "../providers/MorphwareTheme";
 import { TextField } from "mui-rff";
@@ -11,6 +18,8 @@ import { DaemonContext } from "../providers/ServiceProviders";
 import { SettingsRequestProps } from "../service/DaemonService";
 import Web3 from "web3";
 import { ethers } from "ethers";
+import Tooltip from "@mui/material/Tooltip";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 
 interface SettingsRequestPropsErrors {
   httpBindAddress?: string;
@@ -69,11 +78,23 @@ const SettingsForm = () => {
                 elevation={3}
               >
                 <Grid container alignItems="flex-start" spacing={2}>
-                  <Grid item xs={4} style={{ textAlign: "start" }}>
-                    <Typography variant="h6">Settings</Typography>
+                  <Grid item xs={12} style={{ textAlign: "start" }}>
+                    <Typography variant="h5">Settings</Typography>
                   </Grid>
-                  <Grid container xs={8} spacing={2}>
-                    <Grid item xs={6}>
+                  <Grid container xs={12} spacing={2}>
+                    <Grid xs={4}>
+                      <Typography
+                        variant="h6"
+                        style={{ textAlign: "start", padding: "15px" }}
+                      >
+                        Private Key
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={8}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
                       <TextField
                         label="Private Key"
                         name="privateKey"
@@ -86,37 +107,99 @@ const SettingsForm = () => {
                         }}
                       />
                     </Grid>
-
-                    <Grid item xs={6}>
+                    <Grid xs={4}>
+                      <Typography
+                        variant="h6"
+                        style={{ textAlign: "start", padding: "15px" }}
+                      >
+                        Data Path
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={8}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                      {/* <FileField
+                        name="DatePath"
+                        buttonText="Data Path"
+                        acceptedValues={[]}
+                        removeFilesSignal={false}
+                        webkitdirectory={true}
+                        directory={true}
+                      /> */}
+                      <TextField
+                        label="Location to store jobs"
+                        name="dataPath"
+                        // required={true}
+                        type="text"
+                        value="No Folder Selected"
+                        // defaultValue="No Folder Selected"
+                        inputProps={{
+                          readOnly: true,
+                        }}
+                        style={{
+                          width: "70%",
+                          display: "flex",
+                          justifyContent: "flex-start",
+                        }}
+                      />
+                      <IconButton
+                        style={{ width: "10%" }}
+                        // className={classes.removeFileIcon}
+                        // aria-label="delete"
+                        // onClick={removeUploadedFile}
+                      >
+                        <DriveFileRenameOutlineIcon
+                          fontSize="large"
+                          // color="primary"
+                        />
+                      </IconButton>
+                    </Grid>
+                    <Grid xs={4}>
+                      <Typography
+                        variant="h6"
+                        style={{ textAlign: "start", padding: "15px" }}
+                      >
+                        Torrent Listening Port
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={8}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
                       <TextField
                         label="Torrent Listening Port"
                         name="torrentListenPort"
                         required={true}
                         type="number"
                         style={{
-                          width: "80%",
+                          width: "30%",
                           display: "flex",
                           justifyContent: "flex-start",
                         }}
                       />
                     </Grid>
-                    <Grid item xs={12}>
+                    <Grid xs={4}>
+                      <Typography
+                        variant="h6"
+                        style={{ textAlign: "start", padding: "15px" }}
+                      >
+                        Accept Work
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={8}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
                       <Switches
                         name="acceptWork"
                         // required={true}
-                        data={{ label: "Accept Work", value: true }}
+                        data={{ label: "", value: true }}
                       />
                     </Grid>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <FileField
-                      name="DatePath"
-                      buttonText="Data Path"
-                      acceptedValues={[]}
-                      removeFilesSignal={false}
-                      webkitdirectory={true}
-                      directory={true}
-                    />
                   </Grid>
                 </Grid>
               </Paper>
