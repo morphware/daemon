@@ -92,13 +92,14 @@ const FileField = ({
   }, [removeFilesSignal]);
 
   const FileMetaData = () => {
-
     console.log("TEST");
     console.log("fileUploaded TEST: ", fileUploaded);
     console.log("inputRef.current?.files TEST: ", inputRef.current?.files);
-    console.log("inputRef.current?.files CURRENT TEST: ", inputRef.current?.dirName);
+    console.log(
+      "inputRef.current?.files CURRENT TEST: ",
+      inputRef.current?.dirName
+    );
     console.log("inputRef.current?.files CURRENT TEST: ", inputRef);
-
 
     if (fileUploaded && inputRef.current?.files?.length === 1) {
       const classes = styles();
@@ -193,7 +194,8 @@ const FileField = ({
                 }}
               >
                 {/* @ts-expect-error  */}
-                <input webkitdirectory={webkitdirectory ? "" : false} directory={directory ? "" : false}
+                <input webkitdirectory={webkitdirectory ? "" : false}
+                  directory={directory ? "" : false}
                   {...input}
                   type="file"
                   style={{ display: "none" }}
@@ -214,6 +216,7 @@ const FileField = ({
                     style={{ width: "100%", display: "flex", height: "80%" }}
                     component="span"
                     variant="contained"
+                    // variant="outlined"
                     color="primary"
                   >
                     {buttonText}

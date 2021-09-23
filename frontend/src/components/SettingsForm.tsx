@@ -57,9 +57,25 @@ const SettingsForm = () => {
             errors.privateKey = "Invalid Private Key";
           }
 
+          if (values.torrentListenPort) {
+            if (values.torrentListenPort <= 0) {
+              errors.torrentListenPort = "Invalid Port";
+            } else if (
+              values.torrentListenPort < 1024 ||
+              values.torrentListenPort > 49151
+            ) {
+              errors.torrentListenPort = "Please choose within 1024-49151";
+            }
+          }
+
           if (values.torrentListenPort && values.torrentListenPort <= 0) {
             errors.torrentListenPort = "Invalid Port";
           }
+
+          if (values.torrentListenPort && values.torrentListenPort <= 0) {
+            errors.torrentListenPort = "Invalid Port";
+          }
+
           return errors;
         }}
         render={({ handleSubmit, form, submitting, pristine }) => (
