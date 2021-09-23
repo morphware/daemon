@@ -20,7 +20,8 @@ import Web3 from "web3";
 import { ethers } from "ethers";
 import Tooltip from "@mui/material/Tooltip";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
-
+// import { IpcRenderer } from "electron";
+import { ipcRenderer } from "electron";
 interface SettingsRequestPropsErrors {
   httpBindAddress?: string;
   httpPort?: string;
@@ -29,6 +30,16 @@ interface SettingsRequestPropsErrors {
   torrentListenPort?: string;
   dataPath?: string;
 }
+// }
+// declare global {
+//   interface Window {
+//     require: (module: "electron") => {
+//       ipcRenderer: IpcRenderer;
+//     };
+//   }
+// }
+
+// const { ipcRenderer } = window.require("electron");
 
 const SettingsForm = () => {
   const daemonService = useContext(DaemonContext);
@@ -40,6 +51,16 @@ const SettingsForm = () => {
     console.log("Response: ", response);
 
     //Show Modal to restart
+  };
+
+  const getFolder = async () => {
+    // const path = await ipcRenderer.invoke("selectFolder");
+    // console.log("PATH: ", path);
+    // console.log("1: ", ipcRenderer.);
+    console.log("cat: ", window);
+    console.log("cat: ", ipcRenderer);
+    // console.log("cat: ", ipcRenderer);
+    // console.log("cat: ", hello);
   };
 
   return (
@@ -180,6 +201,7 @@ const SettingsForm = () => {
                         Torrent Listening Port
                       </Typography>
                     </Grid>
+                    <button onClick={getFolder}>Test</button>
                     <Grid
                       item
                       xs={8}
