@@ -33,6 +33,7 @@ function createWindow() {
       webSecurity: false,
       plugins: true,
       enableRemoteModule: false,
+      contextIsolation: false,
       preload: `${__dirname}/preload.js`
     },
   });
