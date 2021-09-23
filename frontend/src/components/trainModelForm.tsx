@@ -21,7 +21,7 @@ import { theme } from "../providers/MorphwareTheme";
 import { makeStyles } from "@material-ui/core";
 import PositionedSnackbar from "./PositionedSnackbar";
 import { snackBarProps } from "../components/PositionedSnackbar";
-import FileField from "./FileUploadComponent";
+import FileField from "./FileField";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;

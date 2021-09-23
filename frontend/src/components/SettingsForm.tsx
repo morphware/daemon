@@ -6,7 +6,7 @@ import { TextField } from "mui-rff";
 import { Form } from "react-final-form";
 import { Radios } from "./Radios";
 import { Switches, SwitchData } from "mui-rff";
-import FileField from "./FileUploadComponent";
+import FileField from "./FileField";
 import { DaemonContext } from "../providers/ServiceProviders";
 import { SettingsRequestProps } from "../service/DaemonService";
 import Web3 from "web3";
@@ -51,7 +51,7 @@ const SettingsForm = () => {
           if (values.torrentListenPort && values.torrentListenPort <= 0) {
             errors.torrentListenPort = "Invalid Port";
           }
-          if (values.privateKey) return errors;
+          return errors;
         }}
         render={({ handleSubmit, form, submitting, pristine }) => (
           <form
