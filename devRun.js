@@ -87,6 +87,7 @@ function startElectron(){
 		fs.writeFileSync('preload.js', `
 			localStorage.setItem('url', "${conf.httpAddress}:${conf.httpPort}")
 			localStorage.setItem('environment', "${conf.environment}")
+			window.ipcRenderer = require('electron').ipcRenderer;
 		`);
 		
 		let child = spawn('npx', ['nodemon', '-w', 'electron.js', '--exec', 'electron', '.'], {
