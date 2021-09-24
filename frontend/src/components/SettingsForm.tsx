@@ -1,5 +1,5 @@
 import { Button, Grid, IconButton, Paper, Typography } from "@material-ui/core";
-import React, { useContext, useMemo, useState } from "react";
+import React, { useContext, useState } from "react";
 import { theme } from "../providers/MorphwareTheme";
 import { TextField } from "mui-rff";
 import { Form, useForm } from "react-final-form";
@@ -77,24 +77,6 @@ const SettingsForm = () => {
     currentAppDownloadPath
   );
   const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
-
-  const initialValues = useMemo(() => {
-    const initialValues = {} as SettingsRequestProps;
-    if (!currentSettings) return;
-    if (Object.keys(currentSettings).includes("privateKey")) {
-      initialValues.privateKey = currentSettings.privateKey;
-    }
-    if (Object.keys(currentSettings).includes("appDownloadPath")) {
-      initialValues.appDownloadPath = currentSettings.appDownloadPath;
-    }
-    if (Object.keys(currentSettings).includes("torrentListenPort")) {
-      initialValues.torrentListenPort = currentSettings.torrentListenPort;
-    }
-    if (Object.keys(currentSettings).includes("acceptWork")) {
-      initialValues.acceptWork = currentSettings.acceptWork;
-    }
-    return initialValues;
-  }, [daemonService.currentConfigs]);
 
   const updateConfigurations = async (values: SettingsRequestProps) => {
     console.log("values: ", values);
