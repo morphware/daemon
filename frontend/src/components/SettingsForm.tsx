@@ -43,7 +43,7 @@ const AddDataPath = ({ dataPath, setDataPath }: AddDataPathProps) => {
   return (
     <>
       <TextField
-        // label="Location to store jobs"
+        label="Location to store jobs"
         name="dataPath"
         type="text"
         value={dataPath}

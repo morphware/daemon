@@ -193,9 +193,9 @@ const FileField = ({
                   alignContent: "center",
                 }}
               >
-                {/* @ts-expect-error  */}
-                <input webkitdirectory={webkitdirectory ? "" : false}
-                  directory={directory ? "" : false}
+                <input
+                  // webkitdirectory={webkitdirectory ? "" : false}
+                  // directory={directory ? "" : false}
                   {...input}
                   type="file"
                   style={{ display: "none" }}
