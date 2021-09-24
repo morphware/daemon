@@ -73,7 +73,7 @@ export interface SettingsParamsResponseProps {
     privateKey: string;
     acceptWork: string;
     torrentListenPort: string;
-    dataPath: string;
+    appDownloadPath: string;
   };
 }
 
@@ -83,10 +83,12 @@ export interface SettingsRequestProps {
   privateKey?: string;
   acceptWork?: boolean;
   torrentListenPort?: number;
-  dataPath?: string;
+  appDownloadPath?: string;
 }
 
-export interface SettingsResponseProps extends SettingsRequestProps {}
+export interface SettingsResponseProps extends SettingsRequestProps {
+  error?: any;
+}
 
 export interface IDaemonService {
   submitTrainModelRequest(
@@ -128,8 +130,7 @@ export class DaemonService implements IDaemonService {
   ): Promise<any> => {
     const url = `${this.baseUrl}/api/V0/wallet/send`;
 
-    console.log("Url: ", url);
-    console.log("Body: ", sendMWTRequest);
+    console.log("sendMWT: ", sendMWTRequest);
 
     const requestOptions = {
       method: "POST",
@@ -139,10 +140,6 @@ export class DaemonService implements IDaemonService {
 
     const response = await fetch(url, requestOptions);
     const transaction: TransactionProps = await response.json();
-
-    // console.log("response: ", response);
-    console.log("transaction: ", transaction);
-
     return transaction;
   };
 
@@ -179,7 +176,7 @@ export class DaemonService implements IDaemonService {
   ): Promise<SubmitTrainingModelResponse> => {
     const url = `${this.baseUrl}/api/v0/contract`;
 
-    console.log("request: ", trainModelRequest);
+    console.log("submitTrainModelRequest: ", trainModelRequest);
 
     const requestOptions = {
       method: "POST",
@@ -203,7 +200,6 @@ export class DaemonService implements IDaemonService {
     const response = await fetch(url, requestOptions);
     console.log("Response: ", response);
     const torrentData: ActiveTorrents = await response.json();
-    console.log("Response2: ", torrentData);
 
     return torrentData;
   };
@@ -249,7 +245,7 @@ export class DaemonService implements IDaemonService {
       body: JSON.stringify(requestValues),
     };
 
-    console.log("Sending request: ", requestValues);
+    console.log("updateSettings: ", requestValues);
 
     const response = await fetch(url, requestOptions);
     const updatedSettingsResponse: SettingsResponseProps =

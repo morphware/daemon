@@ -1,5 +1,5 @@
 import { Button, Grid, IconButton, Paper, Typography } from "@material-ui/core";
-import React, { useContext, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { theme } from "../providers/MorphwareTheme";
 import { TextField } from "mui-rff";
 import { Form, useForm } from "react-final-form";
@@ -17,7 +17,7 @@ interface SettingsRequestPropsErrors {
   privateKey?: string;
   acceptWork?: string;
   torrentListenPort?: string;
-  dataPath?: string;
+  appDownloadPath?: string;
 }
 declare global {
   interface Window {
@@ -25,28 +25,31 @@ declare global {
   }
 }
 
-interface AddDataPathProps {
-  dataPath?: string;
-  setDataPath: React.Dispatch<React.SetStateAction<string>>;
+interface AddAppDownloadPathProps {
+  appDownloadPath?: string;
+  setAppDownloadPath: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const AddDataPath = ({ dataPath, setDataPath }: AddDataPathProps) => {
+const AddAppDownloadPath = ({
+  appDownloadPath,
+  setAppDownloadPath,
+}: AddAppDownloadPathProps) => {
   const form = useForm();
 
   const getFolder = () => {
-    const dataPath = window.renderer.sendSync("selectFolder");
-    setDataPath(dataPath);
-    form.change("dataPath", dataPath);
-    return dataPath;
+    const appDownloadPath = window.renderer.sendSync("selectFolder");
+    setAppDownloadPath(appDownloadPath);
+    form.change("appDownloadPath", appDownloadPath);
+    return appDownloadPath;
   };
 
   return (
     <>
       <TextField
         label="Location to store jobs"
-        name="dataPath"
+        name="appDownloadPath"
         type="text"
-        value={dataPath}
+        value={appDownloadPath}
         required={true}
         placeholder="Path to store torrent data and jobs"
         style={{
@@ -65,14 +68,33 @@ const AddDataPath = ({ dataPath, setDataPath }: AddDataPathProps) => {
 const SettingsForm = () => {
   const daemonService = useContext(DaemonContext);
 
-  const currentSettngs = daemonService.currentConfigs;
-  const currentDataPath = currentSettngs?.dataPath
-    ? currentSettngs.dataPath
+  const currentSettings = daemonService.currentConfigs;
+  const currentAppDownloadPath = currentSettings?.appDownloadPath
+    ? currentSettings.appDownloadPath
     : "";
-  console.log("currentSettings: ", currentSettngs);
 
-  const [dataPath, setDataPath] = useState<string>(currentDataPath);
+  const [appDownloadPath, setAppDownloadPath] = useState<string>(
+    currentAppDownloadPath
+  );
   const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
+
+  const initialValues = useMemo(() => {
+    const initialValues = {} as SettingsRequestProps;
+    if (!currentSettings) return;
+    if (Object.keys(currentSettings).includes("privateKey")) {
+      initialValues.privateKey = currentSettings.privateKey;
+    }
+    if (Object.keys(currentSettings).includes("appDownloadPath")) {
+      initialValues.appDownloadPath = currentSettings.appDownloadPath;
+    }
+    if (Object.keys(currentSettings).includes("torrentListenPort")) {
+      initialValues.torrentListenPort = currentSettings.torrentListenPort;
+    }
+    if (Object.keys(currentSettings).includes("acceptWork")) {
+      initialValues.acceptWork = currentSettings.acceptWork;
+    }
+    return initialValues;
+  }, [daemonService.currentConfigs]);
 
   const updateConfigurations = async (values: SettingsRequestProps) => {
     console.log("values: ", values);
@@ -81,18 +103,24 @@ const SettingsForm = () => {
     }
 
     const response = await daemonService.updateSettings(values);
-    console.log("Response: ", response);
-    setSnackBarProps({
-      text: "Changes have been saved. Please restart client to apply changes",
-      severity: "success",
-    });
+    if (response.error!) {
+      setSnackBarProps({
+        text: response.error,
+        severity: "error",
+      });
+    } else {
+      setSnackBarProps({
+        text: "Changes have been saved. Please restart client to apply changes",
+        severity: "success",
+      });
+    }
   };
 
   return (
     <div>
       <Form
         onSubmit={updateConfigurations}
-        initialValues={currentSettngs}
+        initialValues={currentSettings}
         validate={(values) => {
           const errors = {} as SettingsRequestPropsErrors;
 
@@ -188,9 +216,9 @@ const SettingsForm = () => {
                       xs={8}
                       style={{ display: "flex", justifyContent: "flex-end" }}
                     >
-                      <AddDataPath
-                        dataPath={dataPath}
-                        setDataPath={setDataPath}
+                      <AddAppDownloadPath
+                        appDownloadPath={appDownloadPath}
+                        setAppDownloadPath={setAppDownloadPath}
                       />
                     </Grid>
                     <Grid xs={4}>

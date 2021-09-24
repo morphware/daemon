@@ -13,6 +13,7 @@ import {
   WalletHistoryProps,
 } from "../service/DaemonService";
 import Web3 from "web3";
+import { settingsDaemonResponseToSettingsResponseProps } from "../mappers/SettingsMappers";
 export const DaemonContext = React.createContext({} as daemonServiceProps);
 
 interface daemonServiceProps {
@@ -82,7 +83,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     if (request.gas) {
       newRequest.gas = Web3.utils.toWei(request.gas, "gwei");
     }
-    console.log("Req : ", newRequest);
+    console.log("sendMWT : ", newRequest);
     const transaction = await daemonService.sendMWT(newRequest);
     return transaction;
   };
@@ -104,9 +105,9 @@ const ServiceProviders: React.FC = ({ children }) => {
   };
 
   const updateSettings = async (request: SettingsRequestProps) => {
-    console.log("Sending Request");
-    console.log("request: ", request);
-    const response = await daemonService.updateSettings(request);
+    console.log("updateSettings: ", request);
+    let response = await daemonService.updateSettings(request);
+    response = settingsDaemonResponseToSettingsResponseProps(response);
     setCurrentConfigs(response);
     return response;
   };
@@ -117,8 +118,9 @@ const ServiceProviders: React.FC = ({ children }) => {
   };
 
   const getCurrentSettings = async () => {
-    const response = await daemonService.getCurrentSettings();
-    console.log("CURRENT SETTINGS: ", response);
+    let response = await daemonService.getCurrentSettings();
+    response = settingsDaemonResponseToSettingsResponseProps(response);
+    console.log("getCurrentSettings: ", response);
     setCurrentConfigs(response);
   };
 
