@@ -1,28 +1,16 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import {
-  Box,
-  Button,
-  Grid,
-  IconButton,
-  Paper,
-  Typography,
-} from "@material-ui/core";
+import { Button, Grid, IconButton, Paper, Typography } from "@material-ui/core";
 import React, { useContext, useState } from "react";
 import { theme } from "../providers/MorphwareTheme";
 import { TextField } from "mui-rff";
 import { Form, useForm } from "react-final-form";
-import { Radios } from "./Radios";
-import { Switches, SwitchData } from "mui-rff";
-import FileField from "./FileField";
+import { Switches } from "mui-rff";
 import { DaemonContext } from "../providers/ServiceProviders";
 import { SettingsRequestProps } from "../service/DaemonService";
-import Web3 from "web3";
 import { ethers } from "ethers";
-import Tooltip from "@mui/material/Tooltip";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { IpcRenderer } from "electron";
-// import { IpcRenderer } from "electron";
-// import { ipcRenderer } from "electron";
+import PositionedSnackbar from "./PositionedSnackbar";
+import { snackBarProps } from "../components/PositionedSnackbar";
 interface SettingsRequestPropsErrors {
   httpBindAddress?: string;
   httpPort?: string;
@@ -31,7 +19,6 @@ interface SettingsRequestPropsErrors {
   torrentListenPort?: string;
   dataPath?: string;
 }
-// }
 declare global {
   interface Window {
     renderer: IpcRenderer;
@@ -40,7 +27,7 @@ declare global {
 
 interface AddDataPathProps {
   dataPath?: string;
-  setDataPath: React.Dispatch<React.SetStateAction<string | undefined>>;
+  setDataPath: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const AddDataPath = ({ dataPath, setDataPath }: AddDataPathProps) => {
@@ -77,32 +64,45 @@ const AddDataPath = ({ dataPath, setDataPath }: AddDataPathProps) => {
 
 const SettingsForm = () => {
   const daemonService = useContext(DaemonContext);
-  const [dataPath, setDataPath] = useState<string>();
+
+  const currentSettngs = daemonService.currentConfigs;
+  const currentDataPath = currentSettngs?.dataPath
+    ? currentSettngs.dataPath
+    : "";
+  console.log("currentSettings: ", currentSettngs);
+
+  const [dataPath, setDataPath] = useState<string>(currentDataPath);
+  const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
 
   const updateConfigurations = async (values: SettingsRequestProps) => {
     console.log("values: ", values);
+    if (!Object.keys(values).includes("acceptWork")) {
+      values.acceptWork = false;
+    }
 
-    // const response = await daemonService.updateSettings(values);
-    //console.log("Response: ", response);
-
-    //Show Modal to restart
+    const response = await daemonService.updateSettings(values);
+    console.log("Response: ", response);
+    setSnackBarProps({
+      text: "Changes have been saved. Please restart client to apply changes",
+      severity: "success",
+    });
   };
 
   return (
     <div>
       <Form
         onSubmit={updateConfigurations}
-        // initialValues={{ dataPath: dataPath }}
+        initialValues={currentSettngs}
         validate={(values) => {
           const errors = {} as SettingsRequestPropsErrors;
 
-          // try {
-          //   if (values.privateKey) {
-          //     const validPrivateKey = new ethers.Wallet(values.privateKey);
-          //   }
-          // } catch (e) {
-          //   errors.privateKey = "Invalid Private Key";
-          // }
+          try {
+            if (values.privateKey) {
+              new ethers.Wallet(values.privateKey);
+            }
+          } catch (e) {
+            errors.privateKey = "Invalid Private Key";
+          }
 
           if (values.torrentListenPort) {
             if (values.torrentListenPort <= 0) {
@@ -125,7 +125,7 @@ const SettingsForm = () => {
 
           return errors;
         }}
-        render={({ handleSubmit, form, submitting, pristine }) => (
+        render={({ handleSubmit, submitting }) => (
           <form
             className="frm_upload"
             onSubmit={handleSubmit}
@@ -140,10 +140,15 @@ const SettingsForm = () => {
                 }}
                 elevation={3}
               >
+                {snackBarProps.text && snackBarProps.severity && (
+                  <PositionedSnackbar
+                    text={snackBarProps.text}
+                    severity={snackBarProps.severity}
+                    setSnackBarProps={setSnackBarProps}
+                  />
+                )}
                 <Grid container alignItems="flex-start" spacing={2}>
-                  <Grid item xs={12} style={{ textAlign: "start" }}>
-                    <Typography variant="h5">Settings</Typography>
-                  </Grid>
+                  <Grid item xs={12} style={{ textAlign: "start" }} />
                   <Grid container xs={12} spacing={2}>
                     <Grid xs={4}>
                       <Typography
@@ -162,7 +167,6 @@ const SettingsForm = () => {
                         label="Private Key"
                         name="privateKey"
                         required={true}
-                        // type="text"
                         type="password"
                         style={{
                           width: "80%",
@@ -229,7 +233,6 @@ const SettingsForm = () => {
                     >
                       <Switches
                         name="acceptWork"
-                        // required={true}
                         data={{ label: "", value: true }}
                       />
                     </Grid>
@@ -242,19 +245,6 @@ const SettingsForm = () => {
                 style={{ marginTop: 16 }}
                 justifyContent="flex-end"
               >
-                <Grid item style={{ paddingRight: 16 }}>
-                  <Button
-                    type="button"
-                    variant="contained"
-                    onClick={() => {
-                      form.reset();
-                      setDataPath("");
-                    }}
-                    disabled={submitting || pristine}
-                  >
-                    Reset
-                  </Button>
-                </Grid>
                 <Grid item>
                   <Button
                     type="submit"
