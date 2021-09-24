@@ -10,7 +10,7 @@ import {
 import React, { useContext, useState } from "react";
 import { theme } from "../providers/MorphwareTheme";
 import { TextField } from "mui-rff";
-import { Form } from "react-final-form";
+import { Form, useForm } from "react-final-form";
 import { Radios } from "./Radios";
 import { Switches, SwitchData } from "mui-rff";
 import FileField from "./FileField";
@@ -38,7 +38,42 @@ declare global {
   }
 }
 
-// const { ipcRenderer } = window.require("electron");
+interface AddDataPathProps {
+  dataPath?: string;
+  setDataPath: React.Dispatch<React.SetStateAction<string | undefined>>;
+}
+
+const AddDataPath = ({ dataPath, setDataPath }: AddDataPathProps) => {
+  const form = useForm();
+
+  const getFolder = () => {
+    const dataPath = window.renderer.sendSync("selectFolder");
+    setDataPath(dataPath);
+    form.change("dataPath", dataPath);
+    return dataPath;
+  };
+
+  return (
+    <>
+      <TextField
+        // label="Location to store jobs"
+        name="dataPath"
+        type="text"
+        value={dataPath}
+        required={true}
+        placeholder="Path to store torrent data and jobs"
+        style={{
+          width: "70%",
+          display: "flex",
+          justifyContent: "flex-start",
+        }}
+      />
+      <IconButton style={{ width: "10%" }} onClick={getFolder}>
+        <DriveFileRenameOutlineIcon fontSize="large" />
+      </IconButton>
+    </>
+  );
+};
 
 const SettingsForm = () => {
   const daemonService = useContext(DaemonContext);
@@ -47,33 +82,27 @@ const SettingsForm = () => {
   const updateConfigurations = async (values: SettingsRequestProps) => {
     console.log("values: ", values);
 
-    const response = await daemonService.updateSettings(values);
-    console.log("Response: ", response);
+    // const response = await daemonService.updateSettings(values);
+    //console.log("Response: ", response);
 
     //Show Modal to restart
-  };
-
-  const getFolder = () => {
-    const dataPath = window.renderer.sendSync("selectFolder");
-    console.log("DATAPATH: ", dataPath);
-    setDataPath(dataPath);
-    // return dataPath;
   };
 
   return (
     <div>
       <Form
         onSubmit={updateConfigurations}
+        // initialValues={{ dataPath: dataPath }}
         validate={(values) => {
           const errors = {} as SettingsRequestPropsErrors;
 
-          try {
-            if (values.privateKey) {
-              const validPrivateKey = new ethers.Wallet(values.privateKey);
-            }
-          } catch (e) {
-            errors.privateKey = "Invalid Private Key";
-          }
+          // try {
+          //   if (values.privateKey) {
+          //     const validPrivateKey = new ethers.Wallet(values.privateKey);
+          //   }
+          // } catch (e) {
+          //   errors.privateKey = "Invalid Private Key";
+          // }
 
           if (values.torrentListenPort) {
             if (values.torrentListenPort <= 0) {
@@ -155,32 +184,10 @@ const SettingsForm = () => {
                       xs={8}
                       style={{ display: "flex", justifyContent: "flex-end" }}
                     >
-                      <TextField
-                        // label="Location to store jobs"
-                        name="dataPath"
-                        type="text"
-                        value={dataPath}
-                        placeholder="Path to store torrent data and jobs"
-                        inputProps={{
-                          readOnly: true,
-                        }}
-                        style={{
-                          width: "70%",
-                          display: "flex",
-                          justifyContent: "flex-start",
-                        }}
+                      <AddDataPath
+                        dataPath={dataPath}
+                        setDataPath={setDataPath}
                       />
-                      <IconButton
-                        style={{ width: "10%" }}
-                        // className={classes.removeFileIcon}
-                        // aria-label="delete"
-                        onClick={getFolder}
-                      >
-                        <DriveFileRenameOutlineIcon
-                          fontSize="large"
-                          // color="primary"
-                        />
-                      </IconButton>
                     </Grid>
                     <Grid xs={4}>
                       <Typography
@@ -190,7 +197,6 @@ const SettingsForm = () => {
                         Torrent Listening Port
                       </Typography>
                     </Grid>
-                    {/* <button onClick={getFolder}>Test</button> */}
                     <Grid
                       item
                       xs={8}
@@ -242,6 +248,7 @@ const SettingsForm = () => {
                     variant="contained"
                     onClick={() => {
                       form.reset();
+                      setDataPath("");
                     }}
                     disabled={submitting || pristine}
                   >
