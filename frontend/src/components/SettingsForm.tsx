@@ -7,7 +7,7 @@ import {
   Paper,
   Typography,
 } from "@material-ui/core";
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { theme } from "../providers/MorphwareTheme";
 import { TextField } from "mui-rff";
 import { Form } from "react-final-form";
@@ -42,6 +42,7 @@ declare global {
 
 const SettingsForm = () => {
   const daemonService = useContext(DaemonContext);
+  const [dataPath, setDataPath] = useState<string>();
 
   const updateConfigurations = async (values: SettingsRequestProps) => {
     console.log("values: ", values);
@@ -55,7 +56,8 @@ const SettingsForm = () => {
   const getFolder = () => {
     const dataPath = window.renderer.sendSync("selectFolder");
     console.log("DATAPATH: ", dataPath);
-    return dataPath;
+    setDataPath(dataPath);
+    // return dataPath;
   };
 
   return (
@@ -131,7 +133,8 @@ const SettingsForm = () => {
                         label="Private Key"
                         name="privateKey"
                         required={true}
-                        type="text"
+                        // type="text"
+                        type="password"
                         style={{
                           width: "80%",
                           display: "flex",
@@ -152,21 +155,12 @@ const SettingsForm = () => {
                       xs={8}
                       style={{ display: "flex", justifyContent: "flex-end" }}
                     >
-                      {/* <FileField
-                        name="DatePath"
-                        buttonText="Data Path"
-                        acceptedValues={[]}
-                        removeFilesSignal={false}
-                        webkitdirectory={true}
-                        directory={true}
-                      /> */}
                       <TextField
-                        label="Location to store jobs"
+                        // label="Location to store jobs"
                         name="dataPath"
-                        // required={true}
                         type="text"
-                        value="No Folder Selected"
-                        // defaultValue="No Folder Selected"
+                        value={dataPath}
+                        placeholder="Path to store torrent data and jobs"
                         inputProps={{
                           readOnly: true,
                         }}
@@ -180,7 +174,7 @@ const SettingsForm = () => {
                         style={{ width: "10%" }}
                         // className={classes.removeFileIcon}
                         // aria-label="delete"
-                        // onClick={removeUploadedFile}
+                        onClick={getFolder}
                       >
                         <DriveFileRenameOutlineIcon
                           fontSize="large"
@@ -196,7 +190,7 @@ const SettingsForm = () => {
                         Torrent Listening Port
                       </Typography>
                     </Grid>
-                    <button onClick={getFolder}>Test</button>
+                    {/* <button onClick={getFolder}>Test</button> */}
                     <Grid
                       item
                       xs={8}

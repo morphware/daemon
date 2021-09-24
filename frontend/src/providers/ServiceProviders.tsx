@@ -5,7 +5,9 @@ import {
   ActiveTorrents,
   DaemonService,
   SendMWTRequestProps,
+  SettingsParamsResponseProps,
   SettingsRequestProps,
+  SettingsResponseProps,
   SubmitTrainingModelResponse,
   WalletBalanceProps,
   WalletHistoryProps,
@@ -22,7 +24,7 @@ interface daemonServiceProps {
   walletAddress?: string;
   connectionStatus: boolean;
   network?: string;
-  currentConfigs?: SubmitTrainingModelResponse;
+  currentConfigs?: SettingsResponseProps;
   getTorrents: () => Promise<void>;
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -33,7 +35,9 @@ interface daemonServiceProps {
   getConnectionStatus(): Promise<void>;
   updateSettings(
     requestValues: SettingsRequestProps
-  ): Promise<SubmitTrainingModelResponse>;
+  ): Promise<SettingsResponseProps>;
+  getSettings(): Promise<void>;
+  getCurrentSettings(): Promise<void>;
 }
 
 const MWSBalance = "0xbc40e97e6d665ce77e784349293d716b030711bc";
@@ -46,45 +50,9 @@ const ServiceProviders: React.FC = ({ children }) => {
   const [walletHistory, setWalletHistory] = useState<WalletHistoryProps>();
   const [connectionStatus, setConnectionStatus] = useState<boolean>(false);
   const [network, setNetwork] = useState<string>();
-  const [currentConfigs, setCurrentConfigs] = useState();
-
-  const mockTorrents = () => {
-    const mockTorrents: ActiveTorrents = {
-      download: 10,
-      port: 3001,
-      upload: 10,
-      torrents: [
-        {
-          name: "jupyter-notebook.ipymb",
-          progress: 13,
-          downloadSpeed: 23,
-          numPeers: 51,
-          timeRemaining: 21,
-          magnetURI:
-            "magnet:?xt=urn:btih:f35be570c19b5e026930e97a9533ac7207f960a4&dn=jupyter-notebook.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
-        },
-        {
-          name: "training-data.html",
-          progress: 42,
-          downloadSpeed: 74,
-          numPeers: 74,
-          timeRemaining: 25,
-          magnetURI:
-            "magnet:?xt=urn:btih:7948a0c8a8407274fa5bc63219eaa061b495e5db&dn=training-data.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
-        },
-        {
-          name: "testing-data.md",
-          progress: 52,
-          downloadSpeed: 57,
-          numPeers: 47,
-          timeRemaining: 32,
-          magnetURI:
-            "magnet:?xt=urn:btih:c38689c760a42c2f4060935ebfbf6e55d42350f9&dn=testing-data.md&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
-        },
-      ],
-    };
-    return mockTorrents;
-  };
+  const [currentConfigs, setCurrentConfigs] = useState<SettingsResponseProps>();
+  const [configParams, setConfigParams] =
+    useState<SettingsParamsResponseProps>();
 
   const getTorrents = async () => {
     const torrents = await daemonService.getActiveTorrents();
@@ -135,13 +103,23 @@ const ServiceProviders: React.FC = ({ children }) => {
     return await daemonService.submitTrainModelRequest(request);
   };
 
-  const updateSettings = async (request: any) => {
+  const updateSettings = async (request: SettingsRequestProps) => {
     console.log("Sending Request");
     console.log("request: ", request);
-    // return Promise.resolve({} as SubmitTrainingModelResponse);
     const response = await daemonService.updateSettings(request);
     setCurrentConfigs(response);
     return response;
+  };
+
+  const getSettings = async () => {
+    const response = await daemonService.getSettings();
+    setConfigParams(response);
+  };
+
+  const getCurrentSettings = async () => {
+    const response = await daemonService.getCurrentSettings();
+    console.log("CURRENT SETTINGS: ", response);
+    setCurrentConfigs(response);
   };
 
   const daemonServicContext: daemonServiceProps = {
@@ -161,6 +139,8 @@ const ServiceProviders: React.FC = ({ children }) => {
     sendMWT: sendMWT,
     getConnectionStatus: getConnectionStatus,
     updateSettings: updateSettings,
+    getSettings: getSettings,
+    getCurrentSettings: getCurrentSettings,
   };
 
   useEffect(() => {
@@ -176,6 +156,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     getTorrents();
     getBalance();
     getWalletHistory();
+    getCurrentSettings();
   }, []);
 
   return (
