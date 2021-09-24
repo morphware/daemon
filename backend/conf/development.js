@@ -18,5 +18,3 @@ module.exports = {
 	electronDev: true
 };
 
-
-
