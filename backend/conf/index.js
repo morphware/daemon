@@ -52,6 +52,7 @@ args
   .option('ethAddress', 'Remote etherum node')
   .option('acceptWork', 'Accepting jobs')
   .option('appDataPath', 'Path where local data is held')
+  .option('appDownloadPath', 'Path for downloads')
   .option('privateKey', 'Wallet Object', undefined, value=>{
 	return [value];
   })
@@ -112,6 +113,17 @@ if(!fs.pathExistsSync(runtimeConf.appDataLocal)){
 
 // Grab local config
 var localConf = load(runtimeConf.appDataLocal);
+
+
+// Download data
+
+// Set the correct appDownloadPath if its not specified 
+if(!localConf.appDownloadPath || !runtimeConf.appDownloadPath){
+	runtimeConf.appDownloadPath = `${runtimeConf.appDataPath}downloads/`
+}
+
+// Make sure download directory exists
+fs.ensureDirSync(runtimeConf.appDownloadPath || localConf.appDownloadPath);
 
 
 // Build the complete conf object

@@ -13,7 +13,7 @@ Any valid Java Script can be placed in each conf file. `module.exports` must
 export a object.
 
 
-## Local settings on built packages
+## Local paths
 
 When the application is packaged by electron and ran as a distrusted executable
 the `conf` folder is not accessible. If the `conf` object detects this state, it
@@ -41,6 +41,8 @@ on.
   . This should be stored in `secrets.js`
 * `acceptWork` *BOOL* If the current node is a accepting jobs.
 * `electronDev` *BOOL* Bring up the chrome dev tools in electron.
+* `appDownloadPath` *STRING* Absolute path where downloads are kept.
+* `torrentListenPort` *STRING* TCP port for the torrent client to listen on
 
 ## Dev fields
 User may edit these fields, but they are mostly meant for dev issues.
@@ -80,5 +82,3 @@ Changes made to the conf object during run time are not persistent.
 
 ## Settings to add
 
-* `dataPath` *STRING* Path the app will use for data
-* `torrentListenPort` *STRING* TCP port for the torrent client to listen on
