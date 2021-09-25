@@ -6,7 +6,7 @@ paclage-lock.json @morphware/engineering
 /docs/CODEOWNERS @morphware/engineering-admin
 
 // Default for all files
-* /@morphware/engineering-backend
+* @morphware/engineering-backend
 
 // Anyonce can approve docs
 /docs/ @morphware/engineering
