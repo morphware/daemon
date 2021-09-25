@@ -1,31 +1,31 @@
-'use strict';
+"use strict";
 
-const path = require('path');
-const { app, BrowserWindow, Tray, Menu } = require('electron');
+const path = require("path");
+const { app, BrowserWindow, Tray, Menu, ipcMain, dialog } = require("electron");
 let win = null;
 let tray = null;
 
-
-if(app.isPackaged){
-
+if (app.isPackaged) {
   // Pad arvg to comply with the args package.
   // Filed issue https://github.com/leo/args/issues/158
-  process.argv.unshift('.');
-  const expressApp = require('./express');
+  process.argv.unshift(".");
+  const expressApp = require("./express");
 }
 
-const {conf} = require(`./${app.isPackaged ?'': 'backend/'}conf`);
+const { conf } = require(`./${app.isPackaged ? "" : "backend/"}conf`);
 
-console.info(`${conf.appName}, ${conf.environment} version ${app.getVersion()}`);
+console.info(
+  `${conf.appName}, ${conf.environment} version ${app.getVersion()}`
+);
 
 function createWindow() {
   // Create the browser window.
   win = new BrowserWindow({
     width: 1540,
     height: 850,
-    "autoHideMenuBar": true,
-    "minWidth": 1540,
-    "minHeight": 850,
+    autoHideMenuBar: true,
+    minWidth: 1540,
+    minHeight: 850,
     icon: `${__dirname}/resources/icons/64x64.png`,
     webPreferences: {
       nativeWindowOpen: true,
@@ -33,22 +33,37 @@ function createWindow() {
       webSecurity: false,
       plugins: true,
       enableRemoteModule: false,
-      preload: `${__dirname}/preload.js`
+      contextIsolation: false,
+      preload: `${__dirname}/preload.js`,
     },
   });
 
   // and load the index.html of the app.
-  win.loadURL(app.isPackaged ? 
-    `file://${path.join(__dirname, './www/index.html')}` :
-    'http://localhost:3000'
+  win.loadURL(
+    app.isPackaged
+      ? `file://${path.join(__dirname, "./www/index.html")}`
+      : "http://localhost:3000"
   );
 
   // Open the DevTools.
-  if(conf.electronDev) {
-    win.webContents.openDevTools({ mode: 'detach' });
+  if (conf.electronDev) {
+    win.webContents.openDevTools({ mode: "detach" });
   }
 
-  win.on('close', function (event) {
+  ipcMain.on("selectFolder", async (event, args) => {
+    const response = await dialog.showOpenDialog(win, {
+      properties: ["openDirectory"],
+      buttonLabel: "Seeding Folder",
+    });
+
+    const filePath = response.filePaths[0];
+
+    console.log("filepath: ", filePath);
+
+    event.returnValue = filePath;
+  });
+
+  win.on("close", function (event) {
     event.preventDefault();
     win.hide();
     event.returnValue = false;
@@ -61,49 +76,49 @@ function createWindow() {
 app.whenReady().then(createWindow);
 
 app.whenReady().then(() => {
-  try{
+  try {
     tray = new Tray(`${__dirname}/resources/icons/512x512.png`);
-      var contextMenu = Menu.buildFromTemplate([
-        {
-            label: 'Show App', click: function () {
-                win.show();
-            }
+    var contextMenu = Menu.buildFromTemplate([
+      {
+        label: "Show App",
+        click: function () {
+          win.show();
         },
-        {
-            label: 'Quit', click: function () {
-                app.isQuiting = true;
-                app.quit();
-                process.exit(0);
-            }
-        }
-    ])
+      },
+      {
+        label: "Quit",
+        click: function () {
+          app.isQuiting = true;
+          app.quit();
+          process.exit(0);
+        },
+      },
+    ]);
 
-    tray.setToolTip('Morphware Wallet');
+    tray.setToolTip("Morphware Wallet");
 
-    tray.on('click', function(e){
-      if(!win.isVisible()) {
+    tray.on("click", function (e) {
+      if (!win.isVisible()) {
         win.show();
       }
     });
 
     tray.setContextMenu(contextMenu);
-
-
-  }catch(error){
-    console.log('tray error', error);
+  } catch (error) {
+    console.log("tray error", error);
   }
-})
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
+app.on("window-all-closed", () => {
+  if (process.platform !== "darwin") {
     // app.quit();
   }
 });
 
-app.on('activate', () => {
+app.on("activate", () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }

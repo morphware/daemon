@@ -64,6 +64,32 @@ export interface SubmitTrainingModelResponse {
   status: string;
   job: string;
 }
+
+export interface SettingsParamsResponseProps {
+  conf: any;
+  editKeys: {
+    httpBindAddress: string;
+    httpPort: string;
+    privateKey: string;
+    acceptWork: string;
+    torrentListenPort: string;
+    appDownloadPath: string;
+  };
+}
+
+export interface SettingsRequestProps {
+  httpBindAddress?: string;
+  httpPort?: string;
+  privateKey?: string;
+  acceptWork?: boolean;
+  torrentListenPort?: number;
+  appDownloadPath?: string;
+}
+
+export interface SettingsResponseProps extends SettingsRequestProps {
+  error?: any;
+}
+
 export interface IDaemonService {
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -73,6 +99,11 @@ export interface IDaemonService {
   getWalletHistory(): Promise<WalletHistoryProps>;
   sendMWT(sendMWTRequest: SendMWTRequestProps): Promise<TransactionProps>;
   getConnectionStatus(): Promise<ConnectionStatusProps>;
+  getSettings(): Promise<SettingsParamsResponseProps>;
+  updateSettings(
+    requestValues: SettingsRequestProps
+  ): Promise<SettingsResponseProps>;
+  getCurrentSettings(): Promise<SettingsResponseProps>;
 }
 export class DaemonService implements IDaemonService {
   private readonly baseUrl: string =
@@ -91,8 +122,6 @@ export class DaemonService implements IDaemonService {
     const response = await fetch(url, requestOptions);
     const status: ConnectionStatusProps = await response.json();
 
-    console.log("status: ", status);
-
     return status;
   };
 
@@ -101,8 +130,7 @@ export class DaemonService implements IDaemonService {
   ): Promise<any> => {
     const url = `${this.baseUrl}/api/V0/wallet/send`;
 
-    console.log("Url: ", url);
-    console.log("Body: ", sendMWTRequest);
+    console.log("sendMWT: ", sendMWTRequest);
 
     const requestOptions = {
       method: "POST",
@@ -112,10 +140,6 @@ export class DaemonService implements IDaemonService {
 
     const response = await fetch(url, requestOptions);
     const transaction: TransactionProps = await response.json();
-
-    // console.log("response: ", response);
-    console.log("transaction: ", transaction);
-
     return transaction;
   };
 
@@ -129,7 +153,6 @@ export class DaemonService implements IDaemonService {
 
     const response = await fetch(url, requestOptions);
     const history: WalletHistoryProps = await response.json();
-    console.log("History: ", history);
 
     return history;
   };
@@ -144,7 +167,6 @@ export class DaemonService implements IDaemonService {
 
     const response = await fetch(url, requestOptions);
     const balance: WalletBalanceProps = await response.json();
-    console.log("Balance: ", balance);
 
     return balance;
   };
@@ -154,7 +176,7 @@ export class DaemonService implements IDaemonService {
   ): Promise<SubmitTrainingModelResponse> => {
     const url = `${this.baseUrl}/api/v0/contract`;
 
-    console.log("request: ", trainModelRequest);
+    console.log("submitTrainModelRequest: ", trainModelRequest);
 
     const requestOptions = {
       method: "POST",
@@ -178,8 +200,57 @@ export class DaemonService implements IDaemonService {
     const response = await fetch(url, requestOptions);
     console.log("Response: ", response);
     const torrentData: ActiveTorrents = await response.json();
-    console.log("Response2: ", torrentData);
 
     return torrentData;
+  };
+
+  public getSettings = async (): Promise<SettingsParamsResponseProps> => {
+    const url = `${this.baseUrl}/api/v0/settings`;
+
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const settingsConfig: SettingsParamsResponseProps = await response.json();
+
+    console.log("settings: ", settingsConfig);
+
+    return settingsConfig;
+  };
+
+  public getCurrentSettings = async (): Promise<SettingsResponseProps> => {
+    const url = `${this.baseUrl}/api/v0/settings`;
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const currentSettings: SettingsResponseProps = await response.json();
+
+    return currentSettings;
+  };
+
+  public updateSettings = async (
+    requestValues: SettingsRequestProps
+  ): Promise<SettingsResponseProps> => {
+    const url = `${this.baseUrl}/api/v0/settings`;
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestValues),
+    };
+
+    console.log("updateSettings: ", requestValues);
+
+    const response = await fetch(url, requestOptions);
+    const updatedSettingsResponse: SettingsResponseProps =
+      await response.json();
+
+    return updatedSettingsResponse;
   };
 }

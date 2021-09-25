@@ -33,9 +33,6 @@ const PositionedSnackbar = ({
   severity,
   setSnackBarProps,
 }: PositionedSnackbarProps) => {
-  console.log("severityCAT: ", severity);
-  console.log("textCAT", text);
-
   const [state, setState] = React.useState<State>({
     open: openProp,
     vertical: verticalProp,
@@ -54,7 +51,7 @@ const PositionedSnackbar = ({
       open={open}
       onClose={handleClose}
       key={vertical + horizontal}
-      autoHideDuration={8000}
+      autoHideDuration={4000}
       style={{ color: "#2e7d32" }}
       TransitionComponent={TransitionRight}
     >

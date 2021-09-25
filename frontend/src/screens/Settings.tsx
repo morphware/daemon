@@ -1,5 +1,6 @@
 import { createStyles, makeStyles } from "@material-ui/core";
 import React from "react";
+import SettingsForm from "../components/SettingsForm";
 import { theme } from "../providers/MorphwareTheme";
 
 const styles = makeStyles(() =>
@@ -14,7 +15,11 @@ const styles = makeStyles(() =>
 
 const Settings = () => {
   const classes = styles();
-  return <div className={classes.root}></div>;
+  return (
+    <div className={classes.root}>
+      <SettingsForm />
+    </div>
+  );
 };
 
 export default Settings;

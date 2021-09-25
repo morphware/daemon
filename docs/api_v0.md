@@ -315,7 +315,7 @@ View and edit settings
 	    "torrentListenPort": {
 	      "type": "number"
 	    },
-	    "dataPath": {
+	    "appDownloadPath": {
 	      "type": "string"
 	    }
 	  }
