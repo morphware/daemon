@@ -12,7 +12,7 @@ paclage-lock.json @morphware/engineering
 /docs/ @morphware/engineering
 
 // UX team for the frontend
-/frontend @morphware/engineering-ux
+/frontend/ @morphware/engineering-ux
 
 // Backend for the backend
-/backend @morphware/engineering-backend
+/backend/ @morphware/engineering-backend
