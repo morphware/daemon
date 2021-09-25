@@ -1,18 +1,18 @@
-// Allow any one to approve version changes
+# Allow any one to approve version changes
 package.json @morphware/engineering
 paclage-lock.json @morphware/engineering
 
-// Only admins can approve codeowner changes
+# Only admins can approve codeowner changes
 /.github/CODEOWNERS @morphware/engineering-admin
 
-// Default for all files
+# Default for all files
 * @morphware/engineering-backend
 
-// Anyonce can approve docs
+# Anyonce can approve docs
 /docs/ @morphware/engineering
 
-// UX team for the frontend
+# UX team for the frontend
 /frontend/ @morphware/engineering-ux
 
-// Backend for the backend
+# Backend for the backend
 /backend/ @morphware/engineering-backend
