@@ -3,7 +3,7 @@ package.json @morphware/engineering
 paclage-lock.json @morphware/engineering
 
 // Only admins can approve codeowner changes
-/docs/CODEOWNERS @morphware/engineering-admin
+/.github/CODEOWNERS @morphware/engineering-admin
 
 // Default for all files
 * @morphware/engineering-backend
