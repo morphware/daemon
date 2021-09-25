@@ -1,6 +1,6 @@
 'use strict';
 
-const {web3} = require('./contract');
+const {web3, percentHelper} = require('./contract');
 const {conf} = require('../conf');
 const {Job} = require('./job');
 const webtorrent = require('../controller/torrent');
@@ -14,6 +14,7 @@ class JobPoster extends Job{
 	get jobType(){
 		return 'poster';
 	}
+
 
 	// Wrapper for creating a new job
 	// This only exists because a proper constructor can not be async and we
@@ -51,7 +52,6 @@ class JobPoster extends Job{
 					magnetURI: magnetURI
 				};
 			}
-
 		}catch(error){
 			console.log('error __parsePostFile', error);
 			throw error;
@@ -85,10 +85,10 @@ class JobPoster extends Job{
 				parseInt(this.data.trainingTime),
 				parseInt(32000), // get size this.data['training-data']
 				parseInt(this.data.errorRate),
-				web3.utils.toWei((this.data.workerReward*.1).toString()),
+				percentHelper(this.data.workerReward, 10),
 				biddingDeadline,
 				revealDeadline,
-				web3.utils.toWei(this.data.workerReward.toString())
+				this.data.workerReward.toString()
 			);
 
 			let receipt = await action.send({
@@ -98,10 +98,10 @@ class JobPoster extends Job{
 			this.transactions.push(receipt);
 
 			// Gather data about the job
-			this.jobData = receipt.events.JobDescriptionPosted;
+			this.jobData = receipt.events.JobDescriptionPosted.returnValues;
 
 			// End the auction later
-			this.auctionEnd((this.data.biddingTime+30)*1000);
+			this.auctionEnd();
 
 			return receipt.events.JobDescriptionPosted;
 
@@ -114,23 +114,26 @@ class JobPoster extends Job{
 	async auctionEnd(time){
 		setTimeout(async function(job){
 			try{
+				console.info('auctionEnd timeout', job.wallet.address, parseInt(job.id))
+
 				let action = job.auctionContract.methods.auctionEnd(
 					job.wallet.address,
-					parseInt(job.jobID)
+					parseInt(job.id)
 				);
+
 
 				let receipt = await action.send({
 					gas: await action.estimateGas()
 				});
 
-				this.transactions.push(receipt);
+				job.transactions.push(receipt);
 
 				return receipt;
 
 			}catch(error){
 				console.log('JobPoster auctionEnd error', error, 'job', job);
 			}
-		}, time, this);
+		}, (Number(this.data.biddingTime)+30)*1000, this);
 	}
 
 	async shareData(){
@@ -180,7 +183,7 @@ class JobPoster extends Job{
 		try{
 			let action = this.auctionContract.methods.payout(
 				this.wallet.address,
-				job.id
+				this.id
 			);
 
 			let receipt = await action.send({
@@ -208,6 +211,8 @@ class JobPoster extends Job{
 				console.log('payout receipt', receipt);
 				return false;
 			}
+
+			console.log(`${results.winner} won auction ${this.id}`)
 
 			await this.shareData();
 			

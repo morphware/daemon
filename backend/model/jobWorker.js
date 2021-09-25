@@ -1,7 +1,9 @@
 'use strict';
 
+const checkDiskSpace = require('check-disk-space').default;
+
 const {conf} = require('../conf');
-const {web3} = require('./contract');
+const {web3, percentHelper} = require('./contract');
 const webtorrent = require('../controller/torrent');
 const {Job} = require('./job');
 const {wallet} = require('./morphware');
@@ -20,7 +22,7 @@ class JobWorker extends Job{
 		if(conf.acceptWork){
 			// Make new job instance
 			let job = new this({
-				jobData: event.returnValue,
+				jobData: event.returnValues,
 				wallet: wallet
 			});
 
@@ -31,7 +33,7 @@ class JobWorker extends Job{
 			job.transactions.push(event);
 
 			// Kick off the job
-			await job.JobDescriptionPosted();
+			await job.JobDescriptionPosted(event);
 		}
 	}
 
@@ -52,47 +54,79 @@ class JobWorker extends Job{
 		}
 	}
 
+	// Helpers
+	async __checkDisk(size, target){
+		/*
+		This does not account for size on disk(blocks used) vs file size, for
+		larger files this may be an issue.
+
+		This also not not account for space needed to extract or decrypt
+		operations.
+		*/
+
+		console.log('data size', size);
+		let freeSize = await checkDiskSpace(target);
+		console.log('data from check util', freeSize);
+
+		return freeSize.free > size;
+	}
+
 	// Contract actions
 	async bid(){
+		try{
 
-		this.auctionContract.bid = {
-			bidAmount: 11, // How do we figure out the correct bid?
-			fakeBid: false, // How do we know when to fake bid?
-			secret: '0x6d6168616d000000000000000000000000000000000000000000000000000000' // What is this made from?
-		};
+			let approveReceipt =  await this.wallet.approve(percentHelper(
+				this.jobData.workerReward, 100
+			));
 
-		let action = this.auctionContract.methods.bid(
-			this.jobdata.jobPoster, // why do we need this?
-			parseInt(this.id),
-			web3.utils.keccak256(web3.utils.encodePacked(this.bid.bidAmount,this.bid.fakeBid,this.bid.secret)),
-			bidAmount
-		);
+			console.log('approveReceipt', approveReceipt)
 
-		let receipt = await action.send({
-			gas: await action.estimateGas()
-		});
+			this.bidData = {
+				bidAmount: percentHelper(this.jobData.workerReward, 25), // How do we figure out the correct bid?
+				fakeBid: false, // How do we know when to fake bid?
+				secret: '0x6d6168616d000000000000000000000000000000000000000000000000000000' // What is this made from?
+			};
 
-		this.transactions.push(receipt);
+			let action = this.auctionContract.methods.bid(
+				this.jobData.jobPoster, // why do we need this?
+				parseInt(this.id),
+				web3.utils.keccak256(web3.utils.encodePacked(this.bidData.bidAmount,this.bidData.fakeBid,this.bidData.secret)),
+				this.bidData.bidAmount
+			);
 
-		return receipt;
+			let receipt = await action.send({
+				gas: await action.estimateGas()
+			});
+
+			this.transactions.push(receipt);
+
+			return receipt;
+
+		}catch(error){
+			console.log(`ERROR!!! JobWorker bid`, error, this);
+		}
 	}
 
 	async reveal(){
-		let action = this.auctionContract.methods.reveal(
-			this.jobPoster,
-			parseInt(this.id),
-			[this.bid.bidAmount],
-			[this.bid.fakeBid],
-			[this.bid.secret]
-		);
+		try{
+			let action = this.auctionContract.methods.reveal(
+				this.jobData.jobPoster,
+				parseInt(this.id),
+				[this.bidData.bidAmount],
+				[this.bidData.fakeBid],
+				[this.bidData.secret]
+			);
 
-		let receipt = await action.send({
-			gas: await action.estimateGas()
-		});
+			let receipt = await action.send({
+				gas: await action.estimateGas()
+			});
 
-		this.transactions.push(receipt);
+			this.transactions.push(receipt);
 
-		return receipt;
+			return receipt;
+		}catch(error){
+			console.error('ERROR!!! JobWorker reveal', error, this);
+		}
 	}
 
 	async shareTrainedModel(){
@@ -112,23 +146,43 @@ class JobWorker extends Job{
 		return receipt;
 	}
 
+	async withdraw(){
+		try{
+			let action = this.auctionContract.withdraw();
+
+			let receipt = await action.send({
+				gas: await estimateGas()
+			});
+
+			this.transactions.push(receipt)
+
+			return receipt;
+		}catch(error){
+			console.error('ERROR JobWorker withdraw', error, this)
+		}
+	}
+
 	// Contract events
 	async JobDescriptionPosted(event){
-		if(!conf.acceptWork) return;
+		try{
+			if(!conf.acceptWork) return;
 
-		var job = event.returnValues;
+			var job = event.returnValues;
 
-		if(!await checkDisk(job.trainingDatasetSize)){
-			console.info('not enough free disk space, passing');
-			return false;
+			if(!await this.__checkDisk(job.trainingDatasetSize, conf.appDownloadPath)){
+				console.info('not enough free disk space, passing');
+				return false;
+			}
+
+			await this.bid();
+
+			// reveal the bid later
+			setTimeout(()=>{
+				this.reveal();
+			}, 5000);
+		}catch(error){
+			console.error(`ERROR!!! JobWorker JobDescriptionPosted`, error, event)
 		}
-
-		await this.bid();
-
-		// reveal the bid later
-		setTimeout(()=>{
-			this.reveal();
-		}, 1000);
 	}
 
 	async AuctionEnded(event){
@@ -136,8 +190,14 @@ class JobWorker extends Job{
 			var results = event.returnValues;
 
 			if(results.winner !== this.wallet.address){
+
+				await this.withdraw();
+				// vickreyAuction.withdraw({from:accounts[1]});
+				
+
 				// Remove this job from the job jump table if we did not win
 				delete this.constructor.jobs[this.id];
+
 			}
 
 		}catch(error){
