@@ -5,14 +5,16 @@ import {
   ActiveTorrents,
   DaemonService,
   SendMWTRequestProps,
+  SettingsParamsResponseProps,
+  SettingsRequestProps,
+  SettingsResponseProps,
   SubmitTrainingModelResponse,
   WalletBalanceProps,
   WalletHistoryProps,
 } from "../service/DaemonService";
 import Web3 from "web3";
+import { settingsDaemonResponseToSettingsResponseProps } from "../mappers/SettingsMappers";
 export const DaemonContext = React.createContext({} as daemonServiceProps);
-
-// interface trainingModel
 
 interface daemonServiceProps {
   MWTAddress: string;
@@ -23,6 +25,7 @@ interface daemonServiceProps {
   walletAddress?: string;
   connectionStatus: boolean;
   network?: string;
+  currentConfigs?: SettingsResponseProps;
   getTorrents: () => Promise<void>;
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -31,6 +34,11 @@ interface daemonServiceProps {
   getWalletHistory(): Promise<void>;
   sendMWT(sendMWTRequest: SendMWTRequestProps): Promise<void>;
   getConnectionStatus(): Promise<void>;
+  updateSettings(
+    requestValues: SettingsRequestProps
+  ): Promise<SettingsResponseProps>;
+  getSettings(): Promise<void>;
+  getCurrentSettings(): Promise<void>;
 }
 
 const MWSBalance = "0xbc40e97e6d665ce77e784349293d716b030711bc";
@@ -43,44 +51,9 @@ const ServiceProviders: React.FC = ({ children }) => {
   const [walletHistory, setWalletHistory] = useState<WalletHistoryProps>();
   const [connectionStatus, setConnectionStatus] = useState<boolean>(false);
   const [network, setNetwork] = useState<string>();
-
-  const mockTorrents = () => {
-    const mockTorrents: ActiveTorrents = {
-      download: 10,
-      port: 3001,
-      upload: 10,
-      torrents: [
-        {
-          name: "jupyter-notebook.ipymb",
-          progress: 13,
-          downloadSpeed: 23,
-          numPeers: 51,
-          timeRemaining: 21,
-          magnetURI:
-            "magnet:?xt=urn:btih:f35be570c19b5e026930e97a9533ac7207f960a4&dn=jupyter-notebook.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
-        },
-        {
-          name: "training-data.html",
-          progress: 42,
-          downloadSpeed: 74,
-          numPeers: 74,
-          timeRemaining: 25,
-          magnetURI:
-            "magnet:?xt=urn:btih:7948a0c8a8407274fa5bc63219eaa061b495e5db&dn=training-data.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
-        },
-        {
-          name: "testing-data.md",
-          progress: 52,
-          downloadSpeed: 57,
-          numPeers: 47,
-          timeRemaining: 32,
-          magnetURI:
-            "magnet:?xt=urn:btih:c38689c760a42c2f4060935ebfbf6e55d42350f9&dn=testing-data.md&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
-        },
-      ],
-    };
-    return mockTorrents;
-  };
+  const [currentConfigs, setCurrentConfigs] = useState<SettingsResponseProps>();
+  const [configParams, setConfigParams] =
+    useState<SettingsParamsResponseProps>();
 
   const getTorrents = async () => {
     const torrents = await daemonService.getActiveTorrents();
@@ -102,15 +75,15 @@ const ServiceProviders: React.FC = ({ children }) => {
     setWalletHistory(walletBalanceProps);
   };
 
-  const sendMWT = async (sendMWTRequest: SendMWTRequestProps) => {
-    const MWTAmount = Web3.utils.toWei(sendMWTRequest.amount, "ether");
+  const sendMWT = async (request: SendMWTRequestProps) => {
+    const MWTAmount = Web3.utils.toWei(request.amount, "ether");
     const newRequest = {} as SendMWTRequestProps;
-    newRequest.address = sendMWTRequest.address;
+    newRequest.address = request.address;
     newRequest.amount = MWTAmount;
-    if (sendMWTRequest.gas) {
-      newRequest.gas = Web3.utils.toWei(sendMWTRequest.gas, "gwei");
+    if (request.gas) {
+      newRequest.gas = Web3.utils.toWei(request.gas, "gwei");
     }
-    console.log("Req : ", newRequest);
+    console.log("sendMWT : ", newRequest);
     const transaction = await daemonService.sendMWT(newRequest);
     return transaction;
   };
@@ -123,12 +96,32 @@ const ServiceProviders: React.FC = ({ children }) => {
     setNetwork(network);
   };
 
-  const submitTrainModelRequest = async (values: ITrainingModelValuesV2) => {
-    values.workerReward = Web3.utils.toWei(
-      values.workerReward.toString(),
+  const submitTrainModelRequest = async (request: ITrainingModelValuesV2) => {
+    request.workerReward = Web3.utils.toWei(
+      request.workerReward.toString(),
       "ether"
     );
-    return await daemonService.submitTrainModelRequest(values);
+    return await daemonService.submitTrainModelRequest(request);
+  };
+
+  const updateSettings = async (request: SettingsRequestProps) => {
+    console.log("updateSettings: ", request);
+    let response = await daemonService.updateSettings(request);
+    response = settingsDaemonResponseToSettingsResponseProps(response);
+    setCurrentConfigs(response);
+    return response;
+  };
+
+  const getSettings = async () => {
+    const response = await daemonService.getSettings();
+    setConfigParams(response);
+  };
+
+  const getCurrentSettings = async () => {
+    let response = await daemonService.getCurrentSettings();
+    response = settingsDaemonResponseToSettingsResponseProps(response);
+    console.log("getCurrentSettings: ", response);
+    setCurrentConfigs(response);
   };
 
   const daemonServicContext: daemonServiceProps = {
@@ -140,12 +133,16 @@ const ServiceProviders: React.FC = ({ children }) => {
     walletAddress: walletAddress,
     connectionStatus: connectionStatus,
     network: network,
+    currentConfigs: currentConfigs,
     getTorrents: getTorrents,
     submitTrainModelRequest: submitTrainModelRequest,
     getBalance: getBalance,
     getWalletHistory: getWalletHistory,
     sendMWT: sendMWT,
     getConnectionStatus: getConnectionStatus,
+    updateSettings: updateSettings,
+    getSettings: getSettings,
+    getCurrentSettings: getCurrentSettings,
   };
 
   useEffect(() => {
@@ -161,6 +158,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     getTorrents();
     getBalance();
     getWalletHistory();
+    getCurrentSettings();
   }, []);
 
   return (

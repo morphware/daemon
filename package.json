@@ -53,15 +53,18 @@
       ]
     },
     "linux": {
-      "category":"Science",
+      "category": "Science",
       "target": [
         "AppImage",
         "deb",
         "rpm"
       ]
     },
-    "mac":{
+    "mac": {
       "icon": "build/icon/icon.icns"
     }
+  },
+  "dependencies": {
+    "ethers": "^4.0.46"
   }
 }

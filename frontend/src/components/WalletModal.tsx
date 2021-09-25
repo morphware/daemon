@@ -89,7 +89,7 @@ const WalletModal = () => {
   };
 
   const sendMWT = async (values: SendMWTRequestProps) => {
-    console.log("values: ", values);
+    console.log("sendMWT: ", values);
     const transaction = await daemonService.sendMWT(values);
   };
 
@@ -141,8 +141,6 @@ const WalletModal = () => {
       ? daemonService.walletHistory?.transactions
       : [];
 
-    console.log(daemonService.walletHistory?.transactions);
-
     const historyLessThanFive =
       transactions.length < 5 ? transactions : transactions.slice(-4);
 
@@ -183,7 +181,6 @@ const WalletModal = () => {
 
   const viewAllTransactions = () => {
     const url = `https://ropsten.etherscan.io/token/${daemonService.MWTAddress}?a=${daemonService.walletAddress}`;
-    console.log("Url: ", url);
     window.open(url);
   };
 
