@@ -69,6 +69,25 @@ class MorphwareWallet{
 		}
 	}
 
+	async approve(amount){
+		try{
+			let action = this.contract.methods.approve(
+				conf.auctionFactoryContractAddress,
+				amount
+			);
+
+			let receipt = await action.send({
+				gas: await action.estimateGas()
+			});
+
+			this.transactions.push(receipt);
+
+			return receipt;
+		}catch(error){
+			console.error('ERROR!!!, MorphwareWallet approve', error, this);
+		}
+	}
+
 	async getTransactionHistory(){
 		try{
 			let logs = await web3.eth.getPastLogs({
