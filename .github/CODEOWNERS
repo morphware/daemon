@@ -1,7 +1,3 @@
-# Allow any one to approve version changes
-package.json @morphware/engineering
-paclage-lock.json @morphware/engineering
-
 # Only admins can approve codeowner changes
 /.github/CODEOWNERS @morphware/engineering-admin
 
@@ -16,3 +12,7 @@ paclage-lock.json @morphware/engineering
 
 # Backend for the backend
 /backend/ @morphware/engineering-backend
+
+# Allow any one to approve version changes
+package.json @morphware/engineering
+paclage-lock.json @morphware/engineering
