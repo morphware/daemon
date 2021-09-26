@@ -90,6 +90,18 @@
         "internalType": "uint256",
         "name": "workerReward",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "biddingDeadline",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "revealDeadline",
+        "type": "uint256"
       }
     ],
     "name": "JobDescriptionPosted",
@@ -298,12 +310,12 @@
       },
       {
         "internalType": "uint256",
-        "name": "_biddingTimeSpan",
+        "name": "_biddingDeadline",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "_revealTimeSpan",
+        "name": "_revealDeadline",
         "type": "uint256"
       },
       {

@@ -77,8 +77,10 @@ class JobPoster extends Job{
 			// Calculate the auction timing
 			// This is a hack to deal with block timing. All timing will be
 			// reworked soon and this is the last we will speak of it...
+
+			let revealTime = 150;
 			var biddingDeadline = Math.floor(new Date().getTime() / 1000) + parseInt(this.data.biddingTime)
-			var revealDeadline = biddingDeadline+30  // TODO Replace this
+			var revealDeadline = biddingDeadline+revealTime  // TODO Replace this
 
 			// Post the new job
 			let action = this.jobContract.methods.postJobDescription(
@@ -133,7 +135,7 @@ class JobPoster extends Job{
 			}catch(error){
 				console.log('JobPoster auctionEnd error', error, 'job', job);
 			}
-		}, (Number(this.data.biddingTime)+30)*1000, this);
+		}, (Number(this.data.biddingTime)+200)*1000, this);
 	}
 
 	async shareData(){
@@ -195,7 +197,8 @@ class JobPoster extends Job{
 			return receipt;
 
 		}catch(error){
-			throw error;
+			console.error('ERROR!!! JobPoster payout', error)
+			throw error.message || 'error';
 		}
 	}
 
@@ -205,7 +208,7 @@ class JobPoster extends Job{
 		try{
 			var results = event.returnValues;
 
-			if(results.winner === '0x0000000000000000000000000000000000000000'){
+			if(results.winner === this.wallet.address){
 				console.log('No one won...');
 				let receipt =  await this.payout();
 				console.log('payout receipt', receipt);

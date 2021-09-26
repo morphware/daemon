@@ -20,6 +20,10 @@ class JobWorker extends Job{
 
 	static async new(event){
 		if(conf.acceptWork){
+
+			// Check to see if job already exists
+			if(Object.keys(Job.jobs).includes(event.returnValues.id)) return ;
+
 			// Make new job instance
 			let job = new this({
 				jobData: event.returnValues,
@@ -33,7 +37,7 @@ class JobWorker extends Job{
 			job.transactions.push(event);
 
 			// Kick off the job
-			await job.JobDescriptionPosted(event);
+			await job.__JobDescriptionPosted(event);
 		}
 	}
 
@@ -66,7 +70,7 @@ class JobWorker extends Job{
 
 		console.log('data size', size);
 		let freeSize = await checkDiskSpace(target);
-		console.log('data from check util', freeSize);
+		console.log('data from check util', this.id, freeSize);
 
 		return freeSize.free > size;
 	}
@@ -75,22 +79,34 @@ class JobWorker extends Job{
 	async bid(){
 		try{
 
-			let approveReceipt =  await this.wallet.approve(percentHelper(
+			let approveReceipt = await this.wallet.approve(percentHelper(
 				this.jobData.workerReward, 100
 			));
 
-			console.log('approveReceipt', approveReceipt)
+			console.log('approveReceipt', approveReceipt.events.Approval.returnValues)
 
 			this.bidData = {
 				bidAmount: percentHelper(this.jobData.workerReward, 25), // How do we figure out the correct bid?
 				fakeBid: false, // How do we know when to fake bid?
-				secret: '0x6d6168616d000000000000000000000000000000000000000000000000000000' // What is this made from?
+				secret: '0x6d6168616d000000000000000000000000000000000000000000000000000'+Math.floor(Math.random() * 5)+Math.floor(Math.random() * 5)+Math.floor(Math.random() * 5) // What is this made from?
 			};
+
+
+			console.log('bid data',
+				this.jobData.jobPoster, // why do we need this?
+				parseInt(this.id),
+				web3.utils.keccak256(web3.utils.encodePacked(this.bidData.bidAmount,this.bidData.fakeBid,this.bidData.secret)),
+				this.bidData.bidAmount
+			)
 
 			let action = this.auctionContract.methods.bid(
 				this.jobData.jobPoster, // why do we need this?
 				parseInt(this.id),
-				web3.utils.keccak256(web3.utils.encodePacked(this.bidData.bidAmount,this.bidData.fakeBid,this.bidData.secret)),
+				web3.utils.keccak256(web3.utils.encodePacked(
+					this.bidData.bidAmount,
+					this.bidData.fakeBid,
+					this.bidData.secret
+				)),
 				this.bidData.bidAmount
 			);
 
@@ -103,12 +119,22 @@ class JobWorker extends Job{
 			return receipt;
 
 		}catch(error){
-			console.log(`ERROR!!! JobWorker bid`, error, this);
+			console.log(`ERROR!!! JobWorker bid`, error);
+			throw 'error';
 		}
 	}
 
 	async reveal(){
 		try{
+
+			console.log('reveal data',
+				this.jobData.jobPoster,
+				parseInt(this.id),
+				[this.bidData.bidAmount],
+				[this.bidData.fakeBid],
+				[this.bidData.secret]
+			);
+
 			let action = this.auctionContract.methods.reveal(
 				this.jobData.jobPoster,
 				parseInt(this.id),
@@ -125,7 +151,7 @@ class JobWorker extends Job{
 
 			return receipt;
 		}catch(error){
-			console.error('ERROR!!! JobWorker reveal', error, this);
+			console.error('ERROR!!! JobWorker reveal', error);
 		}
 	}
 
@@ -148,22 +174,22 @@ class JobWorker extends Job{
 
 	async withdraw(){
 		try{
-			let action = this.auctionContract.withdraw();
+			let action = this.auctionContract.methods.withdraw();
 
 			let receipt = await action.send({
-				gas: await estimateGas()
+				gas: await action.estimateGas()
 			});
 
 			this.transactions.push(receipt)
 
 			return receipt;
 		}catch(error){
-			console.error('ERROR JobWorker withdraw', error, this)
+			console.error('ERROR JobWorker withdraw', error)
 		}
 	}
 
 	// Contract events
-	async JobDescriptionPosted(event){
+	async __JobDescriptionPosted(event){
 		try{
 			if(!conf.acceptWork) return;
 
@@ -176,12 +202,25 @@ class JobWorker extends Job{
 
 			await this.bid();
 
+
+			var currentTimestamp = Math.floor(new Date().getTime() / 1000);
+
+
+            var biddingDeadline = parseInt(this.jobData.biddingDeadline);
+
+            var safeDelay = 5;
+            var waitTimeInMS1 = ((biddingDeadline - currentTimestamp)+90) * 1000;
+
+
+
+
+
 			// reveal the bid later
 			setTimeout(()=>{
 				this.reveal();
-			}, 5000);
+			}, waitTimeInMS1);
 		}catch(error){
-			console.error(`ERROR!!! JobWorker JobDescriptionPosted`, error, event)
+			console.error(`ERROR!!! JobWorker __JobDescriptionPosted`, error)
 		}
 	}
 
