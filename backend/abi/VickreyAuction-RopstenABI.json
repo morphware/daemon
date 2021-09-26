@@ -123,6 +123,11 @@
       },
       {
         "internalType": "uint256",
+        "name": "bidsPlaced",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
         "name": "highestBid",
         "type": "uint256"
       },
@@ -139,6 +144,11 @@
       {
         "internalType": "bool",
         "name": "ended",
+        "type": "bool"
+      },
+      {
+        "internalType": "bool",
+        "name": "notPaid",
         "type": "bool"
       }
     ],
