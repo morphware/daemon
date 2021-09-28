@@ -9,7 +9,7 @@ This is the documentation for the V0 API and is very much a work in progress.
 Manages job contracts
 
 * **GET** `api/v0/job`
-	Return current contracts
+	Return all current contracts being tracked
 
 	Query **none**
 
@@ -41,6 +41,15 @@ Manages job contracts
 	[Poster](api_poster.json)
 
 	[Worker](api_worker.json)
+
+* **GET** `api/v0/job/<instanceID>`
+		Return data for the passed instance ID
+
+		Query **none**
+
+		Response fields:
+		See above `job` field
+
 
 * **POST**
 	Start a new contract for a job 
