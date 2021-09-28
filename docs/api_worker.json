@@ -1,0 +1,232 @@
+{
+  "jobs": {
+    "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB:11": {
+      "id": "11",
+      "instanceId": "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB:11",
+      "wallet": "0x5733592919406a356192bA957E7DFfb74fb62d1a",
+      "type": "worker",
+      "status": "UntrainedModelAndTrainingDatasetShared",
+      "transactions": [
+        {
+          "removed": false,
+          "logIndex": 4,
+          "transactionIndex": 4,
+          "transactionHash": "0x192820ab4bbcc0b86423385c88d38300b3ef2776fce3f76350e82869481eba32",
+          "blockHash": "0x3e5bccc7c910a8247aa49ad4eb6e4ba506c5bd86e502b7fc5e7c014695c85ea7",
+          "blockNumber": 11126254,
+          "address": "0x5b49ccf5AEc0c370BEAcd2d9416F5fe326163e69",
+          "id": "log_58cab7ad",
+          "returnValues": {
+            "0": "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB",
+            "1": "11",
+            "2": "0xb6e62B07f3FF2855dA9052837dF9A221c2AE0332",
+            "3": "60",
+            "4": "32",
+            "5": "1000000000000000000",
+            "6": "1632849339",
+            "7": "1632849489",
+            "jobPoster": "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB",
+            "id": "11",
+            "auctionAddress": "0xb6e62B07f3FF2855dA9052837dF9A221c2AE0332",
+            "estimatedTrainingTime": "60",
+            "trainingDatasetSize": "32",
+            "workerReward": "1000000000000000000",
+            "biddingDeadline": "1632849339",
+            "revealDeadline": "1632849489"
+          },
+          "event": "JobDescriptionPosted",
+          "signature": "0xc093ba0ce480cdb2892b4668166575a9c21fc26b0f18e1964554848b732c84a4",
+          "raw": {
+            "data": "0x000000000000000000000000f85ceeb0b76b74205caa2e1a72cdc085bc6eb9bb000000000000000000000000000000000000000000000000000000000000000b000000000000000000000000b6e62b07f3ff2855da9052837df9a221c2ae0332000000000000000000000000000000000000000000000000000000000000003c00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000de0b6b3a76400000000000000000000000000000000000000000000000000000000000061534dbb0000000000000000000000000000000000000000000000000000000061534e51",
+            "topics": [
+              "0xc093ba0ce480cdb2892b4668166575a9c21fc26b0f18e1964554848b732c84a4"
+            ]
+          }
+        },
+        {
+          "blockHash": "0x1786a18590aebd617e0456d5cde5b16557aa54f73394c7e93e5014cd343d2df6",
+          "blockNumber": 11126256,
+          "contractAddress": null,
+          "cumulativeGasUsed": 1507853,
+          "effectiveGasPrice": "0x3b9aca09",
+          "from": "0x5733592919406a356192ba957e7dffb74fb62d1a",
+          "gasUsed": 171780,
+          "logsBloom": "0x00100000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080020000000000000000200000000000000000000000000008008000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000010000000000004000000000000000000000000000000000008000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000010000000000000000000000000000000000000000000000000000000000000",
+          "status": true,
+          "to": "0xb6e62b07f3ff2855da9052837df9a221c2ae0332",
+          "transactionHash": "0x47544fce4904791aefd94cc6311cca9292693779dc65399f7be7149977849484",
+          "transactionIndex": 13,
+          "type": "0x2",
+          "events": {
+            "0": {
+              "address": "0xbc40E97E6d665CE77E784349293D716B030711bC",
+              "blockHash": "0x1786a18590aebd617e0456d5cde5b16557aa54f73394c7e93e5014cd343d2df6",
+              "blockNumber": 11126256,
+              "logIndex": 7,
+              "removed": false,
+              "transactionHash": "0x47544fce4904791aefd94cc6311cca9292693779dc65399f7be7149977849484",
+              "transactionIndex": 13,
+              "id": "log_3f56e508",
+              "returnValues": {},
+              "signature": null,
+              "raw": {
+                "data": "0x00000000000000000000000000000000000000000000000003782dace9d90000",
+                "topics": [
+                  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                  "0x0000000000000000000000005733592919406a356192ba957e7dffb74fb62d1a",
+                  "0x000000000000000000000000b6e62b07f3ff2855da9052837df9a221c2ae0332"
+                ]
+              }
+            },
+            "1": {
+              "address": "0xbc40E97E6d665CE77E784349293D716B030711bC",
+              "blockHash": "0x1786a18590aebd617e0456d5cde5b16557aa54f73394c7e93e5014cd343d2df6",
+              "blockNumber": 11126256,
+              "logIndex": 8,
+              "removed": false,
+              "transactionHash": "0x47544fce4904791aefd94cc6311cca9292693779dc65399f7be7149977849484",
+              "transactionIndex": 13,
+              "id": "log_cb2810f8",
+              "returnValues": {},
+              "signature": null,
+              "raw": {
+                "data": "0x0000000000000000000000000000000000000000000000000a688906bd8b0000",
+                "topics": [
+                  "0x8c5be1e5ebec7d5bd14f71427d1e84f3dd0314c0f7b2291e5b200ac8c7c3b925",
+                  "0x0000000000000000000000005733592919406a356192ba957e7dffb74fb62d1a",
+                  "0x000000000000000000000000b6e62b07f3ff2855da9052837df9a221c2ae0332"
+                ]
+              }
+            }
+          },
+          "event": "bid"
+        },
+        {
+          "blockHash": "0xbe92c75ff3dac99307cb4ea63dbd8db44e1b96b953d0a0db07d3a5467fef9b4c",
+          "blockNumber": 11126264,
+          "contractAddress": null,
+          "cumulativeGasUsed": 7825515,
+          "effectiveGasPrice": "0x3b9aca08",
+          "from": "0x5733592919406a356192ba957e7dffb74fb62d1a",
+          "gasUsed": 115907,
+          "logsBloom": "0x00100000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080020000000000000000000000000000000000000000000008008000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000010000000000004000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+          "status": true,
+          "to": "0xb6e62b07f3ff2855da9052837df9a221c2ae0332",
+          "transactionHash": "0x0a5f8a11a5ba4a1b51d302df736e9e5bfbb61b1da080400037349fd693595014",
+          "transactionIndex": 17,
+          "type": "0x2",
+          "events": {
+            "0": {
+              "address": "0xbc40E97E6d665CE77E784349293D716B030711bC",
+              "blockHash": "0xbe92c75ff3dac99307cb4ea63dbd8db44e1b96b953d0a0db07d3a5467fef9b4c",
+              "blockNumber": 11126264,
+              "logIndex": 36,
+              "removed": false,
+              "transactionHash": "0x0a5f8a11a5ba4a1b51d302df736e9e5bfbb61b1da080400037349fd693595014",
+              "transactionIndex": 17,
+              "id": "log_37850d21",
+              "returnValues": {},
+              "signature": null,
+              "raw": {
+                "data": "0x0000000000000000000000000000000000000000000000000000000000000000",
+                "topics": [
+                  "0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef",
+                  "0x000000000000000000000000b6e62b07f3ff2855da9052837df9a221c2ae0332",
+                  "0x0000000000000000000000005733592919406a356192ba957e7dffb74fb62d1a"
+                ]
+              }
+            }
+          },
+          "event": "reveal"
+        },
+        {
+          "removed": false,
+          "logIndex": 33,
+          "transactionIndex": 17,
+          "transactionHash": "0xd4e990f0f1411a0cae80b29c528ae614e30a52d22f63f2ea75603837cbc49a4c",
+          "blockHash": "0xfe6d25bdf3a3288a236127fddf8adf1aaeb394d0b9186ca12651ddc17279620d",
+          "blockNumber": 11126275,
+          "address": "0xb6e62B07f3FF2855dA9052837dF9A221c2AE0332",
+          "id": "log_04e468a8",
+          "returnValues": {
+            "0": "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB",
+            "1": "11",
+            "2": "0x5733592919406a356192bA957E7DFfb74fb62d1a",
+            "3": "0",
+            "endUser": "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB",
+            "auctionId": "11",
+            "winner": "0x5733592919406a356192bA957E7DFfb74fb62d1a",
+            "secondHighestBid": "0"
+          },
+          "event": "AuctionEnded",
+          "signature": "0x4d31a5599cdb48031c1f03259adbd513be468c5735012719a1a9850869b558b1",
+          "raw": {
+            "data": "0x000000000000000000000000000000000000000000000000000000000000000b0000000000000000000000005733592919406a356192ba957e7dffb74fb62d1a0000000000000000000000000000000000000000000000000000000000000000",
+            "topics": [
+              "0x4d31a5599cdb48031c1f03259adbd513be468c5735012719a1a9850869b558b1",
+              "0x000000000000000000000000f85ceeb0b76b74205caa2e1a72cdc085bc6eb9bb"
+            ]
+          }
+        },
+        {
+          "removed": false,
+          "logIndex": 1,
+          "transactionIndex": 2,
+          "transactionHash": "0xa647bd7895699abae4130a6620252152187a41e484b498f78659e79b84bdc0b4",
+          "blockHash": "0xb8c39ef65eb612e26145b48f3d5fd3f69d5fccbfaaf8cd62cb3c9f83909a112d",
+          "blockNumber": 11126276,
+          "address": "0x5b49ccf5AEc0c370BEAcd2d9416F5fe326163e69",
+          "id": "log_8232962c",
+          "returnValues": {
+            "0": "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB",
+            "1": "11",
+            "2": "0x5733592919406a356192bA957E7DFfb74fb62d1a",
+            "3": "magnet:?xt=urn:btih:785d28796849da828f300000e51169da14c25c08&dn=devRun.js&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com",
+            "4": "magnet:?xt=urn:btih:1e6ccd5e23c82807fc536a980c13a6bdb877fae7&dn=README.md&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com",
+            "5": "60",
+            "jobPoster": "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB",
+            "id": "11",
+            "workerNode": "0x5733592919406a356192bA957E7DFfb74fb62d1a",
+            "untrainedModelMagnetLink": "magnet:?xt=urn:btih:785d28796849da828f300000e51169da14c25c08&dn=devRun.js&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com",
+            "trainingDatasetMagnetLink": "magnet:?xt=urn:btih:1e6ccd5e23c82807fc536a980c13a6bdb877fae7&dn=README.md&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com",
+            "targetErrorRate": "60"
+          },
+          "event": "UntrainedModelAndTrainingDatasetShared",
+          "signature": "0x71383303ae11065bffb00fa0a58a1bb4595c8c794ebd6adfdcbc3ec56ebaaa95",
+          "raw": {
+            "data": "0x00000000000000000000000000000000000000000000000000000000000000600000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003c00000000000000000000000000000000000000000000000000000000000001746d61676e65743a3f78743d75726e3a627469683a3738356432383739363834396461383238663330303030306535313136396461313463323563303826646e3d64657652756e2e6a732674723d756470253341253246253246747261636b65722e6c656563686572732d70617261646973652e6f7267253341363936392674723d756470253341253246253246747261636b65722e636f707065727375726665722e746b253341363936392674723d756470253341253246253246747261636b65722e6f70656e747261636b722e6f7267253341313333372674723d7564702533412532462532466578706c6f6469652e6f7267253341363936392674723d756470253341253246253246747261636b65722e656d706972652d6a732e7573253341313333372674723d777373253341253246253246747261636b65722e62746f7272656e742e78797a2674723d777373253341253246253246747261636b65722e6f70656e776562746f7272656e742e636f6d00000000000000000000000000000000000000000000000000000000000000000000000000000000000001746d61676e65743a3f78743d75726e3a627469683a3165366363643565323363383238303766633533366139383063313361366264623837376661653726646e3d524541444d452e6d642674723d756470253341253246253246747261636b65722e6c656563686572732d70617261646973652e6f7267253341363936392674723d756470253341253246253246747261636b65722e636f707065727375726665722e746b253341363936392674723d756470253341253246253246747261636b65722e6f70656e747261636b722e6f7267253341313333372674723d7564702533412532462532466578706c6f6469652e6f7267253341363936392674723d756470253341253246253246747261636b65722e656d706972652d6a732e7573253341313333372674723d777373253341253246253246747261636b65722e62746f7272656e742e78797a2674723d777373253341253246253246747261636b65722e6f70656e776562746f7272656e742e636f6d000000000000000000000000",
+            "topics": [
+              "0x71383303ae11065bffb00fa0a58a1bb4595c8c794ebd6adfdcbc3ec56ebaaa95",
+              "0x000000000000000000000000f85ceeb0b76b74205caa2e1a72cdc085bc6eb9bb",
+              "0x000000000000000000000000000000000000000000000000000000000000000b",
+              "0x0000000000000000000000005733592919406a356192ba957e7dffb74fb62d1a"
+            ]
+          }
+        }
+      ],
+      "jobData": {
+        "0": "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB",
+        "1": "11",
+        "2": "0x5733592919406a356192bA957E7DFfb74fb62d1a",
+        "3": "0",
+        "4": "32",
+        "5": "1000000000000000000",
+        "6": "1632849339",
+        "7": "1632849489",
+        "jobPoster": "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB",
+        "id": "11",
+        "auctionAddress": "0xb6e62B07f3FF2855dA9052837dF9A221c2AE0332",
+        "estimatedTrainingTime": "60",
+        "trainingDatasetSize": "32",
+        "workerReward": "1000000000000000000",
+        "biddingDeadline": "1632849339",
+        "revealDeadline": "1632849489",
+        "endUser": "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB",
+        "auctionId": "11",
+        "winner": "0x5733592919406a356192bA957E7DFfb74fb62d1a",
+        "secondHighestBid": "0"
+      }
+    }
+  },
+  "canTakeWork": true
+}
