@@ -12,9 +12,34 @@ const {wallet} = require('../model/morphware');
 router.post('/', async function (req, res, next) {
 	try{
 
-		let job = await JobPoster.new({...req.body, wallet});
+		let job = await JobPoster.new(wallet, req.body);
 
-		return res.json({status: 'success', job: job.jobID});
+		return res.json({status: 'success', job: job.instanceId});
+
+	}catch(error){
+		next(error);
+	}
+});
+
+router.get('/', async function(req, res, next){
+	try{
+		let jobs = {};
+
+		for(let instanceId in Job.jobs){
+			jobs[instanceId] = Job.jobs[instanceId].asObject
+		}
+
+		return res.json({jobs, canTakeWork: JobWorker.canTakeWork()});
+
+	}catch(error){
+		next(error);
+	}
+});
+
+router.get('/:instanceId', async function(req, res, next){
+	try{
+
+		return res.json(Job.jobs[req.params.instanceId]);
 
 	}catch(error){
 		next(error);

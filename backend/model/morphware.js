@@ -61,7 +61,7 @@ class MorphwareWallet{
 
 			return await transfer.send({
 				from: this.address,
-				gas: gas || await transfer.estimateGas()
+				gas: gas || await transfer.estimateGas(),
 			});
 		}catch(error){
 			console.error('ERROR!!!! `transaction`', error);
@@ -69,7 +69,7 @@ class MorphwareWallet{
 		}
 	}
 
-	async approve(amount){
+	async approve(amount, gas){
 		try{
 			let action = this.contract.methods.approve(
 				conf.auctionFactoryContractAddress,
@@ -77,7 +77,7 @@ class MorphwareWallet{
 			);
 
 			let receipt = await action.send({
-				gas: await action.estimateGas()
+				gas: gas || await action.estimateGas()
 			});
 
 			this.transactions.push(receipt);
@@ -161,7 +161,5 @@ if(conf.privateKey && conf.privateKey.length){
 		privateKey: [account.privateKey]
 	})
 }
-
-console.log(web3.eth.accounts.create())
 
 module.exports = {MorphwareWallet, wallet};
