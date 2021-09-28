@@ -93,6 +93,23 @@ class Job{
 	}
 
 	/*
+	Jobs stream
+
+	Hold `streamMaxLength` amount of job events to report to the user so they
+	can see whats going on in the network.
+	*/
+
+	static streamMaxLength = 50;
+
+	static stream = [];
+
+	static streamAdd(event){
+		this.stream.push(event);
+
+		if(this.stream.length > this.streamMaxLength) this.stream.shift();
+	}
+
+	/*
 	Events
 
 	We will listen for all incoming requests for the job and auction contract. 
@@ -163,19 +180,19 @@ class Job{
 
 			// Call the relevant job method, if it exists
 			if(job[name]){
+
 				job[name](event);
 				
 				// Add this transaction event to the transaction history
 				job.transactions.push(event);
 			}
 
-
-
 			return;
 		}
 
-		// Do something with job events this client doesn't care about
-		// Maybe stream them to the front end, idk.
+		// Capture event in the events stream
+		this.streamAdd(event);
+
 	}
 }
 

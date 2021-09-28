@@ -21,6 +21,14 @@ router.post('/', async function (req, res, next) {
 	}
 });
 
+router.get('/stream', async function(req, res, next){
+	try{
+		return res.json({stream: Job.stream});
+	}catch(error){
+		next(error);
+	}
+});
+
 router.get('/', async function(req, res, next){
 	try{
 		let jobs = {};
@@ -45,5 +53,6 @@ router.get('/:instanceId', async function(req, res, next){
 		next(error);
 	}
 });
+
 
 module.exports = router;

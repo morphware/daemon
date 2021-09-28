@@ -51,6 +51,15 @@ Manages job contracts
 		See above `job` field
 
 
+* **GET** `api/v0/job/stream`
+		Shows the last 50 events 
+
+		Query **none**
+
+		Response fields:
+		* 'stream' *ARRAY* Array of events, see above for event contents
+
+
 * **POST**
 	Start a new contract for a job 
 	Post fields:
