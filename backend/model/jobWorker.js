@@ -68,15 +68,14 @@ class JobWorker extends Job{
 			if(Object.keys(Job.jobs).includes(instanceId)) return;
 
 			if(name === 'JobDescriptionPosted'){
-				
-				console.log('new job post!', this.canTakeWork());
 
 				// Check to see if this client is accepting work
 				if(!this.canTakeWork()) return;
 
-				// If the current client is accepting new jobs, start a new worker
+				// Make the job instance
 				let job = new this(wallet, event.returnValues);
 
+				// Display for auction times
 				console.log('New job found!', (new Date()).toLocaleString());
 				console.info('biddingDeadline', job.instanceId, (new Date(parseInt(job.jobData.biddingDeadline*1000))).toLocaleString())
 				console.info('revealDeadline', job.instanceId, (new Date(parseInt(job.jobData.revealDeadline*1000))).toLocaleString())
@@ -125,6 +124,8 @@ class JobWorker extends Job{
 				fakeBid: false, // How do we know when to fake bid?
 				secret: `0x${crypto.randomBytes(32).toString('hex')}`
 			};
+
+			console.log('bidding data', this.instanceId);
 
 			let action = this.auctionContract.methods.bid(
 				this.jobData.jobPoster,
@@ -188,7 +189,7 @@ class JobWorker extends Job{
 			gas: await action.estimateGas()
 		});
 
-		this.transactions.push(receipt);
+		this.transactions.push({...receipt, event: 'shareTrainedModel'});
 
 		return receipt;
 	}
@@ -205,7 +206,7 @@ class JobWorker extends Job{
 				// gas: await action.estimateGas()
 			});
 
-			this.transactions.push(receipt)
+			this.transactions.push({...receipt, event: 'withdraw'});
 
 			return receipt;
 		}catch(error){
@@ -262,7 +263,14 @@ class JobWorker extends Job{
 		try{
 			this.jobData = {...this.jobData, ...event.returnValues};
 
-			if(this.jobData.winner !== this.wallet.address){
+			if(this.jobData.winner === this.wallet.address){
+				console.info('We won!', this.instanceId);
+
+				// If we do win, we will continue to act on events for this
+				// instanceID and wait for the poster to fire the next step.
+			}else{
+
+				console.log('We lost...', this.instanceId);
 
 				// Return your bid escrow
 				await this.withdraw();
@@ -271,10 +279,6 @@ class JobWorker extends Job{
 				this.removeFromJump();
 			}
 
-			console.info('We won!', this.instanceId);
-
-			// If we do win, we will continue to act on events for this
-			// instanceID and wait for the poster to fire the next step.
 
 		}catch(error){
 			console.error('ERROR!!! `AuctionEnded`', error);

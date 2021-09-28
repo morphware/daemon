@@ -290,6 +290,13 @@ class JobPoster extends Job{
 	class for more information.
 	*/
 
+	async BidPlaced(event){
+		console.info('Bid placed',
+			this.instanceId,
+			(new Date()).toLocaleString(), event
+		);
+	}
+
 	async AuctionEnded(event){
 		try{
 

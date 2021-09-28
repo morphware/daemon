@@ -47,7 +47,7 @@ router.get('/', async function(req, res, next){
 router.get('/:instanceId', async function(req, res, next){
 	try{
 
-		return res.json(Job.jobs[req.params.instanceId]);
+		return res.json(Job.jobs[req.params.instanceId].asObject);
 
 	}catch(error){
 		next(error);
