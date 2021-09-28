@@ -125,7 +125,7 @@ class JobWorker extends Job{
 				secret: `0x${crypto.randomBytes(32).toString('hex')}`
 			};
 
-			console.log('bidding data', this.instanceId);
+			console.log('bidding data', this.bidData, this.instanceId);
 
 			let action = this.auctionContract.methods.bid(
 				this.jobData.jobPoster,
@@ -295,7 +295,8 @@ class JobWorker extends Job{
 /*
 Listen for `JobPostedDescription` events. This runs in addition to `Job.events`
 */
-
-JobWorker.events();
+if(conf.acceptWork){
+	JobWorker.events();
+}
 
 module.exports = {JobWorker};

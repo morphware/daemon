@@ -292,8 +292,9 @@ class JobPoster extends Job{
 
 	async BidPlaced(event){
 		console.info('Bid placed',
+			event.returnValues.bidder,
 			this.instanceId,
-			(new Date()).toLocaleString(), event
+			(new Date()).toLocaleString(),
 		);
 	}
 
