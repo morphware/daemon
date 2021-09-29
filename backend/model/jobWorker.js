@@ -40,7 +40,7 @@ class JobWorker extends Job{
 
 	static lock = false;
 
-	addTOJump(){
+	addToJump(){
 		super.addToJump()
 		this.constructor.lock = true;
 	}
@@ -52,7 +52,7 @@ class JobWorker extends Job{
 
 	// Check to see if the client is ready and willing to take on jobs
 	static canTakeWork(){
-		return conf.acceptWork && !this.lock;
+		return conf.acceptWork && !this.constructor.lock;
 	}
 
 
@@ -147,7 +147,7 @@ class JobWorker extends Job{
 			return receipt;
 
 		}catch(error){
-			console.log(`ERROR!!! JobWorker bid`, error);
+			console.log(`ERROR!!! JobWorker bid`, this.instanceId, error);
 			throw 'error';
 		}
 	}
@@ -173,7 +173,7 @@ class JobWorker extends Job{
 
 			return receipt;
 		}catch(error){
-			console.error('ERROR!!! JobWorker reveal', error);
+			console.error('ERROR!!! JobWorker reveal', this.instanceId, error);
 		}
 	}
 
