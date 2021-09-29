@@ -19,4 +19,29 @@ webtorrent.findOrSeed = function(path){
 }.bind(webtorrent);
 
 
+webtorrent.downloadAll = function(path, ...links){
+	
+	console.log('here in downloadAll', path, links);
+	let count = 0;
+
+	return new Promise((resolve, reject)=>{
+		for(let link of links){
+			console.log('adding', link);
+			this.add(link, {path}, (torrent)=>{
+				console.log('torrent added');
+
+				torrent.on('ready', function () {console.log('torrent ready')})
+				torrent.on('warning', function (err) {console.log('torrent error', error)})
+				torrent.on('download', function (bytes) {console.log('torrent is downloading', bytes)})
+
+				torrent.on('done', ()=>{
+					console.log('done!!!')
+					if(count++ === links.length) resolve();
+				});
+				torrent.on('error', reject)
+			});
+		}
+	});
+}.bind(webtorrent);
+
 module.exports = webtorrent;

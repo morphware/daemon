@@ -118,7 +118,7 @@ class JobPoster extends Job{
 			// This is a hack to deal with block timing. All timing will be
 			// reworked soon and this is the last we will speak of it...
 
-			let revealTime = 150;
+			let revealTime = 90;
 
 			var now = new Date().getTime();
 			let biddingDeadline = now + (parseInt(this.postData.biddingTime) * 1000);
@@ -171,7 +171,7 @@ class JobPoster extends Job{
 	// The job posted will emit an event to end the auction, this will trigger
 	// the smart contract to determine the wine and broadcast `AuctionEnded`
 	async auctionEnd(seconds){
-		seconds += 60;
+		seconds += 10;
 		console.log('Calling auctionEnd in',
 			seconds,
 			'seconds, at',
@@ -199,7 +199,7 @@ class JobPoster extends Job{
 				return receipt;
 
 			}catch(error){
-				console.log('JobPoster auctionEnd error', error, 'job', job);
+				console.log('JobPoster auctionEnd error', this.instanceId, error);
 			}
 		}, (seconds)*1000, this);
 	}
