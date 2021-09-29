@@ -253,7 +253,7 @@ class JobWorker extends Job{
 			// Calculate start of the reveal window
 			var now = Math.floor(new Date().getTime());
 			var biddingDeadline = parseInt(this.jobData.biddingDeadline);
-			var waitTimeInMS1 = ((biddingDeadline*1000 - now)+20000);
+			var waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
 
 			console.log('Revealing bid in', waitTimeInMS1/1000, 'at', new Date(now + waitTimeInMS1).toLocaleString());
 

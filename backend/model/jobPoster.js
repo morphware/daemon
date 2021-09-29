@@ -118,7 +118,7 @@ class JobPoster extends Job{
 			// This is a hack to deal with block timing. All timing will be
 			// reworked soon and this is the last we will speak of it...
 
-			let revealTime = 90;
+			let revealTime = 120;
 
 			var now = new Date().getTime();
 			let biddingDeadline = now + (parseInt(this.postData.biddingTime) * 1000);
