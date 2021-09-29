@@ -1,56 +1,91 @@
 'use strict';
 
+const crypto = require('crypto');
 const checkDiskSpace = require('check-disk-space').default;
 
 const {conf} = require('../conf');
-const {web3, percentHelper} = require('./contract');
 const webtorrent = require('../controller/torrent');
-const {Job} = require('./job');
+const {web3, percentHelper} = require('./contract');
 const {wallet} = require('./morphware');
+const {Job} = require('./job');
 
+/*
+JobWorker extends the common functions of Job class and is responsible for
+handling functionality a worker node needs.
+
+Instances of this class are created based on the `JobDescriptionPosted` event.
+See `__process_event` below for more information
+
+This module starts JobWorker.events() at the end if this file so this classes
+`__process_event` is called.
+
+It is recommend you understand the Job class before editing the JobWorker class
+*/
 
 class JobWorker extends Job{
-	constructor(data){
-		super(data)
+	constructor(wallet, jobData){
+		super(wallet, jobData);
 	}
 
+	// Denote this instance as a Worker type.
 	get jobType(){
 		return 'worker';
 	}
 
-	static async new(event){
-		if(conf.acceptWork){
-			// Make new job instance
-			let job = new this({
-				jobData: event.returnValues,
-				wallet: wallet
-			});
+	/*
+	this.lock will determine if this client is currently occupied with another
+	another job. We will over ride `addTOJump` and `removeFromJump` to set
+	locking at the correct times.
+	*/
 
-			// Hold new instance in the jump table
-			Job.jobs[job.id] = job;
+	static lock = false;
 
-			// Start the transaction history
-			job.transactions.push(event);
-
-			// Kick off the job
-			await job.JobDescriptionPosted(event);
-		}
+	addToJump(){
+		super.addToJump()
+		this.constructor.lock = true;
 	}
 
-	static __process_event(event){
-		let name = event.event;
+	removeFromJump(){
+		super.removeFromJump()
+		this.constructor.lock = false;
+	}
 
-		/*
-		we want to get to the object that holds `returnValues`. Sometime its in the
-		event, and sometimes there is returnValue in a `events` object.
-		*/
-		if(event.events && event.events[name]){
-			event = event.events[name];
-		}
+	// Check to see if the client is ready and willing to take on jobs
+	static canTakeWork(){
+		return conf.acceptWork && !this.lock;
+	}
 
-		// If the current client is accepting new jobs, start a new worker
-		if(name === 'JobDescriptionPosted'){
-			this.new(event);
+
+	/*
+	__process_event in the base Job class deals with listen for events on
+	current job instances. In order for a worker to start the bidding process,
+	we only care about `JobDescriptionPosted` if the client meets cretin run
+	time states. We override __precess event below to make that happen.
+	*/
+	static __process_event(name, instanceId, event){
+		try{
+			// Check to see if job is already tracked by this client
+			if(Object.keys(Job.jobs).includes(instanceId)) return;
+
+			if(name === 'JobDescriptionPosted'){
+
+				// Check to see if this client is accepting work
+				if(!this.canTakeWork()) return;
+
+				// Make the job instance
+				let job = new this(wallet, event.returnValues);
+
+				// Display for auction times
+				console.log('New job found!', (new Date()).toLocaleString());
+				console.info('biddingDeadline', job.instanceId, (new Date(parseInt(job.jobData.biddingDeadline*1000))).toLocaleString())
+				console.info('revealDeadline', job.instanceId, (new Date(parseInt(job.jobData.revealDeadline*1000))).toLocaleString())
+
+				job.addToJump();
+				job.transactions.push(event);
+				job.__JobDescriptionPosted(event);
+			}
+		}catch(error){
+			console.error(`ERROR JobWorker __process_event`, error)
 		}
 	}
 
@@ -64,51 +99,64 @@ class JobWorker extends Job{
 		operations.
 		*/
 
-		console.log('data size', size);
-		let freeSize = await checkDiskSpace(target);
-		console.log('data from check util', freeSize);
-
-		return freeSize.free > size;
+		return (await checkDiskSpace(target)).free > size;
 	}
 
-	// Contract actions
+
+	/*
+	Actions
+
+	The client can initiate actions against the contract as a worker. Most of
+	these result in a action being emitted to the smart contract. 
+	*/
+
 	async bid(){
 		try{
 
-			let approveReceipt =  await this.wallet.approve(percentHelper(
+			console.info('Bidding on', this.instanceId, (new Date()).toLocaleString());
+
+			let approveReceipt = await this.wallet.approve(percentHelper(
 				this.jobData.workerReward, 100
 			));
-
-			console.log('approveReceipt', approveReceipt)
 
 			this.bidData = {
 				bidAmount: percentHelper(this.jobData.workerReward, 25), // How do we figure out the correct bid?
 				fakeBid: false, // How do we know when to fake bid?
-				secret: '0x6d6168616d000000000000000000000000000000000000000000000000000000' // What is this made from?
+				secret: `0x${crypto.randomBytes(32).toString('hex')}`
 			};
 
+			console.log('bidding data', this.bidData, this.instanceId);
+
 			let action = this.auctionContract.methods.bid(
-				this.jobData.jobPoster, // why do we need this?
+				this.jobData.jobPoster,
 				parseInt(this.id),
-				web3.utils.keccak256(web3.utils.encodePacked(this.bidData.bidAmount,this.bidData.fakeBid,this.bidData.secret)),
+				web3.utils.keccak256(web3.utils.encodePacked(
+					this.bidData.bidAmount,
+					this.bidData.fakeBid,
+					this.bidData.secret
+				)),
 				this.bidData.bidAmount
 			);
 
 			let receipt = await action.send({
-				gas: await action.estimateGas()
+				gas: await action.estimateGas(),
 			});
 
-			this.transactions.push(receipt);
+			this.transactions.push({...receipt, event:'bid'});
 
 			return receipt;
 
 		}catch(error){
-			console.log(`ERROR!!! JobWorker bid`, error, this);
+			console.log(`ERROR!!! JobWorker bid`, this.instanceId, error);
+			throw 'error';
 		}
 	}
 
 	async reveal(){
 		try{
+
+			console.info('Revealing on', this.instanceId, (new Date()).toLocaleString());
+
 			let action = this.auctionContract.methods.reveal(
 				this.jobData.jobPoster,
 				parseInt(this.id),
@@ -121,11 +169,11 @@ class JobWorker extends Job{
 				gas: await action.estimateGas()
 			});
 
-			this.transactions.push(receipt);
+			this.transactions.push({...receipt, event:'reveal'});
 
 			return receipt;
 		}catch(error){
-			console.error('ERROR!!! JobWorker reveal', error, this);
+			console.error('ERROR!!! JobWorker reveal', this.instanceId, error);
 		}
 	}
 
@@ -141,64 +189,96 @@ class JobWorker extends Job{
 			gas: await action.estimateGas()
 		});
 
-		this.transactions.push(receipt);
+		this.transactions.push({...receipt, event: 'shareTrainedModel'});
 
 		return receipt;
 	}
 
 	async withdraw(){
 		try{
-			let action = this.auctionContract.withdraw();
+
+			console.info('Withdrawing on', this.instanceId, (new Date()).toLocaleString());
+
+			let action = this.auctionContract.methods.withdraw();
 
 			let receipt = await action.send({
-				gas: await estimateGas()
+				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
+				// gas: await action.estimateGas()
 			});
 
-			this.transactions.push(receipt)
+			this.transactions.push({...receipt, event: 'withdraw'});
 
 			return receipt;
 		}catch(error){
-			console.error('ERROR JobWorker withdraw', error, this)
+			console.error('ERROR JobWorker withdraw', error)
 		}
 	}
 
-	// Contract events
-	async JobDescriptionPosted(event){
+
+	/*
+	Events
+
+	This sections maps events the clients listens for to actionable events.
+	All of the following methods are intended to be called by the
+	`Job.__processEvent` in the `Job` class. See the Events sections in the Job
+	class for more information.
+	*/
+
+	async __JobDescriptionPosted(event){
+		// This is prefixed with '__' so its not auto called by Job.events and
+		// ONLY called when this class wants to call it.
+
 		try{
-			if(!conf.acceptWork) return;
 
-			var job = event.returnValues;
+			// Confirm we have enough free space to perform the job
+/*			if(!await this.__checkDisk(this.trainingDatasetSize, conf.appDownloadPath)){
+				console.info('Not enough free disk space, passing');
 
-			if(!await this.__checkDisk(job.trainingDatasetSize, conf.appDownloadPath)){
-				console.info('not enough free disk space, passing');
+				// Drop this instance instance from the jump table
+				this.removeFromJump();
+
 				return false;
-			}
+			}*/
+
+			// This setTimeout may not bee needed.
+			// Calculate start of the reveal window
+			var now = Math.floor(new Date().getTime());
+			var biddingDeadline = parseInt(this.jobData.biddingDeadline);
+			var waitTimeInMS1 = ((biddingDeadline*1000 - now)+40000);
+
+			console.log('Revealing bid in', waitTimeInMS1/1000, 'at', new Date(now + waitTimeInMS1).toLocaleString());
 
 			await this.bid();
 
-			// reveal the bid later
+			// reveal the bid during the reveal window
 			setTimeout(()=>{
 				this.reveal();
-			}, 5000);
+			}, waitTimeInMS1);
 		}catch(error){
-			console.error(`ERROR!!! JobWorker JobDescriptionPosted`, error, event)
+			console.error(`ERROR!!! JobWorker __JobDescriptionPosted`, error)
 		}
 	}
 
 	async AuctionEnded(event){
 		try{
-			var results = event.returnValues;
+			this.jobData = {...this.jobData, ...event.returnValues};
 
-			if(results.winner !== this.wallet.address){
+			if(this.jobData.winner === this.wallet.address){
+				console.info('We won!', this.instanceId);
 
+				// If we do win, we will continue to act on events for this
+				// instanceID and wait for the poster to fire the next step.
+			}else{
+
+				console.log('We lost...', this.instanceId);
+
+				// Return your bid escrow
 				await this.withdraw();
-				// vickreyAuction.withdraw({from:accounts[1]});
 				
-
-				// Remove this job from the job jump table if we did not win
-				delete this.constructor.jobs[this.id];
-
+				// Drop this instance instance from the jump table
+				this.removeFromJump();
 			}
+
 
 		}catch(error){
 			console.error('ERROR!!! `AuctionEnded`', error);
@@ -206,12 +286,17 @@ class JobWorker extends Job{
 	}
 
 	async UntrainedModelAndTrainingDatasetShared(event){
+		console.log(event)
 		// get files and do work
 		// when the work is done, share the results
 	}
 }
 
-// Listen for new posted jobs
-JobWorker.events();
+/*
+Listen for `JobPostedDescription` events. This runs in addition to `Job.events`
+*/
+if(conf.acceptWork){
+	JobWorker.events();
+}
 
 module.exports = {JobWorker};

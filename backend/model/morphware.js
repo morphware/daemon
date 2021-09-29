@@ -4,6 +4,9 @@ const {conf, editLocalConf} = require('../conf');
 const {web3} = require('./contract');
 var wallet = null;
 
+const tokenAbi = require(`./../abi/${conf.morphwareTokenABIPath}`);
+const tokenContract = new web3.eth.Contract(tokenAbi, conf.morphwareTokenContractAddress);
+
 class MorphwareWallet{
 	constructor(privateKeyOrAccount){
 		if(typeof(privateKeyOrAccount) === 'string'){
@@ -22,14 +25,11 @@ class MorphwareWallet{
 
 		// Assign this wallets address to a contract do the contract can sign
 		// transactions.
-		this.contract = this.constructor.tokenContract.clone();
+		this.contract = tokenContract.clone();
 		this.contract.options.from = this.address;
 
 		this.getTransactionHistory();
 	}
-
-	static tokenAbi = require(`./../abi/${conf.morphwareTokenABIPath}`);
-	static tokenContract = new web3.eth.Contract(this.tokenAbi, conf.morphwareTokenContractAddress);
 	static wallets = [];
 
 	static add(privateKeyOrAccount){
@@ -61,7 +61,7 @@ class MorphwareWallet{
 
 			return await transfer.send({
 				from: this.address,
-				gas: gas || await transfer.estimateGas()
+				gas: gas || await transfer.estimateGas(),
 			});
 		}catch(error){
 			console.error('ERROR!!!! `transaction`', error);
@@ -69,7 +69,7 @@ class MorphwareWallet{
 		}
 	}
 
-	async approve(amount){
+	async approve(amount, gas){
 		try{
 			let action = this.contract.methods.approve(
 				conf.auctionFactoryContractAddress,
@@ -77,14 +77,14 @@ class MorphwareWallet{
 			);
 
 			let receipt = await action.send({
-				gas: await action.estimateGas()
+				gas: gas || await action.estimateGas()
 			});
 
 			this.transactions.push(receipt);
 
 			return receipt;
 		}catch(error){
-			console.error('ERROR!!!, MorphwareWallet approve', error, this);
+			console.error('ERROR!!!, MorphwareWallet approve', error);
 		}
 	}
 
@@ -120,7 +120,7 @@ class MorphwareWallet{
 
 // Listen for transfer events to keep the tracked wallets transactions history
 // fresh.
-MorphwareWallet.tokenContract.events.Transfer((error, event)=>{
+tokenContract.events.Transfer((error, event)=>{
 	if(error){
 		console.error('Error `MorphwareWallet.tokenContract.events.Transfer` from event', error);
 		return ;

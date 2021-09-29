@@ -2,14 +2,63 @@
 
 This is the documentation for the V0 API and is very much a work in progress.
 
-## Contract
+## Jobs
 
-`api/v0/contract`
+`api/v0/job`
 
 Manages job contracts
 
-* **GET** *NOT IMPLEMENTED YET*
-	Return current contracts
+* **GET** `api/v0/job`
+	Return all current contracts being tracked
+
+	Query **none**
+
+	Response fields:
+	* `canTakeWork` *BOOL* If the current client is taking new work, This is not
+		the same as `acceptingWork`, a worker currently involved in a contract will
+		report false.
+	* `jobs` *OBJECT* All the jobs the client is currently involved in.
+	  * `instanceID` *STRING* Unique ID to track job instances
+	  * `id` *STRING* Auction/jd ID for the job
+	  * `type` *STRING* states if this job is a poster, worker or validator
+	  * `wallet` *STRING* Wallet address of this node attached to this job
+	  * `jobData` *OBJECT* Data about the job returned by the contract
+			* `auctionAddress` *STRING* Address of the smart contract
+			* `biddingDeadling` *STRING* Timestamp for when the bidding will end
+			* `revealDeadline` *STRING* Timestamp for when the auction is completed
+			* `estimatedTrainingTime` *STRING* Time it will take the job to run
+			* `id` *STRING* Job/Auction ID
+			* `jobPoster` *STRING* wallet address of the job poster
+			* `trainingDatasetSize` *STRING* size in bytes of the training data size
+			* `workerReward` *STRING* Max payout in MWT WEI for this contract
+		* `postData` *OBJECT* Data posted to create this job, see this sections
+		  **POST** for more information. Only poster clients will have this.
+		* `status` *STRING* Current state of the job life cycle
+		* `transactions` *ARRAY* List of transactions history for this job
+
+	Example
+
+	[Poster](api_poster.json)
+
+	[Worker](api_worker.json)
+
+* **GET** `api/v0/job/<instanceID>`
+		Return data for the passed instance ID
+
+		Query **none**
+
+		Response fields:
+		See above `job` field
+
+
+* **GET** `api/v0/job/stream`
+		Shows the last 50 events 
+
+		Query **none**
+
+		Response fields:
+		* 'stream' *ARRAY* Array of events, see above for event contents
+
 
 * **POST**
 	Start a new contract for a job 
@@ -24,14 +73,29 @@ Manages job contracts
 	* `jupyterNotebook` *STRRING* Local path to the jupyter-notebook 
 	* `trainingData` *STRRING* Local path to the training-data 
 	* `testingData` *STRRING* Local path to the testing-data
+
+		Response fields:
+	* `status` *STRING* "Success" for job created 
+	* `job` *STRING* The jobs instance ID, use this look up the job
+
 		
 	Example
 	
-	Blocked by #15
+	```bash
+	curl 'http://127.0.0.1:3001/api/v0/contract' \
+  -H 'Content-Type: application/json' \
+  --data-raw '{"jupyterNotebook":"/home/william/dev/morphware/daemon/devRun.js","trainingData":"/home/william/dev/morphware/daemon/README.md","testingData":"/home/william/dev/morphware/daemon/build.js","stopTraining":"active_monitoring","stopTrainingAutomatic":"threshold_value","trainingTime":"60","biddingTime":"60","errorRate":"60","workerReward":"1000000000000000000","testModel":true}'
+	{"status":"success","job":"0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB:9"}
+	
+	```
 
 * **PUT**, **PATCH**, **DELETE**
 	
 	Will not implemented, contracts can not be modified once submitted
+
+
+
+
 
 ## Network(ETH)
 
@@ -124,7 +188,7 @@ Torrents the client is currently interacting with
 
 View and send MWT associated with the current wallet
 
-* **GET**
+* **GET** `/api/v0/wallet`
 	
 	Returns the current MWT balance.
 

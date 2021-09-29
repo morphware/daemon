@@ -18,4 +18,12 @@ web3.currentProvider.on('block', function(){console.log('block', arguments)});
 web3.currentProvider.on('start', function(){console.log('start', arguments)});
 
 
-module.exports = {web3, provider ,percentHelper};
+// const jobFactoryAbi = require(`./abi/${conf.jobFactoryAbiPath}`);
+// const auctionFactoryAbi = require(`./abi/${conf.auctionFactoryABIPath}`);
+
+// // Hold the web3 contracts
+// const jobFactoryContract = new web3.eth.Contract(jobFactoryAbi, conf.jobFactoryContractAddress);
+// const auctionFactoryContract = new web3.eth.Contract(auctionFactoryAbi,conf.auctionFactoryContractAddress);
+
+
+module.exports = {web3, provider, percentHelper};
