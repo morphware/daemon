@@ -66,7 +66,12 @@ const TrainModelForm = () => {
   const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
 
   const onSubmit = async (values: formFields) => {
+    values.biddingTime = 60;
+    console.log("pre: ", values);
     const formFields = formFieldsMapper(values);
+
+    console.log("value: ", formFields);
+
     const responseV2 = await daemonService.submitTrainModelRequest(formFields);
 
     if (Object.keys(responseV2).includes("status")) {
@@ -259,6 +264,8 @@ const TrainModelForm = () => {
                       name="biddingTime"
                       required={true}
                       type="number"
+                      // defaultValue={60}
+                      value={60}
                       style={{
                         width: "80%",
                         display: "flex",

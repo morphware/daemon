@@ -4,12 +4,14 @@ import logo from "../assets/logoV2.png";
 import homeNav from "../assets/train.png";
 import torrentsNav from "../assets/torrents.png";
 import settings from "../assets/settings.png";
+import stats from "../assets/stats.png";
 import { Link } from "react-router-dom";
 import { theme } from "../providers/MorphwareTheme";
 import { Grid, makeStyles, Typography } from "@material-ui/core";
 import WalletModal from "../components/WalletModal";
 
 enum navOptions {
+  Home = "Home",
   Train = "Train",
   Torrents = "Torrents",
   ShareCompute = "Share Compute",
@@ -113,9 +115,16 @@ const NavBar = () => {
       </Grid>
       <Grid item className="navbar-content">
         <NavLink
+          title={navOptions.Home}
+          icon={stats}
+          to="/"
+          setSelected={setSelectedNavItem}
+          selected={navOptions.Home === selectedNavItem}
+        ></NavLink>
+        <NavLink
           title={navOptions.Train}
           icon={homeNav}
-          to="/"
+          to="/train"
           setSelected={setSelectedNavItem}
           selected={navOptions.Train === selectedNavItem}
         ></NavLink>
