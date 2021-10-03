@@ -3,7 +3,22 @@
 var instnace;
 
 import ('webtorrent-hybrid').then(mod=>{
-	console.log('here')
+	/*
+	This is a hack I(@wmantly) created to get around `webtorrent-hybrid` forcing
+	the use of the import statement.
+
+	To use this file, require it like so
+
+	`const webtorrent = require('../controller/torrent');`
+
+	and call `webtorrent` when you want to use it
+
+	`webtorrent().torrents`
+
+	`webtorrent()` will return the webtorrent instance.
+
+	*/
+
 	instnace = new mod.default();
 
 	instnace.findOrSeed = function(path){
@@ -34,7 +49,7 @@ import ('webtorrent-hybrid').then(mod=>{
 					console.log('torrent added');
 
 					torrent.on('ready', function () {console.log('torrent ready')})
-					torrent.on('warning', function (err) {console.log('torrent error', error)})
+					torrent.on('warning', function (error) {console.log('torrent error', error)})
 					torrent.on('download', function (bytes) {console.log('torrent is downloading', bytes)})
 
 					torrent.on('done', ()=>{
@@ -47,7 +62,5 @@ import ('webtorrent-hybrid').then(mod=>{
 		});
 	}.bind(instnace);
 });
-
-
 
 module.exports = function(){return instnace};

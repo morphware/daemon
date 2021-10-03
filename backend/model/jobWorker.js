@@ -119,9 +119,9 @@ class JobWorker extends Job{
 
 			console.info('Bidding on', this.instanceId, (new Date()).toLocaleString());
 
-			// let approveReceipt = await this.wallet.approve(percentHelper(
-			// 	this.jobData.workerReward, 100
-			// ));
+			let approveReceipt = await this.wallet.approve(percentHelper(
+				this.jobData.workerReward, 100
+			));
 
 			this.bidData = {
 				bidAmount: percentHelper(this.jobData.workerReward, 25), // How do we figure out the correct bid?
@@ -141,8 +141,6 @@ class JobWorker extends Job{
 				)),
 				this.bidData.bidAmount
 			);
-
-			console.log('Bid staged', await action.estimateGas());
 
 			let receipt = await action.send({
 				gas: await action.estimateGas(),
