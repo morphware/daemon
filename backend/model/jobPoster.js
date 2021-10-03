@@ -78,7 +78,7 @@ class JobPoster extends Job{
 			]
 
 			for(let field of fileFields){
-				let {magnetURI} = await webtorrent.findOrSeed(data[field]);
+				let {magnetURI} = await webtorrent().findOrSeed(data[field]);
 				this.postData.files[field] = {
 					path: data[field],
 					magnetURI: magnetURI

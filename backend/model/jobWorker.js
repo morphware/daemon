@@ -119,9 +119,9 @@ class JobWorker extends Job{
 
 			console.info('Bidding on', this.instanceId, (new Date()).toLocaleString());
 
-			let approveReceipt = await this.wallet.approve(percentHelper(
-				this.jobData.workerReward, 100
-			));
+			// let approveReceipt = await this.wallet.approve(percentHelper(
+			// 	this.jobData.workerReward, 100
+			// ));
 
 			this.bidData = {
 				bidAmount: percentHelper(this.jobData.workerReward, 25), // How do we figure out the correct bid?
@@ -259,10 +259,12 @@ class JobWorker extends Job{
 
 			await this.bid();
 
+			waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
+
 			// reveal the bid during the reveal window
 			setTimeout(()=>{
 				this.reveal();
-			}, waitTimeInMS1);
+			}, ((biddingDeadline+10)*1000)-now);
 		}catch(error){
 			this.removeFromJump();
 			console.error(`ERROR!!! JobWorker __JobDescriptionPosted`, error)
@@ -305,7 +307,7 @@ class JobWorker extends Job{
 			fs.ensureDirSync(this.downloadPath);
 
 			// Download the shared files
-			await webtorrent.downloadAll(this.downloadPath, event.returnValues.untrainedModelMagnetLink, event.returnValues.trainingDatasetMagnetLink);
+			await webtorrent().downloadAll(this.downloadPath, event.returnValues.untrainedModelMagnetLink, event.returnValues.trainingDatasetMagnetLink);
 
 
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
