@@ -14,9 +14,8 @@ enum navOptions {
   Home = "Home",
   Train = "Train",
   Torrents = "Torrents",
-  ShareCompute = "Share Compute",
-  Activity = "Activity",
   Settings = "Settings",
+  Auctions = "Auctions",
 }
 
 interface NavLinkProps {
@@ -71,6 +70,9 @@ const styles = makeStyles({
     paddingTop: "20px",
     paddingBottom: "20px",
     width: "100%",
+    "&:hover": {
+      curser: "pointer",
+    },
   },
 });
 
@@ -110,16 +112,22 @@ const NavBar = () => {
 
   return (
     <Grid container direction="column" className={classes.navContainer}>
-      <Grid item className={classes.logoContainer}>
-        <img src={logo} alt="Morphware Logo" width="85%" />
+      <Grid
+        item
+        className={classes.logoContainer}
+        onClick={() => setSelectedNavItem(navOptions.Home)}
+      >
+        <Link className={classes.itemLink} to={"/"}>
+          <img src={logo} alt="Morphware Logo" width="85%" />
+        </Link>
       </Grid>
       <Grid item className="navbar-content">
         <NavLink
-          title={navOptions.Home}
+          title={navOptions.Auctions}
           icon={stats}
-          to="/"
+          to="/auctions"
           setSelected={setSelectedNavItem}
-          selected={navOptions.Home === selectedNavItem}
+          selected={navOptions.Auctions === selectedNavItem}
         ></NavLink>
         <NavLink
           title={navOptions.Train}

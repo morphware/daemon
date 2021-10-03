@@ -43,6 +43,47 @@ export interface TransactionProps {
   };
 }
 
+export interface JobTransactionProps {
+  address: string;
+  blockHash: string;
+  blockNumber: number;
+  data: string;
+  logIndex: number;
+  removed: boolean;
+  topics: Array<string>;
+  transactionHash: string;
+  transactionIndex: number;
+  id: string;
+  event: string;
+  signature: string;
+  raw: {
+    data: string;
+    topics: Array<string>;
+  };
+  returnValues: {
+    0: string;
+    1: string;
+    2: string;
+    3: string;
+    4: string;
+    5: string;
+    6: string;
+    7: string;
+    id: string;
+    jobPoster: string;
+    auctionAddress: string;
+    estimatedTrainingTime: string;
+    trainingDatasetSize: string;
+    workerReward: string;
+    biddingDeadline: string;
+    revealDeadline: string;
+    __length__: number;
+    from: string;
+    to: string;
+    value: string;
+  };
+}
+
 export interface WalletHistoryProps {
   transactions: Array<TransactionProps>;
   address: string;
@@ -86,9 +127,70 @@ export interface SettingsRequestProps {
   appDownloadPath?: string;
 }
 
+interface trainModelPostDataResponse {
+  jupyterNotebook: string;
+  trainingData: string;
+  testingData: string;
+  stopMethod: string;
+  autoStopMethod: string;
+  trainingTime: string;
+  errorRate: string;
+  biddingTime: string;
+  workerReward: string;
+  testModel: boolean;
+  files: {
+    jupyterNotebook: {
+      path: string;
+      magnetURI: string;
+    };
+    trainingData: {
+      path: string;
+      magnetURI: string;
+    };
+    testingData: {
+      path: string;
+      magnetURI: string;
+    };
+  };
+}
+
 export interface SettingsResponseProps extends SettingsRequestProps {
   error?: any;
 }
+
+export interface ActiveJobsProps {
+  canTakeWork: boolean;
+  jobs: {
+    instanceID: string;
+    id: string;
+    type: string;
+    wallet: string;
+    postData?: trainModelPostDataResponse;
+    status: string;
+    transactions: Array<JobTransactionProps>;
+    jobData: {
+      auctionAddress: string;
+      biddingDeadline: string;
+      revealDeadline: string;
+      estimatedTrainingTime: string;
+      id: string;
+      jobPoster: string;
+      trainingDatasetSize: string;
+      workerReward: string;
+    };
+  };
+}
+
+// canTakeWork BOOL If the current client is taking new work, This is not the same as acceptingWork, a worker currently involved in a contract will report false.
+// jobs OBJECT All the jobs the client is currently involved in.
+// instanceID STRING Unique ID to track job instances
+// id STRING Auction/jd ID for the job
+// type STRING states if this job is a poster, worker or validator
+// wallet STRING Wallet address of this node attached to this job
+// jobData OBJECT Data about the job returned by the contract * auctionAddress STRING Address of the smart contract * biddingDeadling STRING Timestamp for when the bidding will end * revealDeadline STRING Timestamp for when the auction is completed * estimatedTrainingTime STRING Time it will take the job to run * id STRING Job/Auction ID * jobPoster STRING wallet address of the job poster * trainingDatasetSize STRING size in bytes of the training data size * workerReward STRING Max payout in MWT WEI for this contract
+// postData OBJECT Data posted to create this job, see this sections POST for more information. Only poster clients will have this.
+// status STRING Current state of the job life cycle
+// transactions ARRAY List of transactions history for this job
 
 export interface IDaemonService {
   submitTrainModelRequest(
@@ -110,6 +212,19 @@ export class DaemonService implements IDaemonService {
     "http://" + (window.localStorage.getItem("url") || "127.0.0.1:3001");
 
   constructor() {}
+
+  public getTrackedJobs = async (): Promise<ActiveJobsProps> => {
+    const url = `${this.baseUrl}/api/V0/job`;
+
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const activeJobs: ActiveJobsProps = await response.json();
+    return activeJobs;
+  };
 
   public getConnectionStatus = async (): Promise<ConnectionStatusProps> => {
     const url = `${this.baseUrl}/api/V0/network`;
