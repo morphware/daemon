@@ -47,15 +47,25 @@ export interface JobTransactionProps {
   address: string;
   blockHash: string;
   blockNumber: number;
-  data: string;
+  // data: string;
   logIndex: number;
   removed: boolean;
-  topics: Array<string>;
+  // topics: Array<string>;
   transactionHash: string;
   transactionIndex: number;
   id: string;
   event: string;
   signature: string;
+  cumulativeGasUsed?: number;
+  effectiveGasPrice?: string;
+  gasUsed?: number;
+  logsBloom?: string;
+  status?: boolean;
+  to?: string;
+  contractAddress?: string | null;
+  from?: string;
+  type?: string;
+
   raw: {
     data: string;
     topics: Array<string>;
@@ -77,10 +87,10 @@ export interface JobTransactionProps {
     workerReward: string;
     biddingDeadline: string;
     revealDeadline: string;
-    __length__: number;
-    from: string;
-    to: string;
-    value: string;
+    __length__?: number;
+    from?: string;
+    to?: string;
+    value?: string;
   };
 }
 
@@ -158,26 +168,30 @@ export interface SettingsResponseProps extends SettingsRequestProps {
   error?: any;
 }
 
+export interface jobProps {
+  instanceID: string;
+  id: string;
+  type: string;
+  wallet: string;
+  postData?: trainModelPostDataResponse;
+  status: string;
+  transactions: Array<JobTransactionProps>;
+  jobData: {
+    auctionAddress: string;
+    biddingDeadline: string;
+    revealDeadline: string;
+    estimatedTrainingTime: string;
+    id: string;
+    jobPoster: string;
+    trainingDatasetSize: string;
+    workerReward: string;
+  };
+}
+
 export interface ActiveJobsProps {
   canTakeWork: boolean;
   jobs: {
-    instanceID: string;
-    id: string;
-    type: string;
-    wallet: string;
-    postData?: trainModelPostDataResponse;
-    status: string;
-    transactions: Array<JobTransactionProps>;
-    jobData: {
-      auctionAddress: string;
-      biddingDeadline: string;
-      revealDeadline: string;
-      estimatedTrainingTime: string;
-      id: string;
-      jobPoster: string;
-      trainingDatasetSize: string;
-      workerReward: string;
-    };
+    [property: string]: jobProps;
   };
 }
 

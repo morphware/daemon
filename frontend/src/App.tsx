@@ -9,6 +9,7 @@ import ServiceProviders from "./providers/ServiceProviders";
 import { MorphwareTheme } from "./providers/MorphwareTheme";
 import { Box, createStyles, makeStyles } from "@material-ui/core";
 import WalletInfo from "./components/WalletFooterInfo";
+import Auctions from "./screens/Auctions";
 
 const styles = makeStyles(() =>
   createStyles({
@@ -33,6 +34,7 @@ const App = () => {
           <Box style={{ width: "90vw" }}>
             <Switch>
               <Route exact path="/" component={Home} />
+              <Route path="/auctions" component={Auctions} />
               <Route path="/train" component={TrainModel} />
               <Route path="/torrents" component={Torrents} />
               <Route path="/settings" component={Settings} />

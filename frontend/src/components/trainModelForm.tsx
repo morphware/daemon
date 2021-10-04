@@ -22,7 +22,7 @@ import { makeStyles } from "@material-ui/core";
 import PositionedSnackbar from "./PositionedSnackbar";
 import { snackBarProps } from "../components/PositionedSnackbar";
 import FileField from "./FileField";
-import Address from "./Address";
+import { Switches } from "mui-rff";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;
@@ -46,7 +46,7 @@ export interface formFields {
   errorRate: number;
   biddingTime: number;
   workerReward: number;
-  testModel: string;
+  testModel: boolean;
 }
 interface formFieldsErrors {
   jupyterNotebook: string;
@@ -107,9 +107,9 @@ const TrainModelForm = () => {
         if (!values.testingData) {
           errors.testingData = "Required";
         }
-        if (!values.testModel) {
-          errors.testModel = "Required";
-        }
+        // if (!values.testModel) {
+        //   errors.testModel = "Required";
+        // }
         if (values.biddingTime <= 0) {
           errors.biddingTime = "Must be greater than 0";
         }
@@ -176,7 +176,6 @@ const TrainModelForm = () => {
               }}
               elevation={3}
             >
-              <Address walletAddress="0x0cf9D6185AFc49027b9Daddbd2ec2aBf24f432e1" />
               <Grid container alignItems="flex-start" spacing={2}>
                 {/* <Grid item xs={4} style={{ textAlign: "start" }}>
                     <Typography variant="h6">
@@ -290,7 +289,7 @@ const TrainModelForm = () => {
                   </Grid>
                 </Grid>
                 <Grid item xs={4}>
-                  <Radios
+                  {/* <Radios
                     name="testModel"
                     required={true}
                     gridSize={7}
@@ -305,6 +304,11 @@ const TrainModelForm = () => {
                         value: "no",
                       },
                     ]}
+                  /> */}
+                  <Switches
+                    label="Test Model"
+                    name="testModel"
+                    data={{ label: "", value: true }}
                   />
                 </Grid>
               </Grid>

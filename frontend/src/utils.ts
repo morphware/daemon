@@ -20,3 +20,28 @@ export const copyToClipBoard = (toCopy?: string) => {
   if (!toCopy) return;
   navigator.clipboard.writeText(toCopy);
 };
+
+export const auctionStatusMapper = (status: string) => {
+  switch (status) {
+    case "JobDescriptionPosted":
+      return "Job Description Posted";
+    case "AuctionEnded":
+      return "Auction Ended";
+    case "UntrainedModelAndTrainingDatasetShared":
+      return "Untrained Model and Training Data Shared";
+    case "TrainedModelShared":
+      return "Trained Model Shared";
+    case "JobApproved":
+      return "Job Approved";
+    case "postJobDescription":
+      return "Posted Job Description";
+    default:
+      return "-";
+  }
+};
+
+// 1. `JobDescriptionPosted`
+// 2. `AuctionEnded` (from: `AuctionFactory`)
+// 3. `UntrainedModelAndTrainingDatasetShared`
+// 4. `TrainedModelShared`
+// 5. `JobApproved`
