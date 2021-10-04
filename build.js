@@ -45,7 +45,12 @@ const exec = util.promisify(require('child_process').exec);
 		// console.log(await exec('./app-src/node_modules/.bin/electron-builder install-app-deps'));
 
 		console.info('Building')
-		console.log(await exec('./node_modules/.bin/electron-builder -wl'));
+		console.log(await exec('./node_modules/.bin/electron-builder -w'), {
+			env: {
+				SKIP_DOWNLOAD: 'true',
+				...process.env
+			}
+		});
 	}catch(error){
 		console.log('builder error', error)
 	}
