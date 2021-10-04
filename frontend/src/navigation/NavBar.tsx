@@ -105,7 +105,7 @@ const NavLink = ({ to, icon, title, setSelected, selected }: NavLinkProps) => {
 
 const NavBar = () => {
   const [selectedNavItem, setSelectedNavItem] = useState<navOptions>(
-    navOptions.Train
+    navOptions.Home
   );
 
   const classes = styles();

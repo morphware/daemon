@@ -35,6 +35,10 @@ export const auctionStatusMapper = (status: string) => {
       return "Job Approved";
     case "postJobDescription":
       return "Posted Job Description";
+    case "bid":
+      return "Bidding";
+    case "reveal":
+      return "Revealing";
     default:
       return "-";
   }
