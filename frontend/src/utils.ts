@@ -1,10 +1,11 @@
 export const walletShortener = (
   walletAddress?: string,
+  firstLength: number = 7,
   secondLength: number = 3
 ): string => {
   if (!walletAddress) return "Invalid Wallet";
 
-  const shortenedAddressStart = walletAddress.slice(0, 7);
+  const shortenedAddressStart = walletAddress.slice(0, firstLength);
   const shortenedAddressEnd = walletAddress.slice(42 - secondLength, 43);
   const shortenedAddress = `${shortenedAddressStart}...${shortenedAddressEnd}`;
   return shortenedAddress;

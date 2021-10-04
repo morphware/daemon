@@ -22,6 +22,7 @@ import { makeStyles } from "@material-ui/core";
 import PositionedSnackbar from "./PositionedSnackbar";
 import { snackBarProps } from "../components/PositionedSnackbar";
 import FileField from "./FileField";
+import Address from "./Address";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;
@@ -175,6 +176,7 @@ const TrainModelForm = () => {
               }}
               elevation={3}
             >
+              <Address walletAddress="0x0cf9D6185AFc49027b9Daddbd2ec2aBf24f432e1" />
               <Grid container alignItems="flex-start" spacing={2}>
                 {/* <Grid item xs={4} style={{ textAlign: "start" }}>
                     <Typography variant="h6">
