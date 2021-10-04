@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import logo from "../assets/logoV2.png";
 import homeNav from "../assets/train.png";
 import torrentsNav from "../assets/torrents.png";
@@ -9,6 +9,7 @@ import { Link } from "react-router-dom";
 import { theme } from "../providers/MorphwareTheme";
 import { Grid, makeStyles, Typography } from "@material-ui/core";
 import WalletModal from "../components/WalletModal";
+import { DaemonContext } from "../providers/ServiceProviders";
 
 enum navOptions {
   Home = "Home",
@@ -104,6 +105,7 @@ const NavLink = ({ to, icon, title, setSelected, selected }: NavLinkProps) => {
 };
 
 const NavBar = () => {
+  const { clientVersion } = useContext(DaemonContext);
   const [selectedNavItem, setSelectedNavItem] = useState<navOptions>(
     navOptions.Home
   );
@@ -171,6 +173,7 @@ const NavBar = () => {
           />
         </IconButton> */}
         <WalletModal />
+        <Typography variant="body2">V{clientVersion}</Typography>
       </Grid>
     </Grid>
   );

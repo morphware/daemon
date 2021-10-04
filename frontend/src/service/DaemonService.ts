@@ -117,7 +117,9 @@ export interface SubmitTrainingModelResponse {
 }
 
 export interface SettingsParamsResponseProps {
-  conf: any;
+  conf: {
+    version: string;
+  };
   editKeys: {
     httpBindAddress: string;
     httpPort: string;

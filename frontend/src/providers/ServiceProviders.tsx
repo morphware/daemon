@@ -28,6 +28,7 @@ interface daemonServiceProps {
   network?: string;
   currentConfigs?: SettingsResponseProps;
   activeJobs?: ActiveJobsProps;
+  clientVersion: string;
   getTorrents: () => Promise<void>;
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -58,6 +59,7 @@ const ServiceProviders: React.FC = ({ children }) => {
   const [activeJobs, setActiveJobs] = useState<ActiveJobsProps>();
   const [configParams, setConfigParams] =
     useState<SettingsParamsResponseProps>();
+  const [clientVersion, setClientVersion] = useState<string>("");
 
   const getActiveJobs = async () => {
     const activeJobs = await daemonService.getTrackedJobs();
@@ -124,7 +126,10 @@ const ServiceProviders: React.FC = ({ children }) => {
 
   const getSettings = async () => {
     const response = await daemonService.getSettings();
+    console.log("SETTINGS", response);
     setConfigParams(response);
+    const version = response.conf.version;
+    setClientVersion(version);
   };
 
   const getCurrentSettings = async () => {
@@ -145,6 +150,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     network: network,
     currentConfigs: currentConfigs,
     activeJobs: activeJobs,
+    clientVersion: clientVersion,
     getTorrents: getTorrents,
     submitTrainModelRequest: submitTrainModelRequest,
     getBalance: getBalance,
@@ -173,6 +179,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     getWalletHistory();
     getCurrentSettings();
     getActiveJobs();
+    getSettings();
   }, []);
 
   return (
