@@ -15,6 +15,7 @@ import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { copyToClipBoard, roundBalance, walletShortener } from "../utils";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
+import Identicon from "./Identicon";
 
 const styles = makeStyles(() =>
   createStyles({
@@ -67,9 +68,19 @@ const WalletInfo = () => {
           justifyContent: "center",
         }}
       >
-        <Typography variant="body2">
-          Address:&nbsp;&nbsp;&nbsp;{shortenedAddress}
-        </Typography>
+        <span>
+          <Typography variant="body2">
+            Address:&nbsp;&nbsp;&nbsp;
+            <Identicon
+              address={
+                daemonService.walletAddress ? daemonService.walletAddress : "-"
+              }
+              size={15}
+            />
+            &nbsp;&nbsp;
+            {walletShortener(daemonService.walletAddress, 4, 4)}
+          </Typography>{" "}
+        </span>
         <IconButton
           onClick={() => copyToClipBoard(daemonService.walletAddress)}
         >

@@ -13,6 +13,7 @@ import {
   SortDirectionType,
 } from "react-virtualized";
 import "react-virtualized/styles.css";
+import "./PeersTable.css";
 // // import CountryFlag from 'react-country-flag'
 // // import { CopyToClipboard } from "react-copy-to-clipboard";
 // // import Cid from "../../components/cid/Cid";
@@ -145,7 +146,7 @@ import "react-virtualized/styles.css";
 //   }
 // };
 
-import React, { useContext, useState } from "react";
+import React, { useContext, useLayoutEffect, useState } from "react";
 import { ActiveJobsProps } from "../service/DaemonService";
 import Web3 from "web3";
 import { auctionStatusMapper } from "../utils";
@@ -987,13 +988,12 @@ const PeersTable = () => {
   const classes = styles();
 
   const biddingDeadlineRenderer = ({ cellData, rowData }: any) => {
-    const style = { width: "60px" };
     const epochTime = Number.parseInt(cellData);
     const dateObject = new Date(epochTime * 1000);
 
     if (cellData == null)
       return (
-        <span className="dib o-40 no-select" style={style}>
+        <span className="dib o-40 no-select" style={{ width: "100%" }}>
           -
         </span>
       );
@@ -1003,23 +1003,24 @@ const PeersTable = () => {
   };
 
   const jobIdRenderer = ({ cellData, rowData }: any) => {
-    const style = { width: "60px" };
-    const latency = `${cellData}ms`;
     if (cellData == null)
       return (
-        <span className="dib o-40 no-select" style={style}>
+        <span className="dib o-40 no-select" style={{ width: "100%" }}>
           -
         </span>
       );
-    return <span className="dib no-select">{cellData}</span>;
+    return (
+      <span className="dib no-select" style={{ width: "100%" }}>
+        {cellData}
+      </span>
+    );
   };
 
   const mwtRenderer = ({ cellData, rowData }: any) => {
-    const style = { width: "60px" };
     const convertedMWT = Web3.utils.fromWei(cellData, "ether");
     if (cellData == null)
       return (
-        <span className="dib o-40 no-select" style={style}>
+        <span className="dib o-40 no-select" style={{ width: "100%" }}>
           -
         </span>
       );
@@ -1027,11 +1028,10 @@ const PeersTable = () => {
   };
 
   const statusRenderer = ({ cellData, rowData }: any) => {
-    const style = { width: "60px" };
     const status = auctionStatusMapper(cellData);
     if (cellData == null)
       return (
-        <span className="dib o-40 no-select" style={style}>
+        <span className="dib o-40 no-select" style={{ width: "100%" }}>
           -
         </span>
       );
@@ -1050,61 +1050,70 @@ const PeersTable = () => {
   };
 
   return (
-    <div>
-      <Typography variant="body1">
-        <AutoSizer disableHeight>
-          {({ width }) => (
-            <Table
-              width={1200}
-              height={400}
-              headerHeight={20}
-              rowHeight={30}
-              rowCount={activeJobsFiltered.length}
-              rowGetter={({ index }) => sortedJobs[index]}
-              sortBy={sortBy}
-              sortDirection={sortDirection}
-              sort={sort}
-              headerClassName={classes.tableHeader}
-            >
-              <Column
-                label="Job ID"
-                cellRenderer={jobIdRenderer}
-                dataKey="jobID"
-                width={200}
-                // className="f6 charcoal truncate pl2"
-              />
-              <Column
-                label="Bidding Deadline"
-                cellRenderer={biddingDeadlineRenderer}
-                dataKey="biddingDeadline"
-                width={440}
-                // className="f6 charcoal truncate pl2"
-              />
-              <Column
-                label="Training Data Size"
-                //  cellRenderer={this.locationCellRenderer}
-                dataKey="trainingDataSize"
-                width={400}
-                className="f6 charcoal truncate pl2"
-              />
-              <Column
-                label="Worker Reward (MWT)"
-                cellRenderer={mwtRenderer}
-                dataKey="workerReward"
-                width={450}
-                className="f6 charcoal truncate pl2"
-              />
-              <Column
-                label="Status"
-                cellRenderer={statusRenderer}
-                dataKey="status"
-                width={700}
-                className="f6 charcoal truncate pl2"
-              />
-            </Table>
-          )}
-        </AutoSizer>
-      </Typography>
+    <div style={{ maxWidth: 1764 }}>
+      {/* <Typography variant="body1"> */}
+      <AutoSizer disableHeight style={{ width: "100%" }}>
+        {({ width }) => (
+          <Table
+            rowClassName="TEST_CLASS_NAME"
+            width={width}
+            height={400}
+            headerHeight={20}
+            rowHeight={30}
+            rowCount={activeJobsFiltered.length}
+            rowGetter={({ index }) => sortedJobs[index]}
+            sortBy={sortBy}
+            sortDirection={sortDirection}
+            sort={sort}
+            headerClassName={classes.tableHeader}
+            rowStyle={{ width: "100%" }}
+          >
+            <Column
+              label="Job ID"
+              cellRenderer={jobIdRenderer}
+              dataKey="jobID"
+              width={width * 0.2}
+              // width={6}
+              // className="f6 charcoal truncate pl2"
+            />
+            <Column
+              label="Bidding Deadline"
+              cellRenderer={biddingDeadlineRenderer}
+              dataKey="biddingDeadline"
+              width={width * 0.4}
+              // style={{ width: 500 }}
+              // width={6}
+              // className="f6 charcoal truncate pl2"
+            />
+            <Column
+              label="Training Data Size"
+              //  cellRenderer={this.locationCellRenderer}
+              dataKey="trainingDataSize"
+              width={width * 0.4}
+              // width={6}
+              className="f6 charcoal truncate pl2"
+            />
+            <Column
+              label="Worker Reward (MWT)"
+              cellRenderer={mwtRenderer}
+              dataKey="workerReward"
+              // width={550}
+              width={width * 0.4}
+              className="f6 charcoal truncate pl2"
+            />
+            <Column
+              label="Status"
+              cellRenderer={statusRenderer}
+              dataKey="status"
+              // width={800}
+              width={width}
+              // width={6}
+              className="f6 charcoal truncate pl2"
+            />
+          </Table>
+        )}
+      </AutoSizer>
+      {/* </Typography> */}
     </div>
   );
 };

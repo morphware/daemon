@@ -34,7 +34,7 @@ const Auctions = () => {
         {activeJobs}
       </Typography>
       <Typography variant="h5" style={{ paddingBottom: "20px" }}>
-        Live Morphware Jobs
+        Live Morphware Auctions
       </Typography>
       <PeersTable />
     </div>
