@@ -47,9 +47,9 @@ const TorrentsTableV2 = () => {
   );
   const classes = styles();
 
-  //   const torrents = daemonService.torrents?.torrents
-  //     ? daemonService.torrents?.torrents
-  //     : [];
+  const torrents = daemonService.torrents?.torrents
+    ? daemonService.torrents?.torrents
+    : [];
 
   const mockTorrentData = {
     download: 0,
@@ -86,7 +86,7 @@ const TorrentsTableV2 = () => {
     ],
   };
 
-  const sortedTorrents = mockTorrentData.torrents.sort(
+  const sortedTorrents = torrents.sort(
     sortByProperty(sortBy, sortDirection === SortDirection.ASC ? 1 : -1)
   );
 

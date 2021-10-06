@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 // import EnhancedTable from "../components/TorrentsTable";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { theme } from "../providers/MorphwareTheme";
 import TorrentsTableV2 from "../components/TorrentsTableV2";
 import { Grid, Typography } from "@material-ui/core";
+import { DaemonContext } from "../providers/ServiceProviders";
 
 const styles = makeStyles(() =>
   createStyles({
@@ -22,13 +23,15 @@ const styles = makeStyles(() =>
 
 const Torrents = () => {
   const classes = styles();
+  const daemonService = useContext(DaemonContext);
+  const torrents = daemonService.torrents;
 
   return (
     <div className={classes.root}>
       <Grid container>
         <Grid item xs={4} style={{ paddingBottom: "15px" }}>
           <Typography variant="h4" className={classes.statisticNumber}>
-            10
+            {torrents?.download}
           </Typography>
           <Typography variant="h5" style={{ paddingBottom: "20px" }}>
             Download
@@ -36,7 +39,7 @@ const Torrents = () => {
         </Grid>
         <Grid item xs={4}>
           <Typography variant="h4" className={classes.statisticNumber}>
-            41
+            {torrents?.upload}
           </Typography>
           <Typography variant="h5" style={{ paddingBottom: "20px" }}>
             Upload
@@ -44,7 +47,7 @@ const Torrents = () => {
         </Grid>
         <Grid item xs={4}>
           <Typography variant="h4" className={classes.statisticNumber}>
-            46049
+            {torrents?.port}
           </Typography>
           <Typography variant="h5" style={{ paddingBottom: "20px" }}>
             Port

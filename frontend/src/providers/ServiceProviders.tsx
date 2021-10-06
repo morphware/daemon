@@ -169,6 +169,7 @@ const ServiceProviders: React.FC = ({ children }) => {
       await getBalance();
       await getWalletHistory();
       await getActiveJobs();
+      await getTorrents();
     }, 10000);
     return () => clearInterval(interval);
   }, []);

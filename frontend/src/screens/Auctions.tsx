@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { theme } from "../providers/MorphwareTheme";
-import PeersTable from "../components/PeersTable";
+import AuctionsTable from "../components/PeersTable";
 import { Typography } from "@material-ui/core";
 import { DaemonContext } from "../providers/ServiceProviders";
 
@@ -40,7 +40,7 @@ const Auctions = () => {
       <Typography variant="h5" style={{ paddingBottom: "20px" }}>
         Live Morphware Auctions
       </Typography>
-      <PeersTable />
+      <AuctionsTable />
     </div>
   );
 };

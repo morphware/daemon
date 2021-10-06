@@ -39,6 +39,8 @@ export const auctionStatusMapper = (status: string) => {
       return "Bidding";
     case "reveal":
       return "Revealing";
+    case "BidPlaced":
+      return "Bid Placed";
     default:
       return "-";
   }

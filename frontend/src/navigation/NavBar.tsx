@@ -5,6 +5,7 @@ import homeNav from "../assets/train.png";
 import torrentsNav from "../assets/torrents.png";
 import settings from "../assets/settings.png";
 import stats from "../assets/stats.png";
+import auctions from "../assets/auctionsV2.png";
 import { Link } from "react-router-dom";
 import { theme } from "../providers/MorphwareTheme";
 import { Grid, makeStyles, Typography } from "@material-ui/core";
@@ -71,9 +72,9 @@ const styles = makeStyles({
     paddingTop: "20px",
     paddingBottom: "20px",
     width: "100%",
-    "&:hover": {
-      curser: "pointer",
-    },
+    // "&:hover": {
+    //   curser: "pointer",
+    // },
   },
 });
 
@@ -107,7 +108,7 @@ const NavLink = ({ to, icon, title, setSelected, selected }: NavLinkProps) => {
 const NavBar = () => {
   const { clientVersion } = useContext(DaemonContext);
   const [selectedNavItem, setSelectedNavItem] = useState<navOptions>(
-    navOptions.Home
+    navOptions.Auctions
   );
 
   const classes = styles();
@@ -117,16 +118,16 @@ const NavBar = () => {
       <Grid
         item
         className={classes.logoContainer}
-        onClick={() => setSelectedNavItem(navOptions.Home)}
+        // onClick={() => setSelectedNavItem(navOptions.Home)}
       >
-        <Link className={classes.itemLink} to={"/"}>
-          <img src={logo} alt="Morphware Logo" width="85%" />
-        </Link>
+        {/* <Link className={classes.itemLink} to={"/"}> */}
+        <img src={logo} alt="Morphware Logo" width="85%" />
+        {/* </Link> */}
       </Grid>
       <Grid item className="navbar-content">
         <NavLink
           title={navOptions.Auctions}
-          icon={stats}
+          icon={auctions}
           to="/auctions"
           setSelected={setSelectedNavItem}
           selected={navOptions.Auctions === selectedNavItem}
