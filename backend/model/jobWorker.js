@@ -10,6 +10,17 @@ const {web3, percentHelper} = require('./contract');
 const {wallet} = require('./morphware');
 const {Job} = require('./job');
 
+const {exec} = require('./python');
+
+(async function(){
+	try{
+		console.log(await exec('python', '/home/william/test.py'))
+
+	}catch(error){
+		console.error('here error', error)
+	}
+})()
+
 /*
 JobWorker extends the common functions of Job class and is responsible for
 handling functionality a worker node needs.
@@ -221,7 +232,6 @@ class JobWorker extends Job{
 		}
 	}
 
-
 	/*
 	Events
 
@@ -305,10 +315,13 @@ class JobWorker extends Job{
 			fs.ensureDirSync(this.downloadPath);
 
 			// Download the shared files
-			await webtorrent().downloadAll(this.downloadPath, event.returnValues.untrainedModelMagnetLink, event.returnValues.trainingDatasetMagnetLink);
+			let downloads = await webtorrent().downloadAll(this.downloadPath, event.returnValues.untrainedModelMagnetLink, event.returnValues.trainingDatasetMagnetLink);
 
+			console.log('Downloads', downloads);
 
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
+
+			await exec('python', downloads[0].file.path, downloads[1].file.path);
 
 
 		}catch(error){

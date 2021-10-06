@@ -151,3 +151,8 @@ app-src/
 
 // eletron preload file is used to inject settings into react at runtime
 preload.js
+
+
+// Code signing cert for windows.
+// Electron build did not like when this file was out of the project root.
+*.pfx

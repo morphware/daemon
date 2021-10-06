@@ -47,8 +47,8 @@
       "output": "dist"
     },
     "win": {
+      "certificateFile": "Morphware.pfx",
       "target": [
-        "nsis",
         "portable"
       ]
     },
