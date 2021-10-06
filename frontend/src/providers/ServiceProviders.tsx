@@ -63,7 +63,6 @@ const ServiceProviders: React.FC = ({ children }) => {
 
   const getActiveJobs = async () => {
     const activeJobs = await daemonService.getTrackedJobs();
-    console.log("ACTIVE JOBS: ", activeJobs);
     setActiveJobs(activeJobs);
   };
 

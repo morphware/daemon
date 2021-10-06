@@ -47,10 +47,8 @@ export interface JobTransactionProps {
   address: string;
   blockHash: string;
   blockNumber: number;
-  // data: string;
   logIndex: number;
   removed: boolean;
-  // topics: Array<string>;
   transactionHash: string;
   transactionIndex: number;
   id: string;
@@ -196,17 +194,6 @@ export interface ActiveJobsProps {
     [property: string]: jobProps;
   };
 }
-
-// canTakeWork BOOL If the current client is taking new work, This is not the same as acceptingWork, a worker currently involved in a contract will report false.
-// jobs OBJECT All the jobs the client is currently involved in.
-// instanceID STRING Unique ID to track job instances
-// id STRING Auction/jd ID for the job
-// type STRING states if this job is a poster, worker or validator
-// wallet STRING Wallet address of this node attached to this job
-// jobData OBJECT Data about the job returned by the contract * auctionAddress STRING Address of the smart contract * biddingDeadling STRING Timestamp for when the bidding will end * revealDeadline STRING Timestamp for when the auction is completed * estimatedTrainingTime STRING Time it will take the job to run * id STRING Job/Auction ID * jobPoster STRING wallet address of the job poster * trainingDatasetSize STRING size in bytes of the training data size * workerReward STRING Max payout in MWT WEI for this contract
-// postData OBJECT Data posted to create this job, see this sections POST for more information. Only poster clients will have this.
-// status STRING Current state of the job life cycle
-// transactions ARRAY List of transactions history for this job
 
 export interface IDaemonService {
   submitTrainModelRequest(

@@ -315,19 +315,6 @@ const EnhancedTable = () => {
       torrent.magnetURI
     )
   );
-  // return daemonService.torrents
-  //   ? daemonService.torrents?.torrents.map((torrent) =>
-  //       createData(
-  //         torrent.name,
-  //         torrent.progress,
-  //         torrent.downloadSpeed,
-  //         torrent.numPeers,
-  //         torrent.timeRemaining,
-  //         torrent.magnetURI
-  //       )
-  //     )
-  //   : [];
-  // }, [daemonService.torrents]);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,

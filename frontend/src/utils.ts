@@ -45,9 +45,3 @@ export const auctionStatusMapper = (status: string) => {
       return "-";
   }
 };
-
-// 1. `JobDescriptionPosted`
-// 2. `AuctionEnded` (from: `AuctionFactory`)
-// 3. `UntrainedModelAndTrainingDatasetShared`
-// 4. `TrainedModelShared`
-// 5. `JobApproved`

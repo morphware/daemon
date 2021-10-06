@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { theme } from "../providers/MorphwareTheme";
-import AuctionsTable from "../components/PeersTable";
+import AuctionsTable from "../components/AuctionsTable";
 import { Typography } from "@material-ui/core";
 import { DaemonContext } from "../providers/ServiceProviders";
 
@@ -12,7 +12,6 @@ const styles = makeStyles(() =>
       height: "calc(100vh - 120px)",
       padding: "50px 50px 0px",
       display: "flex",
-      // justifyContent: "center",
       flexDirection: "column",
       alignItems: "center",
     },

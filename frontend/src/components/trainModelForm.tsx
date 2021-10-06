@@ -68,11 +68,7 @@ const TrainModelForm = () => {
 
   const onSubmit = async (values: formFields) => {
     values.biddingTime = 60;
-    console.log("pre: ", values);
     const formFields = formFieldsMapper(values);
-
-    console.log("value: ", formFields);
-
     const responseV2 = await daemonService.submitTrainModelRequest(formFields);
 
     if (Object.keys(responseV2).includes("status")) {
@@ -107,9 +103,6 @@ const TrainModelForm = () => {
         if (!values.testingData) {
           errors.testingData = "Required";
         }
-        // if (!values.testModel) {
-        //   errors.testModel = "Required";
-        // }
         if (values.biddingTime <= 0) {
           errors.biddingTime = "Must be greater than 0";
         }
@@ -265,7 +258,6 @@ const TrainModelForm = () => {
                       name="biddingTime"
                       required={true}
                       type="number"
-                      // defaultValue={60}
                       value={60}
                       style={{
                         width: "80%",
@@ -289,22 +281,6 @@ const TrainModelForm = () => {
                   </Grid>
                 </Grid>
                 <Grid item xs={4}>
-                  {/* <Radios
-                    name="testModel"
-                    required={true}
-                    gridSize={7}
-                    color="primary"
-                    data={[
-                      {
-                        label: "Test Model",
-                        value: "yes",
-                      },
-                      {
-                        label: "Do not Test Model",
-                        value: "no",
-                      },
-                    ]}
-                  /> */}
                   <Switches
                     label="Test Model"
                     name="testModel"
