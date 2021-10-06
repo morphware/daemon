@@ -4,4 +4,5 @@
 
 .TEST_CLASS_NAME {
   width: 100%;
+  border: 2px solid rgb(233, 230, 230);
 }

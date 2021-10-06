@@ -1,7 +1,8 @@
 import React from "react";
-import EnhancedTable from "../components/TorrentsTable";
+// import EnhancedTable from "../components/TorrentsTable";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { theme } from "../providers/MorphwareTheme";
+import TorrentsTableV2 from "../components/TorrentsTableV2";
 
 const styles = makeStyles(() =>
   createStyles({
@@ -18,7 +19,8 @@ const Torrents = () => {
 
   return (
     <div className={classes.root}>
-      <EnhancedTable />
+      {/* <EnhancedTable /> */}
+      <TorrentsTableV2 />
     </div>
   );
 };

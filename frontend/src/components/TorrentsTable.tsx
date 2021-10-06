@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useMemo, useState } from "react";
 import clsx from "clsx";
 import {
@@ -270,21 +271,63 @@ const EnhancedTable = () => {
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
 
   const daemonService = useContext(DaemonContext);
-
-  const torrents = useMemo(() => {
-    return daemonService.torrents
-      ? daemonService.torrents?.torrents.map((torrent) =>
-          createData(
-            torrent.name,
-            torrent.progress,
-            torrent.downloadSpeed,
-            torrent.numPeers,
-            torrent.timeRemaining,
-            torrent.magnetURI
-          )
-        )
-      : [];
-  }, [daemonService.torrents]);
+  const torrentsMock = {
+    download: 0,
+    upload: 0,
+    port: 46049,
+    torrents: [
+      {
+        name: "jupyter-notebook.html",
+        progress: 0,
+        downloadSpeed: 0,
+        numPeers: 0,
+        timeRemaining: 0,
+        magnetURI:
+          "magnet:?xt=urn:btih:f35be570c19b5e026930e97a9533ac7207f960a4&dn=jupyter-notebook.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
+      },
+      {
+        name: "training-data.html",
+        progress: 0,
+        downloadSpeed: 0,
+        numPeers: 0,
+        timeRemaining: 0,
+        magnetURI:
+          "magnet:?xt=urn:btih:7948a0c8a8407274fa5bc63219eaa061b495e5db&dn=training-data.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
+      },
+      {
+        name: "testing-data.md",
+        progress: 0,
+        downloadSpeed: 0,
+        numPeers: 0,
+        timeRemaining: 0,
+        magnetURI:
+          "magnet:?xt=urn:btih:c38689c760a42c2f4060935ebfbf6e55d42350f9&dn=testing-data.md&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
+      },
+    ],
+  };
+  const torrents = torrentsMock.torrents.map((torrent) =>
+    createData(
+      torrent.name,
+      torrent.progress,
+      torrent.downloadSpeed,
+      torrent.numPeers,
+      torrent.timeRemaining,
+      torrent.magnetURI
+    )
+  );
+  // return daemonService.torrents
+  //   ? daemonService.torrents?.torrents.map((torrent) =>
+  //       createData(
+  //         torrent.name,
+  //         torrent.progress,
+  //         torrent.downloadSpeed,
+  //         torrent.numPeers,
+  //         torrent.timeRemaining,
+  //         torrent.magnetURI
+  //       )
+  //     )
+  //   : [];
+  // }, [daemonService.torrents]);
 
   const handleRequestSort = (
     event: React.MouseEvent<unknown>,

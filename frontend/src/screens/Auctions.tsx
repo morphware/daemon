@@ -11,6 +11,10 @@ const styles = makeStyles(() =>
       backgroundColor: theme.background?.main,
       height: "calc(100vh - 120px)",
       padding: "50px 50px 0px",
+      display: "flex",
+      // justifyContent: "center",
+      flexDirection: "column",
+      alignItems: "center",
     },
     statisticNumber: {
       color: "#1aae9f",
