@@ -51,37 +51,42 @@ const TorrentsTableV2 = () => {
   //     ? daemonService.torrents?.torrents
   //     : [];
 
-  const torrents = [
-    {
-      name: "jupyter-notebook.html",
-      progress: 13,
-      downloadSpeed: 38,
-      numPeers: 41,
-      timeRemaining: 63,
-      magnetURI:
-        "magnet:?xt=urn:btih:f35be570c19b5e026930e97a9533ac7207f960a4&dn=jupyter-notebook.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
-    },
-    {
-      name: "training-data.html",
-      progress: 41,
-      downloadSpeed: 51,
-      numPeers: 43,
-      timeRemaining: 71,
-      magnetURI:
-        "magnet:?xt=urn:btih:7948a0c8a8407274fa5bc63219eaa061b495e5db&dn=training-data.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
-    },
-    {
-      name: "testing-data.md",
-      progress: 32,
-      downloadSpeed: 21,
-      numPeers: 31,
-      timeRemaining: 1,
-      magnetURI:
-        "magnet:?xt=urn:btih:c38689c760a42c2f4060935ebfbf6e55d42350f9&dn=testing-data.md&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
-    },
-  ];
+  const mockTorrentData = {
+    download: 0,
+    upload: 0,
+    port: 46049,
+    torrents: [
+      {
+        name: "jupyter-notebook.html",
+        progress: 13,
+        downloadSpeed: 38,
+        numPeers: 41,
+        timeRemaining: 63,
+        magnetURI:
+          "magnet:?xt=urn:btih:f35be570c19b5e026930e97a9533ac7207f960a4&dn=jupyter-notebook.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
+      },
+      {
+        name: "training-data.html",
+        progress: 41,
+        downloadSpeed: 51,
+        numPeers: 43,
+        timeRemaining: 71,
+        magnetURI:
+          "magnet:?xt=urn:btih:7948a0c8a8407274fa5bc63219eaa061b495e5db&dn=training-data.html&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
+      },
+      {
+        name: "testing-data.md",
+        progress: 32,
+        downloadSpeed: 21,
+        numPeers: 31,
+        timeRemaining: 1,
+        magnetURI:
+          "magnet:?xt=urn:btih:c38689c760a42c2f4060935ebfbf6e55d42350f9&dn=testing-data.md&tr=wss%3A%2F%2Ftracker.btorrent.xyz&tr=wss%3A%2F%2Ftracker.openwebtorrent.com&tr=udp%3A%2F%2Ftracker.leechers-paradise.org%3A6969&tr=udp%3A%2F%2Ftracker.coppersurfer.tk%3A6969&tr=udp%3A%2F%2Ftracker.opentrackr.org%3A1337&tr=udp%3A%2F%2Fexplodie.org%3A6969&tr=udp%3A%2F%2Ftracker.empire-js.us%3A1337",
+      },
+    ],
+  };
 
-  const sortedTorrents = torrents.sort(
+  const sortedTorrents = mockTorrentData.torrents.sort(
     sortByProperty(sortBy, sortDirection === SortDirection.ASC ? 1 : -1)
   );
 
