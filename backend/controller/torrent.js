@@ -1,6 +1,6 @@
 'use strict';
 
-var instnace;
+var instance;
 
 import ('webtorrent-hybrid').then(mod=>{
 	/*
@@ -19,9 +19,9 @@ import ('webtorrent-hybrid').then(mod=>{
 
 	*/
 
-	instnace = new mod.default();
+	instance = new mod.default();
 
-	instnace.findOrSeed = function(path){
+	instance.findOrSeed = function(path){
 		return new Promise((resolve, reject)=>{
 			this.seed(path, function(torrent){
 				resolve(torrent); // magnetURI
@@ -34,17 +34,14 @@ import ('webtorrent-hybrid').then(mod=>{
 				reject(error);
 			})
 		});
-	}.bind(instnace);
+	}.bind(instance);
 
 
-	instnace.downloadAll = function(path, ...links){
-		
-		console.log('here in downloadAll', path, links);
-		let count = 0;
+	instance.downloadAll = function(path, ...links){
+		let out = [];
 
 		return new Promise((resolve, reject)=>{
 			for(let link of links){
-				console.log('adding', link);
 				this.add(link, {path}, (torrent)=>{
 					console.log('torrent added');
 
@@ -54,13 +51,14 @@ import ('webtorrent-hybrid').then(mod=>{
 
 					torrent.on('done', ()=>{
 						console.log('done!!!')
-						if(count++ === links.length) resolve();
+						out.push(torrent);
+						if(out.length === links.length) resolve();
 					});
 					torrent.on('error', reject)
 				});
 			}
 		});
-	}.bind(instnace);
+	}.bind(instance);
 });
 
-module.exports = function(){return instnace};
+module.exports = function(){return instance};
