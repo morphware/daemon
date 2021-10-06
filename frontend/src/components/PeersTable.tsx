@@ -5,7 +5,13 @@
 // // import ms from "milliseconds";
 // // import { connect } from "redux-bundler-react";
 // // import { withTranslation } from "react-i18next";
-import { Table, Column, AutoSizer, SortDirection } from "react-virtualized";
+import {
+  Table,
+  Column,
+  AutoSizer,
+  SortDirection,
+  SortDirectionType,
+} from "react-virtualized";
 import "react-virtualized/styles.css";
 // // import CountryFlag from 'react-country-flag'
 // // import { CopyToClipboard } from "react-copy-to-clipboard";
@@ -32,55 +38,6 @@ import "react-virtualized/styles.css";
 //     this.sort = this.sort.bind(this);
 //   }
 
-//   flagRenderer = (flagCode, isPrivate) => {
-//     // Check if the OS is Windows to render the flags as SVGs
-//     // Windows doesn't render the flags as emojis  ¯\_(ツ)_/¯
-//     const isWindows = window.navigator.appVersion.indexOf("Win") !== -1;
-//     return (
-//       <span className="f4 pr2">
-//         {isPrivate ? (
-//           "🤝"
-//         ) : flagCode ? (
-//           <CountryFlag code={flagCode} svg={isWindows} />
-//         ) : (
-//           "🌐"
-//         )}
-//       </span>
-//     );
-//   };
-
-//   locationCellRenderer = ({ rowData }) => {
-//     const ref = React.createRef();
-//     const location = rowData.isPrivate ? (
-//       this.props.t("localNetwork")
-//     ) : rowData.location ? (
-//       rowData.isNearby ? (
-//         <span>
-//           {rowData.location}{" "}
-//           <span className="charcoal-muted">({this.props.t("nearby")})</span>
-//         </span>
-//       ) : (
-//         rowData.location
-//       )
-//     ) : (
-//       <span className="charcoal-muted fw4">
-//         {this.props.t("app:terms.unknown")}
-//       </span>
-//     );
-//     const value = rowData.location || this.props.t("app:terms.unknown");
-//     return (
-//       <CopyToClipboard
-//         text={value}
-//         onCopy={() => copyFeedback(ref, this.props.t)}
-//       >
-//         <span title={value} className="copyable" ref={ref}>
-//           {this.flagRenderer(rowData.flagCode, rowData.isPrivate)}
-//           {location}
-//         </span>
-//       </CopyToClipboard>
-//     );
-//   };
-
 //   latencyCellRenderer = ({ cellData, rowData }) => {
 //     const style = { width: "60px" };
 //     const latency = `${cellData}ms`;
@@ -91,69 +48,6 @@ import "react-virtualized/styles.css";
 //         </span>
 //       );
 //     return <span className="dib no-select">{latency}</span>;
-//   };
-
-//   peerIdCellRenderer = ({ cellData: peerId }) => {
-//     const ref = React.createRef();
-//     const p2pMultiaddr = `/p2p/${peerId}`;
-//     return (
-//       <CopyToClipboard
-//         text={p2pMultiaddr}
-//         onCopy={() => copyFeedback(ref, this.props.t)}
-//       >
-//         <Cid value={peerId} identicon ref={ref} className="copyable" />
-//       </CopyToClipboard>
-//     );
-//   };
-
-//   protocolsCellRenderer = ({ rowData, cellData }) => {
-//     const ref = React.createRef();
-//     const { protocols } = rowData;
-//     const title = protocols.split(", ").join("\n");
-//     return (
-//       <CopyToClipboard
-//         text={protocols}
-//         onCopy={() => copyFeedback(ref, this.props.t)}
-//       >
-//         <span ref={ref} className="copyable" title={title}>
-//           {protocols.replaceAll("[unnamed]", "🤔")}
-//         </span>
-//       </CopyToClipboard>
-//     );
-//   };
-
-//   connectionCellRenderer = ({ rowData }) => {
-//     const ref = React.createRef();
-//     const { address, direction, peerId } = rowData;
-//     const p2pMultiaddr = `${address}/p2p/${peerId}`;
-//     const title =
-//       direction != null
-//         ? `${address}\n(${renderDirection(direction, this.props.t)})`
-//         : address;
-
-//     return (
-//       <CopyToClipboard
-//         text={p2pMultiaddr}
-//         onCopy={() => copyFeedback(ref, this.props.t)}
-//       >
-//         <abbr ref={ref} className="copyable" title={title}>
-//           {rowData.connection}
-//         </abbr>
-//       </CopyToClipboard>
-//     );
-//   };
-
-//   rowClassRenderer = ({ index }, peers = []) => {
-//     const { selectedPeers } = this.props;
-//     const shouldAddHoverEffect = selectedPeers?.peerIds?.includes(
-//       peers[index]?.peerId
-//     );
-
-//     return classNames(
-//       "bb b--near-white peersTableItem",
-//       index === -1 && "bg-near-white",
-//       shouldAddHoverEffect && "bg-light-gray"
-//     );
 //   };
 
 //   sort({ sortBy, sortDirection }) {
@@ -251,21 +145,13 @@ import "react-virtualized/styles.css";
 //   }
 // };
 
-// // temporarily replaces contents of element with 'copied!'
-// const copyFeedback = (ref, t) => {
-//   const tag = ref.current;
-//   const { parentNode } = tag;
-//   const msg = document.createElement("em");
-//   msg.innerText = t("copyFeedback");
-//   parentNode.replaceChild(msg, tag);
-//   setTimeout(() => parentNode.replaceChild(tag, msg), ms.seconds(2));
-// };
-
-import React, { useContext } from "react";
+import React, { useContext, useState } from "react";
 import { ActiveJobsProps } from "../service/DaemonService";
 import Web3 from "web3";
 import { auctionStatusMapper } from "../utils";
 import { DaemonContext } from "../providers/ServiceProviders";
+import { makeStyles, Typography } from "@material-ui/core";
+import { theme } from "../providers/MorphwareTheme";
 
 const mockData = {
   canTakeWork: true,
@@ -785,7 +671,7 @@ const mockData = {
       },
     },
     "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB:13": {
-      id: "13",
+      id: "1",
       instanceId: "0xF85CeEB0b76B74205caa2E1a72cDc085bC6eB9BB:13",
       wallet: "0x5733592919406a356192bA957E7DFfb74fb62d1a",
       type: "worker",
@@ -1053,14 +939,37 @@ const activeJobsV2 = activeJobs.map((job) => {
 console.log("activeJobsVe: ", activeJobsV2);
 console.log("length: ", activeJobsV2.length);
 
+const styles = makeStyles({
+  tableHeader: {
+    color: theme.metaDataContainer?.main,
+    fontWeight: 600,
+  },
+});
+
 const PeersTable = () => {
   const daemonService = useContext(DaemonContext);
+  const [sortBy, setSortBy] = useState("jobID");
+  const [sortDirection, setSortDirection] = useState<SortDirectionType>(
+    SortDirection.ASC
+  );
 
   const activeJobsResponse = daemonService.activeJobs;
   const activeJobs = activeJobsResponse
     ? Object.values(activeJobsResponse.jobs)
     : [];
-  const activeJobsFiltered = activeJobs.map((job) => {
+  const activeJobsMock = mockData ? Object.values(mockData.jobs) : [];
+  const manyActiveJobs = [
+    ...activeJobsMock,
+    ...activeJobsMock,
+    ...activeJobsMock,
+    ...activeJobsMock,
+    ...activeJobsMock,
+    ...activeJobsMock,
+    ...activeJobsMock,
+    ...activeJobsMock,
+  ];
+
+  const activeJobsFiltered = manyActiveJobs.map((job) => {
     return {
       jobID: job.id,
       biddingDeadline: job.jobData.biddingDeadline,
@@ -1071,7 +980,11 @@ const PeersTable = () => {
     };
   });
 
-  console.log("FINAL: ", activeJobsFiltered);
+  const sortedJobs = activeJobsFiltered.sort(
+    sortByProperty(sortBy, sortDirection === SortDirection.ASC ? 1 : -1)
+  );
+
+  const classes = styles();
 
   const biddingDeadlineRenderer = ({ cellData, rowData }: any) => {
     const style = { width: "60px" };
@@ -1125,56 +1038,73 @@ const PeersTable = () => {
     return <span className="dib no-select">{status}</span>;
   };
 
+  const sort = ({
+    sortBy,
+    sortDirection,
+  }: {
+    sortBy: string;
+    sortDirection: SortDirectionType;
+  }) => {
+    setSortBy(sortBy);
+    setSortDirection(sortDirection);
+  };
+
   return (
     <div>
-      <AutoSizer disableHeight>
-        {({ width }) => (
-          <Table
-            width={1200}
-            height={500}
-            headerHeight={20}
-            rowHeight={30}
-            rowCount={activeJobsFiltered.length}
-            rowGetter={({ index }) => activeJobsFiltered[index]}
-          >
-            <Column
-              label="Job ID"
-              cellRenderer={jobIdRenderer}
-              dataKey="jobID"
-              width={100}
-              // className="f6 charcoal truncate pl2"
-            />
-            <Column
-              label="Bidding Deadline"
-              cellRenderer={biddingDeadlineRenderer}
-              dataKey="biddingDeadline"
-              width={440}
-              // className="f6 charcoal truncate pl2"
-            />
-            <Column
-              label="Training Data Size"
-              //  cellRenderer={this.locationCellRenderer}
-              dataKey="trainingDataSize"
-              width={300}
-              className="f6 charcoal truncate pl2"
-            />
-            <Column
-              label="Worker Reward (MWT)"
-              cellRenderer={mwtRenderer}
-              dataKey="workerReward"
-              width={400}
-              className="f6 charcoal truncate pl2"
-            />
-            <Column
-              label="Status"
-              cellRenderer={statusRenderer}
-              dataKey="status"
-              width={700}
-              className="f6 charcoal truncate pl2"
-            />
-          </Table>
-        )}
-      </AutoSizer>
+      <Typography variant="body1">
+        <AutoSizer disableHeight>
+          {({ width }) => (
+            <Table
+              width={1200}
+              height={400}
+              headerHeight={20}
+              rowHeight={30}
+              rowCount={activeJobsFiltered.length}
+              rowGetter={({ index }) => sortedJobs[index]}
+              sortBy={sortBy}
+              sortDirection={sortDirection}
+              sort={sort}
+              headerClassName={classes.tableHeader}
+            >
+              <Column
+                label="Job ID"
+                cellRenderer={jobIdRenderer}
+                dataKey="jobID"
+                width={200}
+                // className="f6 charcoal truncate pl2"
+              />
+              <Column
+                label="Bidding Deadline"
+                cellRenderer={biddingDeadlineRenderer}
+                dataKey="biddingDeadline"
+                width={440}
+                // className="f6 charcoal truncate pl2"
+              />
+              <Column
+                label="Training Data Size"
+                //  cellRenderer={this.locationCellRenderer}
+                dataKey="trainingDataSize"
+                width={400}
+                className="f6 charcoal truncate pl2"
+              />
+              <Column
+                label="Worker Reward (MWT)"
+                cellRenderer={mwtRenderer}
+                dataKey="workerReward"
+                width={450}
+                className="f6 charcoal truncate pl2"
+              />
+              <Column
+                label="Status"
+                cellRenderer={statusRenderer}
+                dataKey="status"
+                width={700}
+                className="f6 charcoal truncate pl2"
+              />
+            </Table>
+          )}
+        </AutoSizer>
+      </Typography>
     </div>
   );
 };
@@ -1183,3 +1113,10 @@ export default PeersTable;
 
 //Collumns
 //Job ID | biddingDeadline | training dataset size | worker reward | status
+
+function sortByProperty(property: any, dir = 1) {
+  // @ts-ignore - `a` and `b` may not be numbers
+  return ({ [property]: a }, { [property]: b }) =>
+    // @ts-ignore - `a` and `b` may not be numbers
+    (a == null) - (b == null) || dir * +(a > b) || dir * -(a < b);
+}
