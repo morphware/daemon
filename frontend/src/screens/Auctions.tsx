@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { theme } from "../providers/MorphwareTheme";
 import AuctionsTable from "../components/AuctionsTable";
-import { Typography } from "@material-ui/core";
+import { Grid, Paper, Typography } from "@material-ui/core";
 import { DaemonContext } from "../providers/ServiceProviders";
 
 const styles = makeStyles(() =>
@@ -11,9 +11,6 @@ const styles = makeStyles(() =>
       backgroundColor: theme.background?.main,
       height: "calc(100vh - 120px)",
       padding: "50px 50px 0px",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
     },
     statisticNumber: {
       color: "#1aae9f",
@@ -33,13 +30,27 @@ const Auctions = () => {
 
   return (
     <div className={classes.root}>
-      <Typography variant="h4" className={classes.statisticNumber}>
-        {activeJobs}
-      </Typography>
-      <Typography variant="h5" style={{ paddingBottom: "20px" }}>
-        Live Morphware Auctions
-      </Typography>
-      <AuctionsTable />
+      <Paper
+        style={{
+          backgroundColor: theme.formSectionBackground?.main,
+          paddingTop: 30,
+        }}
+        elevation={0}
+      >
+        <Grid container>
+          <Grid item xs={12}>
+            <Typography variant="h4" className={classes.statisticNumber}>
+              {activeJobs}
+            </Typography>
+          </Grid>
+          <Grid item xs={12}>
+            <Typography variant="h5" style={{ paddingBottom: "20px" }}>
+              Live Morphware Auctions
+            </Typography>
+          </Grid>
+          <AuctionsTable />
+        </Grid>
+      </Paper>
     </div>
   );
 };

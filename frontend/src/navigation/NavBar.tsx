@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useState } from "react";
-import logo from "../assets/logoV2.png";
+import logo from "../assets/logoV3.png";
 import homeNav from "../assets/train.png";
 import torrentsNav from "../assets/torrents.png";
 import settings from "../assets/settings.png";

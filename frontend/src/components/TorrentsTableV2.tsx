@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useState } from "react";
 import { DaemonContext } from "../providers/ServiceProviders";
 import {
@@ -12,6 +13,7 @@ import { IconButton, makeStyles, Typography } from "@material-ui/core";
 import { theme } from "../providers/MorphwareTheme";
 import { copyToClipBoard } from "../utils";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
+import "./AuctionsTable.css";
 
 const styles = makeStyles({
   tableHeader: {
@@ -19,6 +21,41 @@ const styles = makeStyles({
     fontWeight: 600,
   },
 });
+
+const mockTorrents = [
+  {
+    name: "name",
+    magnetURI: "www.google",
+    progress: "5%",
+    numPeers: "2",
+    timeRemaining: "12",
+    downloadSpeed: "10",
+  },
+  {
+    name: "name",
+    magnetURI: "www.google",
+    progress: "5%",
+    numPeers: "2",
+    timeRemaining: "12",
+    downloadSpeed: "10",
+  },
+  {
+    name: "name",
+    magnetURI: "www.google",
+    progress: "5%",
+    numPeers: "2",
+    timeRemaining: "12",
+    downloadSpeed: "10",
+  },
+  {
+    name: "name",
+    magnetURI: "www.google",
+    progress: "5%",
+    numPeers: "2",
+    timeRemaining: "12",
+    downloadSpeed: "10",
+  },
+];
 
 const TorrentsTableV2 = () => {
   const daemonService = useContext(DaemonContext);
@@ -28,11 +65,11 @@ const TorrentsTableV2 = () => {
   );
   const classes = styles();
 
-  const torrents = daemonService.torrents?.torrents
-    ? daemonService.torrents?.torrents
-    : [];
+  // const torrents = daemonService.torrents?.torrents
+  //   ? daemonService.torrents?.torrents
+  //   : [];
 
-  const sortedTorrents = torrents.sort(
+  const sortedTorrents = mockTorrents.sort(
     sortByProperty(sortBy, sortDirection === SortDirection.ASC ? 1 : -1)
   );
 
@@ -46,7 +83,10 @@ const TorrentsTableV2 = () => {
   const genericCell = ({ cellData }: any) => {
     if (cellData == null)
       return (
-        <span className="dib o-40 no-select" style={{ width: "100%" }}>
+        <span
+          className="dib o-40 no-select"
+          style={{ width: "100%", backgroundColor: "white" }}
+        >
           -
         </span>
       );
@@ -83,6 +123,7 @@ const TorrentsTableV2 = () => {
   };
 
   console.log("sortedTorrents: ", sortedTorrents);
+  //              rowClassName="react_virtualised_row_custom"
 
   return (
     <div style={{ maxWidth: 1800, width: "100%" }}>
@@ -90,7 +131,7 @@ const TorrentsTableV2 = () => {
         <AutoSizer disableHeight style={{ width: "100%" }}>
           {({ width }) => (
             <Table
-              rowClassName="TEST_CLASS_NAME"
+              // rowClassName="react_virtualised_row_custom"
               width={width}
               height={400}
               headerHeight={20}
@@ -101,6 +142,7 @@ const TorrentsTableV2 = () => {
               sortDirection={sortDirection}
               sort={sort}
               headerClassName={classes.tableHeader}
+              // rowClassName={classes.tableHeader}
               rowStyle={{ width: "100%" }}
             >
               <Column
@@ -119,7 +161,7 @@ const TorrentsTableV2 = () => {
                 label="Download Speed (Mbps)"
                 cellRenderer={genericCell}
                 dataKey="downloadSpeed"
-                width={width * 0.2}
+                width={width * 0.22}
                 className="f6 charcoal truncate pl2"
               />
               <Column
