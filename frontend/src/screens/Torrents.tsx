@@ -59,8 +59,14 @@ const Torrents = () => {
               Port
             </Typography>
           </Grid>
+          <Grid
+            item
+            xs={12}
+            style={{ display: "flex", justifyContent: "center" }}
+          >
+            <TorrentsTableV2 />
+          </Grid>
         </Grid>
-        <TorrentsTableV2 />
       </Paper>
     </div>
   );

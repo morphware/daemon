@@ -48,7 +48,13 @@ const Auctions = () => {
               Live Morphware Auctions
             </Typography>
           </Grid>
-          <AuctionsTable />
+          <Grid
+            item
+            xs={12}
+            style={{ display: "flex", justifyContent: "center" }}
+          >
+            <AuctionsTable />
+          </Grid>
         </Grid>
       </Paper>
     </div>
