@@ -20,7 +20,7 @@ import { formFieldsMapper } from "../mappers/TrainModelFormMappers";
 import { theme } from "../providers/MorphwareTheme";
 import { makeStyles } from "@material-ui/core";
 import PositionedSnackbar from "./PositionedSnackbar";
-import { snackBarProps } from "../components/PositionedSnackbar";
+import { snackBarProps } from "./PositionedSnackbar";
 import FileField from "./FileField";
 import { Switches } from "mui-rff";
 

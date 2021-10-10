@@ -62,7 +62,10 @@ const FileField = ({
   };
 
   const fileName = (files?: FileList | null) => {
-    return fileUploaded && files?.length === 1 ? files[0].name : "";
+    const fileName = fileUploaded && files?.length === 1 ? files[0].name : "";
+    const truncatedFileName =
+      fileName.length <= 25 ? fileName : fileName.substring(0, 25) + "...";
+    return truncatedFileName;
   };
 
   const fileSize = (files?: FileList | null) => {
@@ -204,7 +207,7 @@ const FileField = ({
                   style={{ height: "100%", width: "80%" }}
                 >
                   <Button
-                    style={{ width: "100%", display: "flex", height: "80%" }}
+                    style={{ width: "100%", display: "flex", height: "50px" }}
                     component="span"
                     variant="contained"
                     // variant="outlined"

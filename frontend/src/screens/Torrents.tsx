@@ -1,7 +1,7 @@
 import React, { useContext } from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { theme } from "../providers/MorphwareTheme";
-import TorrentsTableV2 from "../components/TorrentsTableV2";
+import TorrentsTable from "../components/TorrentsTable";
 import { Grid, Paper, Typography } from "@material-ui/core";
 import { DaemonContext } from "../providers/ServiceProviders";
 
@@ -64,7 +64,7 @@ const Torrents = () => {
             xs={12}
             style={{ display: "flex", justifyContent: "center" }}
           >
-            <TorrentsTableV2 />
+            <TorrentsTable />
           </Grid>
         </Grid>
       </Paper>
