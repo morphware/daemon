@@ -62,7 +62,8 @@ export const theme: ThemeProps = createTheme({
       main: "#dbd9d9",
     },
     secondary: {
-      main: "#55341",
+      // main: "#55341",
+      main: "#5B676D",
     },
   },
   typography: {

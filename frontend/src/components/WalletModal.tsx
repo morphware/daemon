@@ -119,7 +119,7 @@ const WalletModal = () => {
                 style={{ fontSize: 30 }}
               />
             ) : (
-              <CallMadeIcon color="primary" style={{ fontSize: 30 }} />
+              <CallMadeIcon color="secondary" style={{ fontSize: 30 }} />
             )}
           </Box>
           <Box padding={1}>
@@ -386,8 +386,9 @@ const WalletModal = () => {
               >
                 <Grid item xs={6}>
                   <Button
-                    variant={toggleModal ? "contained" : "outlined"}
-                    color={toggleModal ? "primary" : "secondary"}
+                    // variant={toggleModal ? "contained" : "outlined"}
+                    variant="contained"
+                    color={toggleModal ? "secondary" : "primary"}
                     style={{ width: "60%" }}
                     onClick={() => {
                       if (!toggleModal) {
@@ -410,8 +411,9 @@ const WalletModal = () => {
                   {/* Toggal modal is False */}
                   <Button
                     type="submit"
+                    // variant={toggleModal ? "outlined" : "contained"}
                     variant="contained"
-                    color={toggleModal ? "secondary" : "primary"}
+                    color={toggleModal ? "primary" : "secondary"}
                     style={{ width: "60%" }}
                     onClick={() => {
                       if (toggleModal) {
