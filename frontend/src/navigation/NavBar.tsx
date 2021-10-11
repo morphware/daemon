@@ -1,20 +1,23 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import logo from "../assets/logoV2.png";
 import homeNav from "../assets/train.png";
 import torrentsNav from "../assets/torrents.png";
 import settings from "../assets/settings.png";
+import stats from "../assets/stats.png";
+import auctions from "../assets/auctionsV2.png";
 import { Link } from "react-router-dom";
 import { theme } from "../providers/MorphwareTheme";
 import { Grid, makeStyles, Typography } from "@material-ui/core";
 import WalletModal from "../components/WalletModal";
+import { DaemonContext } from "../providers/ServiceProviders";
 
 enum navOptions {
+  Home = "Home",
   Train = "Train",
   Torrents = "Torrents",
-  ShareCompute = "Share Compute",
-  Activity = "Activity",
   Settings = "Settings",
+  Auctions = "Auctions",
 }
 
 interface NavLinkProps {
@@ -69,6 +72,9 @@ const styles = makeStyles({
     paddingTop: "20px",
     paddingBottom: "20px",
     width: "100%",
+    // "&:hover": {
+    //   curser: "pointer",
+    // },
   },
 });
 
@@ -100,22 +106,36 @@ const NavLink = ({ to, icon, title, setSelected, selected }: NavLinkProps) => {
 };
 
 const NavBar = () => {
+  const { clientVersion } = useContext(DaemonContext);
   const [selectedNavItem, setSelectedNavItem] = useState<navOptions>(
-    navOptions.Train
+    navOptions.Auctions
   );
 
   const classes = styles();
 
   return (
     <Grid container direction="column" className={classes.navContainer}>
-      <Grid item className={classes.logoContainer}>
+      <Grid
+        item
+        className={classes.logoContainer}
+        // onClick={() => setSelectedNavItem(navOptions.Home)}
+      >
+        {/* <Link className={classes.itemLink} to={"/"}> */}
         <img src={logo} alt="Morphware Logo" width="85%" />
+        {/* </Link> */}
       </Grid>
       <Grid item className="navbar-content">
         <NavLink
+          title={navOptions.Auctions}
+          icon={auctions}
+          to="/auctions"
+          setSelected={setSelectedNavItem}
+          selected={navOptions.Auctions === selectedNavItem}
+        ></NavLink>
+        <NavLink
           title={navOptions.Train}
           icon={homeNav}
-          to="/"
+          to="/train"
           setSelected={setSelectedNavItem}
           selected={navOptions.Train === selectedNavItem}
         ></NavLink>
@@ -154,6 +174,7 @@ const NavBar = () => {
           />
         </IconButton> */}
         <WalletModal />
+        <Typography variant="body2">V{clientVersion}</Typography>
       </Grid>
     </Grid>
   );

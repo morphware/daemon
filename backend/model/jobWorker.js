@@ -1,5 +1,6 @@
 'use strict';
 
+const fs = require('fs-extra');
 const crypto = require('crypto');
 const checkDiskSpace = require('check-disk-space').default;
 
@@ -8,6 +9,17 @@ const webtorrent = require('../controller/torrent');
 const {web3, percentHelper} = require('./contract');
 const {wallet} = require('./morphware');
 const {Job} = require('./job');
+
+const {exec} = require('./python');
+
+(async function(){
+	try{
+		console.log(await exec('python', '/home/william/test.py'))
+
+	}catch(error){
+		console.error('here error', error)
+	}
+})()
 
 /*
 JobWorker extends the common functions of Job class and is responsible for
@@ -46,8 +58,10 @@ class JobWorker extends Job{
 	}
 
 	removeFromJump(){
-		super.removeFromJump()
-		this.constructor.lock = false;
+		try{
+			super.removeFromJump()
+			this.constructor.lock = false;
+		}catch(error){}
 	}
 
 	// Check to see if the client is ready and willing to take on jobs
@@ -85,6 +99,7 @@ class JobWorker extends Job{
 				job.__JobDescriptionPosted(event);
 			}
 		}catch(error){
+			this.removeFromJump();
 			console.error(`ERROR JobWorker __process_event`, error)
 		}
 	}
@@ -147,6 +162,7 @@ class JobWorker extends Job{
 			return receipt;
 
 		}catch(error){
+			this.removeFromJump();
 			console.log(`ERROR!!! JobWorker bid`, this.instanceId, error);
 			throw 'error';
 		}
@@ -173,6 +189,7 @@ class JobWorker extends Job{
 
 			return receipt;
 		}catch(error){
+			this.removeFromJump();
 			console.error('ERROR!!! JobWorker reveal', this.instanceId, error);
 		}
 	}
@@ -210,10 +227,10 @@ class JobWorker extends Job{
 
 			return receipt;
 		}catch(error){
+			this.removeFromJump();
 			console.error('ERROR JobWorker withdraw', error)
 		}
 	}
-
 
 	/*
 	Events
@@ -244,17 +261,20 @@ class JobWorker extends Job{
 			// Calculate start of the reveal window
 			var now = Math.floor(new Date().getTime());
 			var biddingDeadline = parseInt(this.jobData.biddingDeadline);
-			var waitTimeInMS1 = ((biddingDeadline*1000 - now)+40000);
+			var waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
 
 			console.log('Revealing bid in', waitTimeInMS1/1000, 'at', new Date(now + waitTimeInMS1).toLocaleString());
 
 			await this.bid();
 
+			waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
+
 			// reveal the bid during the reveal window
 			setTimeout(()=>{
 				this.reveal();
-			}, waitTimeInMS1);
+			}, ((biddingDeadline+10)*1000)-now);
 		}catch(error){
+			this.removeFromJump();
 			console.error(`ERROR!!! JobWorker __JobDescriptionPosted`, error)
 		}
 	}
@@ -271,23 +291,44 @@ class JobWorker extends Job{
 			}else{
 
 				console.log('We lost...', this.instanceId);
-
-				// Return your bid escrow
-				await this.withdraw();
 				
 				// Drop this instance instance from the jump table
 				this.removeFromJump();
+
+				// Return your bid escrow
+				await this.withdraw();
 			}
 
 
 		}catch(error){
+			this.removeFromJump();
 			console.error('ERROR!!! `AuctionEnded`', error);
 		}
 	}
 
 	async UntrainedModelAndTrainingDatasetShared(event){
-		console.log(event)
-		// get files and do work
+		try{
+
+			this.downloadPath = `${conf.appDownloadPath}${this.jobData.jobPoster}/${this.id}`;
+
+			// Make sure download spot exists
+			fs.ensureDirSync(this.downloadPath);
+
+			// Download the shared files
+			let downloads = await webtorrent().downloadAll(this.downloadPath, event.returnValues.untrainedModelMagnetLink, event.returnValues.trainingDatasetMagnetLink);
+
+			console.log('Downloads', downloads);
+
+			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
+
+			await exec('python', downloads[0].file.path, downloads[1].file.path);
+
+
+		}catch(error){
+			this.removeFromJump();
+			console.error('ERROR!!! JobWorker UntrainedModelAndTrainingDatasetShared', this.instanceId, error);
+		}
+
 		// when the work is done, share the results
 	}
 }

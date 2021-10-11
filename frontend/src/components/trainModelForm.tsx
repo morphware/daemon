@@ -22,6 +22,7 @@ import { makeStyles } from "@material-ui/core";
 import PositionedSnackbar from "./PositionedSnackbar";
 import { snackBarProps } from "../components/PositionedSnackbar";
 import FileField from "./FileField";
+import { Switches } from "mui-rff";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;
@@ -45,7 +46,7 @@ export interface formFields {
   errorRate: number;
   biddingTime: number;
   workerReward: number;
-  testModel: string;
+  testModel: boolean;
 }
 interface formFieldsErrors {
   jupyterNotebook: string;
@@ -66,6 +67,7 @@ const TrainModelForm = () => {
   const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
 
   const onSubmit = async (values: formFields) => {
+    values.biddingTime = 60;
     const formFields = formFieldsMapper(values);
     const responseV2 = await daemonService.submitTrainModelRequest(formFields);
 
@@ -100,9 +102,6 @@ const TrainModelForm = () => {
         }
         if (!values.testingData) {
           errors.testingData = "Required";
-        }
-        if (!values.testModel) {
-          errors.testModel = "Required";
         }
         if (values.biddingTime <= 0) {
           errors.biddingTime = "Must be greater than 0";
@@ -259,6 +258,7 @@ const TrainModelForm = () => {
                       name="biddingTime"
                       required={true}
                       type="number"
+                      value={60}
                       style={{
                         width: "80%",
                         display: "flex",
@@ -281,21 +281,10 @@ const TrainModelForm = () => {
                   </Grid>
                 </Grid>
                 <Grid item xs={4}>
-                  <Radios
+                  <Switches
+                    label="Test Model"
                     name="testModel"
-                    required={true}
-                    gridSize={7}
-                    color="primary"
-                    data={[
-                      {
-                        label: "Test Model",
-                        value: "yes",
-                      },
-                      {
-                        label: "Do not Test Model",
-                        value: "no",
-                      },
-                    ]}
+                    data={{ label: "", value: true }}
                   />
                 </Grid>
               </Grid>

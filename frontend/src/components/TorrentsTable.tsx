@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useMemo, useState } from "react";
 import clsx from "clsx";
 import {

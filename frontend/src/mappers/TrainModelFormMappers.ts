@@ -25,6 +25,6 @@ export const formFieldsMapper = (fields: formFields) => {
   formFieldsDto.biddingTime = fields.biddingTime;
   formFieldsDto.errorRate = fields.errorRate;
   formFieldsDto.workerReward = fields.workerReward;
-  formFieldsDto.testModel = fields.testModel === "yes" ? true : false;
+  formFieldsDto.testModel = fields.testModel;
   return formFieldsDto;
 };

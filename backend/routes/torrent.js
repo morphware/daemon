@@ -5,8 +5,10 @@ const webtorrent = require('../controller/torrent');
 
 router.get('/', async function(req, res, next){
 	try{
+
+
 		let torrents = [];
-		for(let torrent of webtorrent.torrents){
+		for(let torrent of webtorrent().torrents){
 			torrents.push({
 				name: torrent.info.name.toString(),
 				progress: torrent.progress,
@@ -19,9 +21,9 @@ router.get('/', async function(req, res, next){
 		}
 
 		res.json({
-			download: webtorrent.downloadSpeed,
-			upload: webtorrent.uploadSpeed,
-			port: webtorrent.torrentPort,
+			download: webtorrent().downloadSpeed,
+			upload: webtorrent().uploadSpeed,
+			port: webtorrent().torrentPort,
 			torrents: torrents,
 		});
 

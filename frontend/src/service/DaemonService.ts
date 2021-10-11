@@ -43,6 +43,55 @@ export interface TransactionProps {
   };
 }
 
+export interface JobTransactionProps {
+  address: string;
+  blockHash: string;
+  blockNumber: number;
+  logIndex: number;
+  removed: boolean;
+  transactionHash: string;
+  transactionIndex: number;
+  id: string;
+  event: string;
+  signature: string;
+  cumulativeGasUsed?: number;
+  effectiveGasPrice?: string;
+  gasUsed?: number;
+  logsBloom?: string;
+  status?: boolean;
+  to?: string;
+  contractAddress?: string | null;
+  from?: string;
+  type?: string;
+
+  raw: {
+    data: string;
+    topics: Array<string>;
+  };
+  returnValues: {
+    0: string;
+    1: string;
+    2: string;
+    3: string;
+    4: string;
+    5: string;
+    6: string;
+    7: string;
+    id: string;
+    jobPoster: string;
+    auctionAddress: string;
+    estimatedTrainingTime: string;
+    trainingDatasetSize: string;
+    workerReward: string;
+    biddingDeadline: string;
+    revealDeadline: string;
+    __length__?: number;
+    from?: string;
+    to?: string;
+    value?: string;
+  };
+}
+
 export interface WalletHistoryProps {
   transactions: Array<TransactionProps>;
   address: string;
@@ -66,7 +115,9 @@ export interface SubmitTrainingModelResponse {
 }
 
 export interface SettingsParamsResponseProps {
-  conf: any;
+  conf: {
+    version: string;
+  };
   editKeys: {
     httpBindAddress: string;
     httpPort: string;
@@ -86,8 +137,62 @@ export interface SettingsRequestProps {
   appDownloadPath?: string;
 }
 
+interface trainModelPostDataResponse {
+  jupyterNotebook: string;
+  trainingData: string;
+  testingData: string;
+  stopMethod: string;
+  autoStopMethod: string;
+  trainingTime: string;
+  errorRate: string;
+  biddingTime: string;
+  workerReward: string;
+  testModel: boolean;
+  files: {
+    jupyterNotebook: {
+      path: string;
+      magnetURI: string;
+    };
+    trainingData: {
+      path: string;
+      magnetURI: string;
+    };
+    testingData: {
+      path: string;
+      magnetURI: string;
+    };
+  };
+}
+
 export interface SettingsResponseProps extends SettingsRequestProps {
   error?: any;
+}
+
+export interface jobProps {
+  instanceID: string;
+  id: string;
+  type: string;
+  wallet: string;
+  postData?: trainModelPostDataResponse;
+  status: string;
+  transactions: Array<JobTransactionProps>;
+  jobData: {
+    auctionAddress: string;
+    biddingDeadline: string;
+    revealDeadline: string;
+    estimatedTrainingTime: string;
+    id: string;
+    jobPoster: string;
+    trainingDatasetSize: string;
+    workerReward: string;
+  };
+}
+
+export interface ActiveJobsProps {
+  canTakeWork: boolean;
+  jobs: {
+    [property: string]: jobProps;
+  };
 }
 
 export interface IDaemonService {
@@ -110,6 +215,19 @@ export class DaemonService implements IDaemonService {
     "http://" + (window.localStorage.getItem("url") || "127.0.0.1:3001");
 
   constructor() {}
+
+  public getTrackedJobs = async (): Promise<ActiveJobsProps> => {
+    const url = `${this.baseUrl}/api/V0/job`;
+
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const activeJobs: ActiveJobsProps = await response.json();
+    return activeJobs;
+  };
 
   public getConnectionStatus = async (): Promise<ConnectionStatusProps> => {
     const url = `${this.baseUrl}/api/V0/network`;

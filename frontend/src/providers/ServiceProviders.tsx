@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { ITrainingModelValuesV2 } from "../mappers/TrainModelFormMappers";
 import {
+  ActiveJobsProps,
   ActiveTorrents,
   DaemonService,
   SendMWTRequestProps,
@@ -26,6 +27,8 @@ interface daemonServiceProps {
   connectionStatus: boolean;
   network?: string;
   currentConfigs?: SettingsResponseProps;
+  activeJobs?: ActiveJobsProps;
+  clientVersion: string;
   getTorrents: () => Promise<void>;
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -39,6 +42,7 @@ interface daemonServiceProps {
   ): Promise<SettingsResponseProps>;
   getSettings(): Promise<void>;
   getCurrentSettings(): Promise<void>;
+  setActiveJobs(): Promise<void>;
 }
 
 const MWSBalance = "0xbc40e97e6d665ce77e784349293d716b030711bc";
@@ -52,8 +56,15 @@ const ServiceProviders: React.FC = ({ children }) => {
   const [connectionStatus, setConnectionStatus] = useState<boolean>(false);
   const [network, setNetwork] = useState<string>();
   const [currentConfigs, setCurrentConfigs] = useState<SettingsResponseProps>();
+  const [activeJobs, setActiveJobs] = useState<ActiveJobsProps>();
   const [configParams, setConfigParams] =
     useState<SettingsParamsResponseProps>();
+  const [clientVersion, setClientVersion] = useState<string>("");
+
+  const getActiveJobs = async () => {
+    const activeJobs = await daemonService.getTrackedJobs();
+    setActiveJobs(activeJobs);
+  };
 
   const getTorrents = async () => {
     const torrents = await daemonService.getActiveTorrents();
@@ -114,7 +125,10 @@ const ServiceProviders: React.FC = ({ children }) => {
 
   const getSettings = async () => {
     const response = await daemonService.getSettings();
+    console.log("SETTINGS", response);
     setConfigParams(response);
+    const version = response.conf.version;
+    setClientVersion(version);
   };
 
   const getCurrentSettings = async () => {
@@ -134,6 +148,8 @@ const ServiceProviders: React.FC = ({ children }) => {
     connectionStatus: connectionStatus,
     network: network,
     currentConfigs: currentConfigs,
+    activeJobs: activeJobs,
+    clientVersion: clientVersion,
     getTorrents: getTorrents,
     submitTrainModelRequest: submitTrainModelRequest,
     getBalance: getBalance,
@@ -143,6 +159,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     updateSettings: updateSettings,
     getSettings: getSettings,
     getCurrentSettings: getCurrentSettings,
+    setActiveJobs: getActiveJobs,
   };
 
   useEffect(() => {
@@ -150,6 +167,8 @@ const ServiceProviders: React.FC = ({ children }) => {
       await getConnectionStatus();
       await getBalance();
       await getWalletHistory();
+      await getActiveJobs();
+      await getTorrents();
     }, 10000);
     return () => clearInterval(interval);
   }, []);
@@ -159,6 +178,8 @@ const ServiceProviders: React.FC = ({ children }) => {
     getBalance();
     getWalletHistory();
     getCurrentSettings();
+    getActiveJobs();
+    getSettings();
   }, []);
 
   return (
