@@ -34,8 +34,8 @@ const App = () => {
           <NavBar />
           <Box style={{ width: "90vw" }}>
             <Switch>
-              <Route exact path="/" component={Home} />
-              <Route path="/auctions" component={Auctions} />
+              <Route exact path="/" component={Auctions} />
+              {/* <Route path="/auctions" component={Auctions} /> */}
               <Route path="/train" component={TrainModel} />
               <Route path="/torrents" component={Torrents} />
               <Route path="/settings" component={Settings} />

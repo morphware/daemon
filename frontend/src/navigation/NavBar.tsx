@@ -118,17 +118,17 @@ const NavBar = () => {
       <Grid
         item
         className={classes.logoContainer}
-        onClick={() => setSelectedNavItem(navOptions.Home)}
+        // onClick={() => setSelectedNavItem(navOptions.Home)}
       >
-        <Link className={classes.itemLink} to={"/"}>
-          <img src={logo} alt="Morphware Logo" width="85%" />
-        </Link>
+        {/* <Link className={classes.itemLink} to={"/"}> */}
+        <img src={logo} alt="Morphware Logo" width="85%" />
+        {/* </Link> */}
       </Grid>
       <Grid item className="navbar-content">
         <NavLink
           title={navOptions.Auctions}
           icon={auctions}
-          to="/auctions"
+          to="/"
           setSelected={setSelectedNavItem}
           selected={navOptions.Auctions === selectedNavItem}
         ></NavLink>
@@ -164,15 +164,6 @@ const NavBar = () => {
           padding: "20px",
         }}
       >
-        {/* <IconButton
-          style={{ width: "fit-content" }}
-          // onClick={updateTorrents} disabled={fetchingTorrents}
-        >
-          <AccountBalanceWalletIcon
-            style={{ fontSize: 48 }}
-            color="secondary"
-          />
-        </IconButton> */}
         <WalletModal />
         <Typography variant="body2">V{clientVersion}</Typography>
       </Grid>
