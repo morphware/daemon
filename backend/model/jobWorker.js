@@ -176,9 +176,9 @@ class JobWorker extends Job{
 			let action = this.auctionContract.methods.reveal(
 				this.jobData.jobPoster,
 				parseInt(this.id),
-				[this.bidData.bidAmount],
-				[this.bidData.fakeBid],
-				[this.bidData.secret]
+				this.bidData.bidAmount,
+				this.bidData.fakeBid,
+				this.bidData.secret
 			);
 
 			let receipt = await action.send({
