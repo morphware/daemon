@@ -115,7 +115,7 @@ const WalletModal = () => {
           <Box padding={1}>
             {recieving ? (
               <VerticalAlignBottomIcon
-                color="primary"
+                color="secondary"
                 style={{ fontSize: 30 }}
               />
             ) : (
@@ -163,7 +163,7 @@ const WalletModal = () => {
               borderTop: "15px",
               border: "1px solid black",
             }}
-            color="primary"
+            color="secondary"
             variant="outlined"
             onClick={viewAllTransactions}
           >
