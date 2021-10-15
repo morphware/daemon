@@ -130,14 +130,15 @@ class JobPoster extends Job{
 				parseInt(32), // get size this.postData['training-data']
 				parseInt(this.postData.errorRate),
 				percentHelper(this.postData.workerReward, 10),
-				parseInt(biddingDeadline/1000),
-				parseInt(revealDeadline/1000),
-				this.postData.workerReward.toString()
+				this.postData.workerReward.toString(),
+				//TODO: Send clientVersion
 			);
 
 			let receipt = await action.send({
 				gas: await action.estimateGas()
 			});
+
+			console.log("Receipt: ", receipt);
 
 			this.transactions.push({...receipt, event:'postJobDescription'});
 
