@@ -61,9 +61,9 @@ function processPostedJob(job){
                 auctionFactory.methods.reveal(
                     job.jobPoster,
                     parseInt(job.id),
-                    [bidAmount],
-                    [fakeBid],
-                    [secret]
+                    bidAmount,
+                    fakeBid,
+                    secret
                 ).send({
                     from: account.address, gas:'3000000'
                 }).on('receipt', function(receipt) {

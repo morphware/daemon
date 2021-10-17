@@ -176,9 +176,9 @@ class JobWorker extends Job{
 			let action = this.auctionContract.methods.reveal(
 				this.jobData.jobPoster,
 				parseInt(this.id),
-				[this.bidData.bidAmount],
-				[this.bidData.fakeBid],
-				[this.bidData.secret]
+				this.bidData.bidAmount,
+				this.bidData.fakeBid,
+				this.bidData.secret
 			);
 
 			let receipt = await action.send({
@@ -323,6 +323,10 @@ class JobWorker extends Job{
 
 			await exec('python', downloads[0].file.path, downloads[1].file.path);
 
+		    //we are here
+
+			//1. Train the model
+			//2. Torrent it back to the DS
 
 		}catch(error){
 			this.removeFromJump();

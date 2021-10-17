@@ -117,27 +117,25 @@ class JobPoster extends Job{
 			// Calculate the auction timing
 			// This is a hack to deal with block timing. All timing will be
 			// reworked soon and this is the last we will speak of it...
-
-			let revealTime = 120;
-
-			var now = new Date().getTime();
-			let biddingDeadline = now + (parseInt(this.postData.biddingTime) * 1000);
-			let revealDeadline = now + ((parseInt(this.postData.biddingTime ) + revealTime) * 1000);
-
+			
 			// Post the new job
 			let action = this.jobContract.methods.postJobDescription(
 				parseInt(this.postData.trainingTime),
 				parseInt(32), // get size this.postData['training-data']
 				parseInt(this.postData.errorRate),
 				percentHelper(this.postData.workerReward, 10),
-				parseInt(biddingDeadline/1000),
-				parseInt(revealDeadline/1000),
-				this.postData.workerReward.toString()
+				this.postData.workerReward.toString(),
+				//TODO: Send clientVersion
 			);
 
 			let receipt = await action.send({
 				gas: await action.estimateGas()
 			});
+
+			console.log("Receipt: ", receipt);
+
+			let biddingDeadline = (parseInt(receipt.returnValues["0"]) * 1000);
+			let revealDeadline = (parseInt(receipt.returnValues["1"]) * 1000);
 
 			this.transactions.push({...receipt, event:'postJobDescription'});
 
@@ -158,7 +156,8 @@ class JobPoster extends Job{
 			);
 
 			// End the auction when the reveal deadline has passed
-			this.auctionEnd(parseInt(this.postData.biddingTime) + revealTime);
+			// let auctionEndTimeSeconds = (new Date().getTime() - revealDeadline)/1000;
+			this.auctionEnd(parseInt(auctionEndTimeSeconds));
 
 			return receipt.events.JobDescriptionPosted;
 
@@ -347,6 +346,13 @@ class JobPoster extends Job{
 		}catch(error){
 			console.error('ERROR!!! `JobApproved`', error);
 		}
+	}
+
+	//TODO: Add an event listener for JobDescriptionPosted, this will know when to call auctionEnd
+	async JobDescriptionPosted(event){
+		let auctionEndTimeSeconds = (new Date().getTime() - event.returnValues.revealDeadline)/1000;
+		this.auctionEnd(parseInt(auctionEndTimeSeconds));
+		// return receipt.events.JobDescriptionPosted;
 	}
 }
 
