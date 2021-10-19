@@ -15,4 +15,12 @@ RUN npm install
 COPY . .
 
 EXPOSE 3001
-CMD [ "node", "express.js" ]
+
+# Use ENTRYPOINT instead of CMD because we want to allow the invoker to
+# specify arguments on the "docker run" command. Override this by setting
+# --entrypoint.
+ENTRYPOINT [ "node", "express.js" ]
+
+# This doesn't work... :(
+# How should we pass the parameters to conf/index.js?
+#CMD [ "--help" ]
