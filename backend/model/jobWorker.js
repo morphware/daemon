@@ -324,12 +324,12 @@ class JobWorker extends Job{
 
 			//TODO: Unzip if needed
 
-			//Convert .ipymb => .py
-			let filePath = downloads[0].file.path.slice(0,-5).concat('py');
+			let pythonFilePath = downloads[0].file.path.slice(0,-5).concat('py');
 
-			await exec('jupyter nbconvert --to script', filePath);
+			//Convert .ipynb => .py
+			await exec('jupyter nbconvert --to script', downloads[0].file.path);
 
-			await exec('python3', downloads[0].file.path, downloads[1].file.path);
+			await exec('python3', pythonFilePath, downloads[1].file.path);
 
 		}catch(error){
 			this.removeFromJump();
