@@ -14,7 +14,7 @@ const {exec} = require('./python');
 
 (async function(){
 	try{
-		console.log(await exec('python', '/home/william/test.py'))
+		console.log(await exec('python'))
 
 	}catch(error){
 		console.error('here error', error)
@@ -321,8 +321,15 @@ class JobWorker extends Job{
 
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
 
-			await exec('python', downloads[0].file.path, downloads[1].file.path);
 
+			//TODO: Unzip if needed
+
+			//Convert .ipymb => .py
+			let filePath = downloads[0].file.path.slice(0,-5).concat('py');
+
+			await exec('jupyter nbconvert --to script', filePath);
+
+			await exec('python3', downloads[0].file.path, downloads[1].file.path);
 
 		}catch(error){
 			this.removeFromJump();

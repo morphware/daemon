@@ -120,6 +120,8 @@ class JobPoster extends Job{
 
 			let revealTime = 120;
 
+			console.log("postData: ", this.postData)
+
 			var now = new Date().getTime();
 			let biddingDeadline = now + (parseInt(this.postData.biddingTime) * 1000);
 			let revealDeadline = now + ((parseInt(this.postData.biddingTime ) + revealTime) * 1000);
@@ -171,7 +173,7 @@ class JobPoster extends Job{
 	// The job posted will emit an event to end the auction, this will trigger
 	// the smart contract to determine the wine and broadcast `AuctionEnded`
 	async auctionEnd(seconds){
-		seconds += 10;
+		seconds += 180;
 		console.log('Calling auctionEnd in',
 			seconds,
 			'seconds, at',
