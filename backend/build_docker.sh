@@ -7,4 +7,5 @@ VERSION=$(jq -r '.version' < ${ROOT}/package.json)
 docker build \
   --network=host \
   -t morphware/backend:${VERSION} \
+  -t morphware/backend:latest \
     .
