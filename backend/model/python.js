@@ -18,7 +18,12 @@ async function makeVenv(){
 	console.log('env', env);
 
 	console.info('Installing python dependencies');
-	let install = await executeVenv('pip3', 'install', '-r', `${__dirname}/../../resources/share/python/requirements.txt`);
+
+  let req = fs.existsSync("/usr/src/app/requirements.txt")
+    ? "/usr/src/app/requirements.txt"
+    : `${__dirname}/../../resources/share/python/requirements.txt`;
+
+	let install = await executeVenv('pip3', 'install', '-r', req);
 
 	console.info('install', install)
 
