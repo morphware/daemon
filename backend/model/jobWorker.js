@@ -328,13 +328,20 @@ class JobWorker extends Job{
 
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
 
-			//TODO: Unzip if needed
 
+            let jupyterNotebookPathname;
+            let trainingDataPathname;
 
+            for (let download of downloads) {
+                if (download.dn.slice(-5) == 'ipynb') {
+        			jupyterNotebookPathname = download.path + '/' + download.dn;
+                } else {
+        			//TODO: Unzip if needed
+        			trainingDataPathname = download.path + '/' + downloads.dn;
+                }
+            }
 
-			let jupyterNotebookPathname = downloads[0].path + '/' + downloads[0].dn;
 			let pythonPathname = jupyterNotebookPathname.slice(0,-5).concat('py');
-			let trainingDataPathname = downloads[1].path + '/' + downloads[1].dn;
 
             console.log('pythonPathname:', pythonPathname);
 
