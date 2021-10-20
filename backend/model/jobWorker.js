@@ -257,22 +257,22 @@ class JobWorker extends Job{
 				return false;
 			}*/
 
-			// This setTimeout may not bee needed.
+			// This setTimeout may not be needed.
 			// Calculate start of the reveal window
 			var now = Math.floor(new Date().getTime());
-			var biddingDeadline = parseInt(this.jobData.biddingDeadline) + 75;
-			var waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
+			var biddingDeadline = parseInt(this.jobData.biddingDeadline);
+			var waitTimeInMS1 = ((biddingDeadline*1000 - now)+45000);
 
 			console.log('Revealing bid in', waitTimeInMS1/1000, 'at', new Date(now + waitTimeInMS1).toLocaleString());
 
 			await this.bid();
 
-			waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
+			//waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
 
 			// reveal the bid during the reveal window
 			setTimeout(()=>{
 				this.reveal();
-			}, ((biddingDeadline+10)*1000)-now);
+			}, waitTimeInMS1);
 		}catch(error){
 			this.removeFromJump();
 			console.error(`ERROR!!! JobWorker __JobDescriptionPosted`, error)
