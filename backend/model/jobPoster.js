@@ -119,12 +119,14 @@ class JobPoster extends Job{
 			// reworked soon and this is the last we will speak of it...
 
 			let revealTime = 120;
+			let buffer = 180;
+
 
 			console.log("postData: ", this.postData)
 
 			var now = new Date().getTime();
-			let biddingDeadline = now + (parseInt(this.postData.biddingTime) * 1000);
-			let revealDeadline = now + ((parseInt(this.postData.biddingTime ) + revealTime) * 1000);
+			let biddingDeadline = now + parseInt(parseInt(this.postData.biddingTime) + buffer) * 1000;
+			let revealDeadline = now + parseInt(parseInt(this.postData.biddingTime) + revealTime + buffer) * 1000;
 
 			// Post the new job
 			let action = this.jobContract.methods.postJobDescription(
