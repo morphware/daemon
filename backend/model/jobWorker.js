@@ -14,7 +14,7 @@ const {exec} = require('./python');
 
 (async function(){
 	try{
-		console.log(await exec('python'))
+		console.log(await exec('python3'))
 
 	}catch(error){
 		console.error('here error', error)
@@ -258,21 +258,19 @@ class JobWorker extends Job{
 
 			// This setTimeout may not be needed.
 			// Calculate start of the reveal window
-			let buffer = 180;
 			var now = Math.floor(new Date().getTime());
-			var biddingDeadline = parseInt(this.jobData.biddingDeadline) + buffer;
-			var waitTimeInMS1 = ((biddingDeadline*1000 - now)+45000);
+			var waitTimeInMS = ((parseInt(this.jobData.revealDeadlline) * 1000) - now);
 
-			console.log('Revealing bid in', waitTimeInMS1/1000, 'at', new Date(now + waitTimeInMS1).toLocaleString());
+
+			console.log('Revealing bid in', waitTimeInMS/1000, 'at', new Date(now + waitTimeInMS).toLocaleString());
 
 			await this.bid();
 
-			//waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
 
 			// reveal the bid during the reveal window
 			setTimeout(()=>{
 				this.reveal();
-			}, waitTimeInMS1);
+			}, waitTimeInMS);
 		}catch(error){
 			this.removeFromJump();
 			console.error(`ERROR!!! JobWorker __JobDescriptionPosted`, error)
