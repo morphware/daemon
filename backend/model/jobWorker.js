@@ -154,7 +154,10 @@ class JobWorker extends Job{
 			);
 
 			let receipt = await action.send({
-				gas: await action.estimateGas(),
+                // Target amount: 7,900,000
+				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
+				//gas: web3.utils.toWei('.01','ether'),
+				//gas: await action.estimateGas(),
 			});
 
 			this.transactions.push({...receipt, event:'bid'});
@@ -182,7 +185,10 @@ class JobWorker extends Job{
 			);
 
 			let receipt = await action.send({
-				gas: await action.estimateGas()
+                // Target amount: 7,900,000
+				//gas: web3.utils.toWei('.01','ether'),
+				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
+
 			});
 
 			this.transactions.push({...receipt, event:'reveal'});
@@ -203,7 +209,8 @@ class JobWorker extends Job{
 		);
 
 		let receipt = await action.send({
-			gas: await action.estimateGas(),
+        	gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
+			//gas: await action.estimateGas(),
 		});
 
 		this.transactions.push({...receipt, event: 'shareTrainedModel'});
@@ -323,15 +330,19 @@ class JobWorker extends Job{
 
 			//TODO: Unzip if needed
 
-			let pythonFilePath = downloads[0].path.slice(0,-5).concat('py');
 
-            console.log('pythonFilePath:', pythonFilePath);
+
+			let jupyterNotebookPathname = downloads[0].path + '/' + downloads[0].dn;
+			let pythonPathname = jupyterNotebookPathname.slice(0,-5).concat('py');
+			let trainingDataPathname = downloads[1].path + '/' + downloads[1].dn;
+
+            console.log('pythonPathname:', pythonPathname);
 
 
 			//Convert .ipynb => .py
-			await exec('jupyter nbconvert --to script', downloads[0].path);
+			await exec('jupyter nbconvert --to script', jupyterNotebookPathname);
 
-			await exec('python3', pythonFilePath, downloads[1].path);
+			await exec('python3', pythonPathname, trainingDataPathname);
 
 		}catch(error){
 			this.removeFromJump();
