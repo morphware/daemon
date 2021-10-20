@@ -154,10 +154,7 @@ class JobWorker extends Job{
 			);
 
 			let receipt = await action.send({
-                // Target amount: 7,900,000
 				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
-				//gas: web3.utils.toWei('.01','ether'),
-				//gas: await action.estimateGas(),
 			});
 
 			this.transactions.push({...receipt, event:'bid'});
@@ -185,10 +182,7 @@ class JobWorker extends Job{
 			);
 
 			let receipt = await action.send({
-                // Target amount: 7,900,000
-				//gas: web3.utils.toWei('.01','ether'),
 				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
-
 			});
 
 			this.transactions.push({...receipt, event:'reveal'});
@@ -210,7 +204,6 @@ class JobWorker extends Job{
 
 		let receipt = await action.send({
         	gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
-			//gas: await action.estimateGas(),
 		});
 
 		this.transactions.push({...receipt, event: 'shareTrainedModel'});
@@ -227,7 +220,6 @@ class JobWorker extends Job{
 
 			let receipt = await action.send({
 				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
-				// gas: await action.estimateGas()
 			});
 
 			this.transactions.push({...receipt, event: 'withdraw'});
