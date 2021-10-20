@@ -52,7 +52,7 @@ import ('webtorrent-hybrid').then(mod=>{
 					torrent.on('done', ()=>{
 						console.log('done!!!')
 						out.push(torrent);
-						if(out.length === links.length) resolve();
+						if(out.length === links.length) resolve(out);
 					});
 					torrent.on('error', reject)
 				});
