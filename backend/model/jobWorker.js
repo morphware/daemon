@@ -203,7 +203,7 @@ class JobWorker extends Job{
 		);
 
 		let receipt = await action.send({
-			gas: await action.estimateGas()
+			gas: await action.estimateGas(),
 		});
 
 		this.transactions.push({...receipt, event: 'shareTrainedModel'});
@@ -260,7 +260,7 @@ class JobWorker extends Job{
 			// This setTimeout may not bee needed.
 			// Calculate start of the reveal window
 			var now = Math.floor(new Date().getTime());
-			var biddingDeadline = parseInt(this.jobData.biddingDeadline);
+			var biddingDeadline = parseInt(this.jobData.biddingDeadline) + 75;
 			var waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
 
 			console.log('Revealing bid in', waitTimeInMS1/1000, 'at', new Date(now + waitTimeInMS1).toLocaleString());
@@ -321,10 +321,12 @@ class JobWorker extends Job{
 
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
 
-
 			//TODO: Unzip if needed
 
 			let pythonFilePath = downloads[0].file.path.slice(0,-5).concat('py');
+
+            console.log('pythonFilePath:', pythonFilePath);
+
 
 			//Convert .ipynb => .py
 			await exec('jupyter nbconvert --to script', downloads[0].file.path);
