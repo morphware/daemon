@@ -337,7 +337,7 @@ class JobWorker extends Job{
         			jupyterNotebookPathname = download.path + '/' + download.dn;
                 } else {
         			//TODO: Unzip if needed
-        			trainingDataPathname = download.path + '/' + downloads.dn;
+        			trainingDataPathname = download.path + '/' + download.dn;
                 }
             }
 
