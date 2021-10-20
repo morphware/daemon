@@ -193,7 +193,8 @@ class JobPoster extends Job{
 				);
 
 				let receipt = await action.send({
-					gas: await action.estimateGas()
+					// gas: await action.estimateGas()
+					gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
 				});
 
 				job.transactions.push({...receipt, event:'auctionEnd'});
@@ -218,8 +219,10 @@ class JobPoster extends Job{
 				this.postData.files['trainingData'].magnetURI
 			);
 
-			let receipt = await action.send(
-				{gas: await action.estimateGas()
+			let receipt = await action.send({
+				// gas: await action.estimateGas()
+				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
+
 			});
 
 			this.transactions.push({
@@ -269,7 +272,7 @@ class JobPoster extends Job{
 			);
 
 			let receipt = await action.send({
-				gas: await action.estimateGas()
+				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
 			});
 
 			this.transactions.push({...receipt, event: 'shareTestingDataset'});
