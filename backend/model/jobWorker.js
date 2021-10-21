@@ -195,11 +195,17 @@ class JobWorker extends Job{
 	}
 
 	async shareTrainedModel(){
+
+		let pathToTrainedModel = '/home/kenso/Projects/Morphware/daemon/backend/uploads/trainedModels/trained_model.h5';
+
+		let { trainedModelMagnetLink } = await webtorrent().findOrSeed(pathToTrainedModel);
+
 		let action = jobFactoryContract.methods.shareTrainedModel(
 			this.jobData.jobPoster,
 			parseInt(this.id),
 			trainedModelMagnetLink, // get this data
-			parseInt(trainingErrorRate) // get this data
+			// parseInt(trainingErrorRate) // get this data\
+			0.06
 		);
 
 		let receipt = await action.send({
@@ -259,13 +265,14 @@ class JobWorker extends Job{
 			// This setTimeout may not be needed.
 			// Calculate start of the reveal window
 			var now = Math.floor(new Date().getTime());
-			var waitTimeInMS = ((parseInt(this.jobData.revealDeadlline) * 1000) - now);
 
+			console.log("JobData: ", this.jobData);
+
+			var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now);
 
 			console.log('Revealing bid in', waitTimeInMS/1000, 'at', new Date(now + waitTimeInMS).toLocaleString());
 
 			await this.bid();
-
 
 			// reveal the bid during the reveal window
 			setTimeout(()=>{
@@ -341,6 +348,8 @@ class JobWorker extends Job{
 			await exec('jupyter nbconvert --to script', jupyterNotebookPathname);
 
 			await exec('python3', pythonPathname, trainingDataPathname);
+			 
+			shareTrainedModel();
 
 		}catch(error){
 			this.removeFromJump();
