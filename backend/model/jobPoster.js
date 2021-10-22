@@ -125,8 +125,9 @@ class JobPoster extends Job{
 			console.log("postData: ", this.postData)
 
 			var now = new Date().getTime();
+			// let biddingDeadline = now + parseInt(parseInt(this.postData.biddingTime) + buffer) * 1000;
 			let biddingDeadline = now + parseInt(parseInt(this.postData.biddingTime) + buffer) * 1000;
-			let revealDeadline = now + parseInt(parseInt(this.postData.biddingTime) + revealTime + buffer) * 1000;
+			let revealDeadline = now + parseInt(parseInt(this.postData.biddingTime) + revealTime + buffer + buffer) * 1000;
 
 			// Post the new job
 			let action = this.jobContract.methods.postJobDescription(
@@ -196,7 +197,7 @@ class JobPoster extends Job{
 
 				let receipt = await action.send({
 					// gas: await action.estimateGas()
-					gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
+					gas: parseInt(parseInt(await action.estimateGas()) * 2),
 				});
 
 				job.transactions.push({...receipt, event:'auctionEnd'});
@@ -223,7 +224,7 @@ class JobPoster extends Job{
 
 			let receipt = await action.send({
 				// gas: await action.estimateGas()
-				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
+				gas: parseInt(parseInt(await action.estimateGas()) * 2),
 
 			});
 
@@ -252,7 +253,7 @@ class JobPoster extends Job{
 			);
 
 			let receipt = await action.send({
-				gas: await action.estimateGas()
+				gas: parseInt(parseInt(await action.estimateGas()) * 2),
 			});
 
 			this.transactions.push({...receipt, event:'shareTestingDataset'});

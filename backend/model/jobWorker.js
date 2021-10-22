@@ -154,7 +154,7 @@ class JobWorker extends Job{
 			);
 
 			let receipt = await action.send({
-				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
+				gas: parseInt(parseInt(await action.estimateGas()) * 1.5),
 			});
 
 			this.transactions.push({...receipt, event:'bid'});
@@ -182,7 +182,7 @@ class JobWorker extends Job{
 			);
 
 			let receipt = await action.send({
-				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
+				gas: parseInt(parseInt(await action.estimateGas()) * 1.5),
 			});
 
 			this.transactions.push({...receipt, event:'reveal'});
@@ -209,7 +209,7 @@ class JobWorker extends Job{
 		);
 
 		let receipt = await action.send({
-        	gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
+        	gas: parseInt(parseInt(await action.estimateGas()) * 1.5),
 		});
 
 		this.transactions.push({...receipt, event: 'shareTrainedModel'});
@@ -268,9 +268,7 @@ class JobWorker extends Job{
 			var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now - 75000);
 
             console.log('\n\n\n\nthis.jobData:',this.jobData);
-
-			var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now);
-
+			
 			console.log('Revealing bid in', waitTimeInMS/1000, 'at', new Date(now + waitTimeInMS).toLocaleString());
 
 			await this.bid();
