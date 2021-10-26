@@ -270,7 +270,7 @@ class JobWorker extends Job{
 			var revealDeadline = parseInt(this.jobData.revealDeadline);
 
 			//Reveal 3 mins before reveal deadline
-			var revealTime = revealDeadline - 3*60*1000;
+			var revealTime = (revealDeadline*1000) - 3*60*1000;
 			var revealInMS = revealTime - now;
 			
 
