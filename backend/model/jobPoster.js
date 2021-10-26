@@ -102,7 +102,7 @@ class JobPoster extends Job{
 	async post(){
 		try{
 
-			// Transfer founds for the contract to hold in escrow
+			// Transfer funds for the contract to hold in escrow
 			let transfer = await this.wallet.send(
 				conf.auctionFactoryContractAddress,
 				this.postData.workerReward,

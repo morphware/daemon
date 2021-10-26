@@ -264,8 +264,12 @@ class JobWorker extends Job{
 
 			// This setTimeout may not be needed.
 			// Calculate start of the reveal window
-			var now = Math.floor(new Date().getTime());
+			// var now = Math.floor(new Date().getTime());
+			var now = Date.now();
 			var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now - 75000);
+
+			var revealDeadline = Date(parseInt(this.jobData.revealDeadline));
+			console.log("Reveal Deadline: ", revealDeadline)
 
             console.log('\n\n\n\nthis.jobData:',this.jobData);
 			
@@ -348,7 +352,7 @@ class JobWorker extends Job{
 
 			await exec('python3', pythonPathname, trainingDataPathname);
 			 
-			shareTrainedModel();
+			this.shareTrainedModel();
 
 		}catch(error){
 			this.removeFromJump();
