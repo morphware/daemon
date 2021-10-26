@@ -154,7 +154,7 @@ class JobWorker extends Job{
 			);
 
 			let receipt = await action.send({
-				gas: parseInt(parseInt(await action.estimateGas()) * 1.5),
+				gas: parseInt(parseInt(await action.estimateGas()) * 2),
 			});
 
 			this.transactions.push({...receipt, event:'bid'});
@@ -182,7 +182,7 @@ class JobWorker extends Job{
 			);
 
 			let receipt = await action.send({
-				gas: parseInt(parseInt(await action.estimateGas()) * 1.5),
+				gas: parseInt(parseInt(await action.estimateGas()) * 2),
 			});
 
 			this.transactions.push({...receipt, event:'reveal'});
@@ -196,7 +196,7 @@ class JobWorker extends Job{
 
 	async shareTrainedModel(){
 
-		let pathToTrainedModel = '/home/kenso/Projects/Morphware/daemon/backend/uploads/trainedModels/trained_model.h5';
+		let pathToTrainedModel = '/home/darshan/Desktop/morphware/daemon/backend/uploads/trainedModels/trained_model.h5';					  
 
 		let { trainedModelMagnetLink } = await webtorrent().findOrSeed(pathToTrainedModel);
 
@@ -209,7 +209,7 @@ class JobWorker extends Job{
 		);
 
 		let receipt = await action.send({
-        	gas: parseInt(parseInt(await action.estimateGas()) * 1.5),
+        	gas: parseInt(parseInt(await action.estimateGas()) * 2),
 		});
 
 		this.transactions.push({...receipt, event: 'shareTrainedModel'});
@@ -264,15 +264,15 @@ class JobWorker extends Job{
 
 			// This setTimeout may not be needed.
 			// Calculate start of the reveal window
-			// var now = Math.floor(new Date().getTime());
-			var now = Date.now();
-			var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now - 75000);
+			var now = Math.floor(new Date().getTime());
+			var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now - 180000);
 
 			var revealDeadline = Date(parseInt(this.jobData.revealDeadline));
 			console.log("Reveal Deadline: ", revealDeadline)
 
             console.log('\n\n\n\nthis.jobData:',this.jobData);
 			
+
 			console.log('Revealing bid in', waitTimeInMS/1000, 'at', new Date(now + waitTimeInMS).toLocaleString());
 
 			await this.bid();
