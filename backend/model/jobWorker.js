@@ -272,10 +272,11 @@ class JobWorker extends Job{
 			//Reveal 3 mins before reveal deadline
 			var revealTime = (revealDeadline*1000) - 3*60*1000;
 			var revealInMS = revealTime - now;
-			
+
+			var revealDeadline = new Date(revealTime).toLocaleTimeString();
 
             console.log('\n\n\n\nthis.jobData:',this.jobData);
-			console.log('Revealing bid in', revealInMS/1000, 'at', Date(revealTime));
+			console.log('Revealing bid in', revealInMS/1000, ' at ', revealDeadline);
 			console.log("Reveal Deadline from smartContract: ", parseInt(this.jobData.revealDeadline));
 
 			await this.bid();
