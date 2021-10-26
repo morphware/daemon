@@ -9,8 +9,8 @@ const webtorrent = require('../controller/torrent');
 const {web3, percentHelper} = require('./contract');
 const {wallet} = require('./morphware');
 const {Job} = require('./job');
-
 const {exec} = require('./python');
+const moment = require('moment');
 
 (async function(){
 	try{
@@ -265,22 +265,25 @@ class JobWorker extends Job{
 			// This setTimeout may not be needed.
 			// Calculate start of the reveal window
 			// var now = Math.floor(new Date().getTime());
-			var now = Date.now();
-			var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now - 180000);
+			var now = new Date().getTime();
+			// var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now - 180000);
+			var revealDeadline = parseInt(this.jobData.revealDeadline);
 
-			var revealDeadline = Date(parseInt(this.jobData.revealDeadline));
+			//Reveal 3 mins before reveal deadline
+			var revealTime = revealDeadline - 3*60*1000;
+			var revealInMS = revealTime - now;
+			
 
             console.log('\n\n\n\nthis.jobData:',this.jobData);
-			
-			console.log('Revealing bid in', waitTimeInMS/1000, 'at', new Date(now + waitTimeInMS).toLocaleString());
-			console.log("Reveal Deadline: ", revealDeadline)
+			console.log('Revealing bid in', revealInMS/1000, 'at', revealTime);
+			console.log("Reveal Deadline: ", parseInt(this.jobData.revealDeadline))
 
 			await this.bid();
 
 			// reveal the bid during the reveal window
 			setTimeout(()=>{
 				this.reveal();
-			}, waitTimeInMS);
+			}, revealInMS);
 		}catch(error){
 			this.removeFromJump();
 			console.error(`ERROR!!! JobWorker __JobDescriptionPosted`, error)
