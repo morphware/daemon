@@ -336,6 +336,9 @@ class JobPoster extends Job{
 
 	async TrainedModelShared(event){
 		try{
+
+			console.log("TrainedModelShared Event: ", event);
+
 			this.files.trainedModel = {
 				magnetURI: event.returnValues.trainedModelMagnetLink
 			};

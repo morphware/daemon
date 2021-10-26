@@ -200,7 +200,8 @@ class JobWorker extends Job{
 
 		let { trainedModelMagnetLink } = await webtorrent().findOrSeed(pathToTrainedModel);
 
-		let action = jobFactoryContract.methods.shareTrainedModel(
+		// let action = this.jobFactoryContract.methods.shareTrainedModel(
+		let action = this.jobContract.methods.shareTrainedModel(
 			this.jobData.jobPoster,
 			parseInt(this.id),
 			trainedModelMagnetLink, // get this data
