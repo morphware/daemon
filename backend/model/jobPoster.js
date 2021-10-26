@@ -26,6 +26,9 @@ class JobPoster extends Job{
 
 		// Data for creating new job, this is the only Job type to have postData
 		this.postData = postData;
+
+		// Storing Magnet URI of trained models
+		this.files = {};
 	}
 
 	// Build a hashable object to represent a current instance state.
@@ -338,6 +341,10 @@ class JobPoster extends Job{
 		try{
 
 			console.log("TrainedModelShared Event: ", event);
+
+			console.log("Return Values --------");
+			
+			console.log(event.returnValues);
 
 			this.files.trainedModel = {
 				magnetURI: event.returnValues.trainedModelMagnetLink
