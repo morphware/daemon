@@ -10,7 +10,6 @@ const {web3, percentHelper} = require('./contract');
 const {wallet} = require('./morphware');
 const {Job} = require('./job');
 const {exec} = require('./python');
-const moment = require('moment');
 
 (async function(){
 	try{
@@ -196,24 +195,33 @@ class JobWorker extends Job{
 
 	async shareTrainedModel(){
 
-		let pathToTrainedModel = '/home/kenso/Projects/Morphware/daemon/backend/uploads/trainedModels/trained_model.h5';
+		console.log("Sharing Trained Model")
 
-		let { trainedModelMagnetLink } = await webtorrent().findOrSeed(pathToTrainedModel);
+		let pathToTrainedModel = '/home/darshan/Desktop/morphware/daemon/backend/uploads/trainedModels/trained_model.h5';
+
+		let { magnetURI } = await webtorrent().findOrSeed(pathToTrainedModel);
+
+		console.log("Magnet Link to trained mode: ", magnetURI);
 
 		// let action = this.jobFactoryContract.methods.shareTrainedModel(
 		let action = this.jobContract.methods.shareTrainedModel(
 			this.jobData.jobPoster,
 			parseInt(this.id),
-			trainedModelMagnetLink, // get this data
+			magnetURI, // get this data
 			// parseInt(trainingErrorRate) // get this data\
-			0.06
+			6 //is 0.06 a uint64
 		);
 
+		console.log("Action: ", action);
+
 		let receipt = await action.send({
-        	gas: parseInt(parseInt(await action.estimateGas()) * 2),
+			gas: await action.estimateGas(),
 		});
 
+		console.log("Reciept: ", receipt);
+
 		this.transactions.push({...receipt, event: 'shareTrainedModel'});
+		// this.transactions.push({...receipt, event:'postJobDescription'});
 
 		return receipt;
 	}
