@@ -118,8 +118,8 @@ class JobPoster extends Job{
 			// This is a hack to deal with block timing. All timing will be
 			// reworked soon and this is the last we will speak of it...
 
-			let revealTime = 120;
 			let buffer = 180;
+			let revealTime = 120 + buffer + buffer;
 
 
 			console.log("postData: ", this.postData)
@@ -127,7 +127,7 @@ class JobPoster extends Job{
 			var now = new Date().getTime();
 			// let biddingDeadline = now + parseInt(parseInt(this.postData.biddingTime) + buffer) * 1000;
 			let biddingDeadline = now + parseInt(parseInt(this.postData.biddingTime) + buffer) * 1000;
-			let revealDeadline = now + parseInt(parseInt(this.postData.biddingTime) + revealTime + buffer + buffer) * 1000;
+			let revealDeadline = now + parseInt(parseInt(this.postData.biddingTime) + revealTime) * 1000;
 
 			// Post the new job
 			let action = this.jobContract.methods.postJobDescription(
