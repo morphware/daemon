@@ -275,8 +275,8 @@ class JobWorker extends Job{
 			
 
             console.log('\n\n\n\nthis.jobData:',this.jobData);
-			console.log('Revealing bid in', revealInMS/1000, 'at', revealTime);
-			console.log("Reveal Deadline: ", parseInt(this.jobData.revealDeadline))
+			console.log('Revealing bid in', revealInMS/1000, 'at', Date(revealTime));
+			console.log("Reveal Deadline from smartContract: ", parseInt(this.jobData.revealDeadline));
 
 			await this.bid();
 
