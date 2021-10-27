@@ -4,6 +4,7 @@ const {web3, percentHelper} = require('./contract');
 const {conf} = require('../conf');
 const {Job} = require('./job');
 const webtorrent = require('../controller/torrent');
+const fs = require('fs-extra');
 
 
 /*
@@ -236,7 +237,8 @@ class JobPoster extends Job{
 				event: 'shareUntrainedModelAndTrainingDataset'
 			});
 
-			this.payout();
+			//Calling payout when approve job has been emmited
+			//this.payout();
 
 			return receipt;
 
@@ -359,8 +361,22 @@ class JobPoster extends Job{
 	async JobApproved(event){
 		try{
 			let receipt = await this.payout();
-
 			console.log('JobPoster JobApproved payout receipt', receipt);
+
+			this.downloadPath = `${conf.appDownloadPath}${this.jobData.jobPoster}/${this.id}`;
+			console.log("Download Path: ", this.downloadPath);
+
+			// Make sure download spot exists
+			fs.ensureDirSync(this.downloadPath);
+
+			// Download the shared files
+			let downloads = await webtorrent().downloadAll(this.downloadPath, this.files.trainedModel.magnetURI);
+
+			console.log("Download Complete: ", downloads);
+
+			let path = downloads[0].path || "path?"
+
+			console.log("Trained Model Path: ", path);
 
 		}catch(error){
 			console.error('ERROR!!! `JobApproved`', error);

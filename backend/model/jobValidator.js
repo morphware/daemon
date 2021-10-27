@@ -204,13 +204,15 @@ class JobValidator extends Job{
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
 
             //Approve the job if loss is less than target loss
-            let reciept = this.jobContract.methods.approveJob(
+            let action = this.jobContract.methods.approveJob(
                 job.jobPoster,
                 parseInt(job.id),
                 job.trainedModelMagnetLink
-            ).send({
-                from: this.wallet.address
-            });
+            )
+			
+			let reciept = await action.send({
+				gas: await action.estimateGas()            
+			});
 
             console.log("Reciept: ", reciept);
 
