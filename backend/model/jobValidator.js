@@ -11,6 +11,7 @@ const {wallet} = require('./morphware');
 const {Job} = require('./job');
 const {exec} = require('./python');
 const moment = require('moment');
+const { stdout } = require('process');
 
 (async function(){
 	try{
@@ -95,9 +96,12 @@ class JobValidator extends Job{
 
 				// Display for auction times
 				console.log('New Validation job found', (new Date()).toLocaleString());
-				console.info('Error Rate', job.targetErrorRate)
-				console.info('Trained Model Magnet URI', job._trainedModelMagnetLink);
-				console.info('Testing Dataset Magnet URI', job._testingDatasetMagnetLink);
+
+				console.log("JobData: ", this.jobData);
+
+				console.info('Error Rate', event.returnValues.targetErrorRate);
+				console.info('Trained Model Magnet URI', event.returnValues.trainedModelMagnetLink);
+				console.info('Testing Dataset Magnet URI', event.returnValues.testingDatasetMagnetLink);
 
 				job.addToJump();
 				job.transactions.push(event);
@@ -202,9 +206,11 @@ class JobValidator extends Job{
             //Test the modal and get loss
 			// await exec('python3 unsorted/validator_node.py 2> /dev/null | tail -n 1', trainingDataPathname);
 			const std = await exec('python3 unsorted/validator_node.py 2> /dev/null | tail -n 1');
+			//TODO: Check if std returns correct array		
+			console.log("Python STDOUT: ", stdout);
 			let error = 1 - std.out[0];
 			error = parseInt(error * 100);
-			const maximumAllowableError = parseInt(job.targetErrorRate);
+			const maximumAllowableError = parseInt(event.returnValues.targetErrorRate);
 
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
 
@@ -223,7 +229,7 @@ class JobValidator extends Job{
 				console.log("Reciept: ", reciept);
 			}
 			else {
-				throw("This model isn't accurate enough");
+				throw(`This model isn't accurate enough. Error is ${error} Maximum Allowable Error is ${maximumAllowableError}`);
 			}
         } catch (error) {
             // this.removeFromJump();
