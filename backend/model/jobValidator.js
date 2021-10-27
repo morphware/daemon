@@ -207,12 +207,15 @@ class JobValidator extends Job{
 			// await exec('python3 unsorted/validator_node.py 2> /dev/null | tail -n 1', trainingDataPathname);
 			const std = await exec('python3 unsorted/validator_node.py 2> /dev/null | tail -n 1');
 			//TODO: Check if std returns correct array		
-			console.log("Python STDOUT: ", stdout);
+			console.log("Python STDOUT: ", std);
 			let error = 1 - std.out[0];
 			error = parseInt(error * 100);
 			const maximumAllowableError = parseInt(event.returnValues.targetErrorRate);
 
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
+
+			console.log("Training Error: ", error);
+			console.log("Required Max Error: ", maximumAllowableError);
 
 			if(error <= maximumAllowableError) {
 				//Approve the job if loss is less than target loss
