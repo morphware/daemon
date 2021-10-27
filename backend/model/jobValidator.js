@@ -22,24 +22,24 @@ const moment = require('moment');
 })()
 
 /*
-JobWorker extends the common functions of Job class and is responsible for
-handling functionality a worker node needs.
+JobValidator extends the common functions of Job class and is responsible for
+handling functionality a validator node needs.
 
 Instances of this class are created based on the `JobDescriptionPosted` event.
 See `__process_event` below for more information
 
-This module starts JobWorker.events() at the end if this file so this classes
+This module starts JobValidator.events() at the end if this file so this classes
 `__process_event` is called.
 
-It is recommend you understand the Job class before editing the JobWorker class
+It is recommend you understand the Job class before editing the JobValidator class
 */
 
-class JobWorker extends Job{
+class JobValidator extends Job{
 	constructor(wallet, jobData){
 		super(wallet, jobData);
 	}
 
-	// Denote this instance as a Worker type.
+	// Denote this instance as a Validator type.
 	get jobType(){
 		return 'validator';
 	}
@@ -65,14 +65,14 @@ class JobWorker extends Job{
 	}
 
 	// Check to see if the client is ready and willing to take on jobs
-	static canTakeWork(){
-		return conf.acceptWork && !this.lock;
+	static canValidate(){
+		return conf.validate && !this.lock;
 	}
 
 
 	/*
 	__process_event in the base Job class deals with listen for events on
-	current job instances. In order for a worker to start the bidding process,
+	current job instances. In order for a validator to start the bidding process,
 	we only care about `JobDescriptionPosted` if the client meets cretin run
 	time states. We override __precess event below to make that happen.
 	*/
@@ -88,8 +88,7 @@ class JobWorker extends Job{
 			if(name === 'TestingDatasetShared'){
 
 				// Check to see if this client is accepting work
-                // TODO: New check for validating - or does 'accepting work' mean worker and validator
-				if(!this.canTakeWork()) return;
+				if(!this.canValidate()) return;
 
 				// Make the job instance
 				let job = new this(wallet, event.returnValues);
@@ -106,7 +105,7 @@ class JobWorker extends Job{
 			}
 		}catch(error){
 			this.removeFromJump();
-			console.error(`ERROR JobWorker __process_event`, error)
+			console.error(`ERROR JobValidator __process_event`, error)
 		}
 	}
 
@@ -127,122 +126,10 @@ class JobWorker extends Job{
 	/*
 	Actions
 
-	The client can initiate actions against the contract as a worker. Most of
+	The client can initiate actions against the contract as a validator. Most of
 	these result in a action being emitted to the smart contract. 
 	*/
 
-	async bid(){
-		try{
-
-			console.info('Bidding on', this.instanceId, (new Date()).toLocaleString());
-
-			let approveReceipt = await this.wallet.approve(percentHelper(
-				this.jobData.workerReward, 100
-			));
-
-			this.bidData = {
-				bidAmount: percentHelper(this.jobData.workerReward, 25), // How do we figure out the correct bid?
-				fakeBid: false, // How do we know when to fake bid?
-				secret: `0x${crypto.randomBytes(32).toString('hex')}`
-			};
-
-			console.log('bidding data', this.bidData, this.instanceId);
-
-			let action = this.auctionContract.methods.bid(
-				this.jobData.jobPoster,
-				parseInt(this.id),
-				web3.utils.keccak256(web3.utils.encodePacked(
-					this.bidData.bidAmount,
-					this.bidData.fakeBid,
-					this.bidData.secret
-				)),
-				this.bidData.bidAmount
-			);
-
-			let receipt = await action.send({
-				gas: parseInt(parseInt(await action.estimateGas()) * 2),
-			});
-
-			this.transactions.push({...receipt, event:'bid'});
-
-			return receipt;
-
-		}catch(error){
-			this.removeFromJump();
-			console.log(`ERROR!!! JobWorker bid`, this.instanceId, error);
-			throw 'error';
-		}
-	}
-
-	async reveal(){
-		try{
-
-			console.info('Revealing on', this.instanceId, (new Date()).toLocaleString());
-
-			let action = this.auctionContract.methods.reveal(
-				this.jobData.jobPoster,
-				parseInt(this.id),
-				[this.bidData.bidAmount],
-				[this.bidData.fakeBid],
-				[this.bidData.secret]
-			);
-
-			let receipt = await action.send({
-				gas: parseInt(parseInt(await action.estimateGas()) * 2),
-			});
-
-			this.transactions.push({...receipt, event:'reveal'});
-
-			return receipt;
-		}catch(error){
-			this.removeFromJump();
-			console.error('ERROR!!! JobWorker reveal', this.instanceId, error);
-		}
-	}
-
-	async shareTrainedModel(){
-
-		let pathToTrainedModel = '/home/kenso/Projects/Morphware/daemon/backend/uploads/trainedModels/trained_model.h5';
-
-		let { trainedModelMagnetLink } = await webtorrent().findOrSeed(pathToTrainedModel);
-
-		// let action = this.jobFactoryContract.methods.shareTrainedModel(
-		let action = this.jobContract.methods.shareTrainedModel(
-			this.jobData.jobPoster,
-			parseInt(this.id),
-			trainedModelMagnetLink, // get this data
-			// parseInt(trainingErrorRate) // get this data\
-			0.06
-		);
-
-		let receipt = await action.send({
-        	gas: parseInt(parseInt(await action.estimateGas()) * 2),
-		});
-
-		this.transactions.push({...receipt, event: 'shareTrainedModel'});
-
-		return receipt;
-	}
-
-	async withdraw(){
-		try{
-
-			console.info('Withdrawing on', this.instanceId, (new Date()).toLocaleString());
-
-			let action = this.auctionContract.methods.withdraw();
-
-			let receipt = await action.send({
-				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
-			});
-
-			this.transactions.push({...receipt, event: 'withdraw'});
-
-			return receipt;
-		}catch(error){
-			this.removeFromJump();
-			console.error('ERROR JobWorker withdraw', error)
-		}
-	}
 
 	/*
 	Events
@@ -253,50 +140,50 @@ class JobWorker extends Job{
 	class for more information.
 	*/
 
-	async __JobDescriptionPosted(event){
-		// This is prefixed with '__' so its not auto called by Job.events and
-		// ONLY called when this class wants to call it.
+// 	async __JobDescriptionPosted(event){
+// 		// This is prefixed with '__' so its not auto called by Job.events and
+// 		// ONLY called when this class wants to call it.
 
-		try{
+// 		try{
 
-			// Confirm we have enough free space to perform the job
-/*			if(!await this.__checkDisk(this.trainingDatasetSize, conf.appDownloadPath)){
-				console.info('Not enough free disk space, passing');
+// 			// Confirm we have enough free space to perform the job
+// /*			if(!await this.__checkDisk(this.trainingDatasetSize, conf.appDownloadPath)){
+// 				console.info('Not enough free disk space, passing');
 
-				// Drop this instance instance from the jump table
-				this.removeFromJump();
+// 				// Drop this instance instance from the jump table
+// 				this.removeFromJump();
 
-				return false;
-			}*/
+// 				return false;
+// 			}*/
 
-			// This setTimeout may not be needed.
-			// Calculate start of the reveal window
-			// var now = Math.floor(new Date().getTime());
-			var now = new Date().getTime();
-			// var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now - 180000);
-			var revealDeadline = parseInt(this.jobData.revealDeadline);
+// 			// This setTimeout may not be needed.
+// 			// Calculate start of the reveal window
+// 			// var now = Math.floor(new Date().getTime());
+// 			var now = new Date().getTime();
+// 			// var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now - 180000);
+// 			var revealDeadline = parseInt(this.jobData.revealDeadline);
 
-			//Reveal 3 mins before reveal deadline
-			var revealTime = (revealDeadline*1000) - 3*60*1000;
-			var revealInMS = revealTime - now;
+// 			//Reveal 3 mins before reveal deadline
+// 			var revealTime = (revealDeadline*1000) - 3*60*1000;
+// 			var revealInMS = revealTime - now;
 
-			var revealDeadline = new Date(revealTime).toLocaleTimeString();
+// 			var revealDeadline = new Date(revealTime).toLocaleTimeString();
 
-            console.log('\n\n\n\nthis.jobData:',this.jobData);
-			console.log('Revealing bid in', revealInMS/1000, ' at ', revealDeadline);
-			console.log("Reveal Deadline from smartContract: ", parseInt(this.jobData.revealDeadline));
+//             console.log('\n\n\n\nthis.jobData:',this.jobData);
+// 			console.log('Revealing bid in', revealInMS/1000, ' at ', revealDeadline);
+// 			console.log("Reveal Deadline from smartContract: ", parseInt(this.jobData.revealDeadline));
 
-			await this.bid();
+// 			await this.bid();
 
-			// reveal the bid during the reveal window
-			setTimeout(()=>{
-				this.reveal();
-			}, revealInMS);
-		}catch(error){
-			this.removeFromJump();
-			console.error(`ERROR!!! JobWorker __JobDescriptionPosted`, error)
-		}
-	}
+// 			// reveal the bid during the reveal window
+// 			setTimeout(()=>{
+// 				this.reveal();
+// 			}, revealInMS);
+// 		}catch(error){
+// 			this.removeFromJump();
+// 			console.error(`ERROR!!! JobValidator __JobDescriptionPosted`, error)
+// 		}
+// 	}
 
     async __TestingDatasetShared(event){
         try {
@@ -309,12 +196,28 @@ class JobWorker extends Job{
 			fs.ensureDirSync(this.downloadPath);
 
             // Download the shared files
-			let downloads = await webtorrent().downloadAll(this.downloadPath, event.returnValues.untrainedModelMagnetLink, event.returnValues.trainingDatasetMagnetLink);
+			let downloads = await webtorrent().downloadAll(this.downloadPath, event.returnValues.trainedModelMagnetLink, event.returnValues.testingDatasetMagnetLink);
+			console.log('Downloads', downloads);
+
+            //Test the modal and get loss
+
+			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
+
+            //Approve the job if loss is less than target loss
+            let reciept = this.jobContract.methods.approveJob(
+                job.jobPoster,
+                parseInt(job.id),
+                job.trainedModelMagnetLink
+            ).send({
+                from: this.wallet.address
+            });
+
+            console.log("Reciept: ", reciept);
 
 
         } catch (error) {
             // this.removeFromJump();
-			console.error(`ERROR!!! JobWorker __JobDescriptionPosted`, error)
+			console.error(`ERROR!!! JobValidator __JobDescriptionPosted`, error)
         }
     }
 }
@@ -322,8 +225,8 @@ class JobWorker extends Job{
 /*
 Listen for `JobPostedDescription` events. This runs in addition to `Job.events`
 */
-if(conf.acceptWork){
-	JobWorker.events();
+if(conf.validate){
+	JobValidator.events();
 }
 
-module.exports = {JobWorker};
+module.exports = {JobValidator};

@@ -138,7 +138,6 @@ class JobWorker extends Job{
 				fakeBid: false, // How do we know when to fake bid?
 				secret: `0x${crypto.randomBytes(32).toString('hex')}`
 			};
-
 			console.log('bidding data', this.bidData, this.instanceId);
 
 			let action = this.auctionContract.methods.bid(
