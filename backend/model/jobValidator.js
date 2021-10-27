@@ -200,23 +200,31 @@ class JobValidator extends Job{
 			console.log('Downloads', downloads);
 
             //Test the modal and get loss
+			// await exec('python3 unsorted/validator_node.py 2> /dev/null | tail -n 1', trainingDataPathname);
+			const std = await exec('python3 unsorted/validator_node.py 2> /dev/null | tail -n 1');
+			let error = 1 - std.out[0];
+			error = parseInt(error * 100);
+			const maximumAllowableError = parseInt(job.targetErrorRate);
 
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
 
-            //Approve the job if loss is less than target loss
-            let action = this.jobContract.methods.approveJob(
-                job.jobPoster,
-                parseInt(job.id),
-                job.trainedModelMagnetLink
-            )
-			
-			let reciept = await action.send({
-				gas: await action.estimateGas()            
-			});
+			if(error <= maximumAllowableError) {
+				//Approve the job if loss is less than target loss
+				let action = this.jobContract.methods.approveJob(
+					job.jobPoster,
+					parseInt(job.id),
+					job.trainedModelMagnetLink
+				)
+				
+				let reciept = await action.send({
+					gas: await action.estimateGas()            
+				});
 
-            console.log("Reciept: ", reciept);
-
-
+				console.log("Reciept: ", reciept);
+			}
+			else {
+				throw("This model isn't accurate enough");
+			}
         } catch (error) {
             // this.removeFromJump();
 			console.error(`ERROR!!! JobValidator __JobDescriptionPosted`, error)
