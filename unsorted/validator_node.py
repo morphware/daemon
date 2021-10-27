@@ -35,7 +35,7 @@ X_test           = X_test / maximum_pixel_intensity
 
 # TODO Prepend the downloads directory and the broader path to this filename.
 
-infile_pathname  = 'uploads/trainedModels/trained_model.h5'
+infile_pathname  = 'unsorted/uploads/trainedModels/trained_model.h5'
 model = keras.models.load_model(infile_pathname)
 
 
