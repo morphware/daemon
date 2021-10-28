@@ -14,7 +14,6 @@ const {exec} = require('./python');
 (async function(){
 	try{
 		console.log("pwd");
-		console.log(await exec('pwd'));
 
 	}catch(error){
 		console.error('here error', error)

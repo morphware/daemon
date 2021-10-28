@@ -208,7 +208,12 @@ class JobValidator extends Job{
 			const std = await exec('python3 unsorted/validator_node.py 2> /dev/null | tail -n 1');
 			//TODO: Check if std returns correct array		
 			console.log("Python STDOUT: ", std);
-			let error = 1 - std.out[0];
+
+            let retVal = std.out[0][-2];
+            console.log('retVal', retVal);
+            console.log('retVal type:', typeof retVal);
+
+			let error = 1 - parseInt(retVal);
 			error = parseInt(error * 100);
 			const maximumAllowableError = parseInt(event.returnValues.targetErrorRate);
 
