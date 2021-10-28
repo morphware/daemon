@@ -209,7 +209,7 @@ class JobValidator extends Job{
 			//TODO: Check if std returns correct array		
 			console.log("Python STDOUT: ", std);
 
-            let retVal = std.out[0][-2];
+            let retVal = std.out[0].slice(0,-1);
             console.log('retVal', retVal);
             console.log('retVal type:', typeof retVal);
 
