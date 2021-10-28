@@ -225,11 +225,11 @@ class JobValidator extends Job{
 					job.trainedModelMagnetLink
 				)
 				
-				let reciept = await action.send({
+				let receipt = await action.send({
 					gas: await action.estimateGas()            
 				});
 
-				console.log("Reciept: ", reciept);
+				console.log("receipt: ", receipt);
 			}
 			else {
 				throw(`This model isn't accurate enough. Error is ${error} Maximum Allowable Error is ${maximumAllowableError}`);
