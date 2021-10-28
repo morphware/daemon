@@ -213,8 +213,9 @@ class JobValidator extends Job{
             console.log('retVal', retVal);
             console.log('retVal type:', typeof retVal);
 
-			let error = 1 - parseInt(retVal);
-			error = parseInt(error * 100);
+			let error = parseInt(retVal * 100);
+			error = 100 - error;
+
 			const maximumAllowableError = parseInt(event.returnValues.targetErrorRate);
 
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
