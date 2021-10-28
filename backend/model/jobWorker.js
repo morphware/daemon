@@ -9,12 +9,11 @@ const webtorrent = require('../controller/torrent');
 const {web3, percentHelper} = require('./contract');
 const {wallet} = require('./morphware');
 const {Job} = require('./job');
-
 const {exec} = require('./python');
 
 (async function(){
 	try{
-		console.log(await exec('python', '/home/william/test.py'))
+		console.log("pwd");
 
 	}catch(error){
 		console.error('here error', error)
@@ -139,7 +138,6 @@ class JobWorker extends Job{
 				fakeBid: false, // How do we know when to fake bid?
 				secret: `0x${crypto.randomBytes(32).toString('hex')}`
 			};
-
 			console.log('bidding data', this.bidData, this.instanceId);
 
 			let action = this.auctionContract.methods.bid(
@@ -154,7 +152,7 @@ class JobWorker extends Job{
 			);
 
 			let receipt = await action.send({
-				gas: await action.estimateGas(),
+				gas: parseInt(parseInt(await action.estimateGas()) * 2),
 			});
 
 			this.transactions.push({...receipt, event:'bid'});
@@ -182,7 +180,7 @@ class JobWorker extends Job{
 			);
 
 			let receipt = await action.send({
-				gas: await action.estimateGas()
+				gas: parseInt(parseInt(await action.estimateGas()) * 2),
 			});
 
 			this.transactions.push({...receipt, event:'reveal'});
@@ -195,18 +193,34 @@ class JobWorker extends Job{
 	}
 
 	async shareTrainedModel(){
-		let action = jobFactoryContract.methods.shareTrainedModel(
+
+		console.log("Sharing Trained Model")
+
+		let pathToTrainedModel = '/home/darshan/Desktop/morphware/daemon/backend/uploads/trainedModels/trained_model.h5';
+
+		let { magnetURI } = await webtorrent().findOrSeed(pathToTrainedModel);
+
+		console.log("Magnet Link to trained mode: ", magnetURI);
+
+		// let action = this.jobFactoryContract.methods.shareTrainedModel(
+		let action = this.jobContract.methods.shareTrainedModel(
 			this.jobData.jobPoster,
 			parseInt(this.id),
-			trainedModelMagnetLink, // get this data
-			parseInt(trainingErrorRate) // get this data
+			magnetURI, // get this data
+			// parseInt(trainingErrorRate) // get this data\
+			6 //is 0.06 a uint64
 		);
 
+		console.log("Action: ", action);
+
 		let receipt = await action.send({
-			gas: await action.estimateGas()
+			gas: await action.estimateGas(),
 		});
 
+		console.log("Reciept: ", receipt);
+
 		this.transactions.push({...receipt, event: 'shareTrainedModel'});
+		// this.transactions.push({...receipt, event:'postJobDescription'});
 
 		return receipt;
 	}
@@ -220,7 +234,6 @@ class JobWorker extends Job{
 
 			let receipt = await action.send({
 				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
-				// gas: await action.estimateGas()
 			});
 
 			this.transactions.push({...receipt, event: 'withdraw'});
@@ -257,22 +270,29 @@ class JobWorker extends Job{
 				return false;
 			}*/
 
-			// This setTimeout may not bee needed.
+			// This setTimeout may not be needed.
 			// Calculate start of the reveal window
-			var now = Math.floor(new Date().getTime());
-			var biddingDeadline = parseInt(this.jobData.biddingDeadline);
-			var waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
+			// var now = Math.floor(new Date().getTime());
+			var now = new Date().getTime();
+			// var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now - 180000);
+			var revealDeadline = parseInt(this.jobData.revealDeadline);
 
-			console.log('Revealing bid in', waitTimeInMS1/1000, 'at', new Date(now + waitTimeInMS1).toLocaleString());
+			//Reveal 3 mins before reveal deadline
+			var revealTime = (revealDeadline*1000) - 3*60*1000;
+			var revealInMS = revealTime - now;
+
+			var revealDeadline = new Date(revealTime).toLocaleTimeString();
+
+            console.log('\n\n\n\nthis.jobData:',this.jobData);
+			console.log('Revealing bid in', revealInMS/1000, ' at ', revealDeadline);
+			console.log("Reveal Deadline from smartContract: ", parseInt(this.jobData.revealDeadline));
 
 			await this.bid();
-
-			waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
 
 			// reveal the bid during the reveal window
 			setTimeout(()=>{
 				this.reveal();
-			}, ((biddingDeadline+10)*1000)-now);
+			}, revealInMS);
 		}catch(error){
 			this.removeFromJump();
 			console.error(`ERROR!!! JobWorker __JobDescriptionPosted`, error)
@@ -321,8 +341,30 @@ class JobWorker extends Job{
 
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
 
-			await exec('python', downloads[0].file.path, downloads[1].file.path);
 
+            let jupyterNotebookPathname;
+            let trainingDataPathname;
+
+            for (let download of downloads) {
+                if (download.dn.slice(-5) == 'ipynb') {
+        			jupyterNotebookPathname = download.path + '/' + download.dn;
+                } else {
+        			//TODO: Unzip if needed
+        			trainingDataPathname = download.path + '/' + download.dn;
+                }
+            }
+
+			let pythonPathname = jupyterNotebookPathname.slice(0,-5).concat('py');
+
+            console.log('pythonPathname:', pythonPathname);
+
+
+			//Convert .ipynb => .py
+			await exec('jupyter nbconvert --to script', jupyterNotebookPathname);
+
+			await exec('python3', pythonPathname, trainingDataPathname);
+			 
+			this.shareTrainedModel();
 
 		}catch(error){
 			this.removeFromJump();

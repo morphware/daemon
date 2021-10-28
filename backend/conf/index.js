@@ -50,9 +50,10 @@ args
   .option('httpPort', 'http port')
   .option('electronDev', 'Load chrome dev tools')
   .option('ethAddress', 'Remote etherum node')
-  .option('acceptWork', 'Accepting jobs')
+  .option('acceptWork', 'Accepting model training jobs')
   .option('appDataPath', 'Path where local data is held')
   .option('appDownloadPath', 'Path for downloads')
+  .option('validate', 'Accept validation jobs')
   .option('privateKey', 'Wallet Object', undefined, value=>{
 	return [value];
   })
@@ -65,6 +66,7 @@ var runtimeConf = args.parse(process.argv, {
 	}
 })
 
+// console.log("Runtime Conf: ", runtimeConf);
 
 // Include the current version
 runtimeConf.version = packageJSON.version;
@@ -137,5 +139,7 @@ var conf = extend(
 );
 
 console.info('Local path is', runtimeConf.appDataPath);
+
+// console.log("Final Conf: ", conf);
 
 module.exports = {conf, localConf, editLocalConf}
