@@ -1,6 +1,7 @@
 import { createStyles, makeStyles } from "@material-ui/core";
 import React from "react";
 import TrainModelForm from "../components/trainModelForm";
+// import TrainModelForm from "../components/trainModelForm";
 import { theme } from "../providers/MorphwareTheme";
 
 const styles = makeStyles(() =>

@@ -1,8 +1,8 @@
 import React, { useContext } from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
 import { theme } from "../providers/MorphwareTheme";
-import TorrentsTableV2 from "../components/TorrentsTableV2";
-import { Grid, Typography } from "@material-ui/core";
+import TorrentsTable from "../components/TorrentsTable";
+import { Grid, Paper, Typography } from "@material-ui/core";
 import { DaemonContext } from "../providers/ServiceProviders";
 
 const styles = makeStyles(() =>
@@ -27,34 +27,47 @@ const Torrents = () => {
 
   return (
     <div className={classes.root}>
-      <Grid container>
-        <Grid item xs={4} style={{ paddingBottom: "15px" }}>
-          <Typography variant="h4" className={classes.statisticNumber}>
-            {torrents?.download}
-          </Typography>
-          <Typography variant="h5" style={{ paddingBottom: "20px" }}>
-            Download
-          </Typography>
+      <Paper
+        style={{
+          backgroundColor: theme.formSectionBackground?.main,
+          paddingTop: 30,
+        }}
+        elevation={0}
+      >
+        <Grid container>
+          <Grid item xs={4} style={{ paddingBottom: "15px" }}>
+            <Typography variant="h4" className={classes.statisticNumber}>
+              {torrents?.download}
+            </Typography>
+            <Typography variant="h5" style={{ paddingBottom: "20px" }}>
+              Download
+            </Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <Typography variant="h4" className={classes.statisticNumber}>
+              {torrents?.upload}
+            </Typography>
+            <Typography variant="h5" style={{ paddingBottom: "20px" }}>
+              Upload
+            </Typography>
+          </Grid>
+          <Grid item xs={4}>
+            <Typography variant="h4" className={classes.statisticNumber}>
+              {torrents?.port}
+            </Typography>
+            <Typography variant="h5" style={{ paddingBottom: "20px" }}>
+              Port
+            </Typography>
+          </Grid>
+          <Grid
+            item
+            xs={12}
+            style={{ display: "flex", justifyContent: "center" }}
+          >
+            <TorrentsTable />
+          </Grid>
         </Grid>
-        <Grid item xs={4}>
-          <Typography variant="h4" className={classes.statisticNumber}>
-            {torrents?.upload}
-          </Typography>
-          <Typography variant="h5" style={{ paddingBottom: "20px" }}>
-            Upload
-          </Typography>
-        </Grid>
-        <Grid item xs={4}>
-          <Typography variant="h4" className={classes.statisticNumber}>
-            {torrents?.port}
-          </Typography>
-          <Typography variant="h5" style={{ paddingBottom: "20px" }}>
-            Port
-          </Typography>
-        </Grid>
-      </Grid>
-
-      <TorrentsTableV2 />
+      </Paper>
     </div>
   );
 };

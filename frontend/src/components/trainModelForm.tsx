@@ -20,7 +20,7 @@ import { formFieldsMapper } from "../mappers/TrainModelFormMappers";
 import { theme } from "../providers/MorphwareTheme";
 import { makeStyles } from "@material-ui/core";
 import PositionedSnackbar from "./PositionedSnackbar";
-import { snackBarProps } from "../components/PositionedSnackbar";
+import { snackBarProps } from "./PositionedSnackbar";
 import FileField from "./FileField";
 import { Switches } from "mui-rff";
 
@@ -139,7 +139,7 @@ const TrainModelForm = () => {
                 backgroundColor: theme.formSectionBackground?.main,
                 marginBottom: 50,
               }}
-              elevation={3}
+              elevation={0}
             >
               <FileField
                 name="jupyterNotebook"
@@ -167,7 +167,9 @@ const TrainModelForm = () => {
                 width: "100%",
                 backgroundColor: theme.formSectionBackground?.main,
               }}
-              elevation={3}
+              elevation={0}
+
+              // elevation={3}
             >
               <Grid container alignItems="flex-start" spacing={2}>
                 {/* <Grid item xs={4} style={{ textAlign: "start" }}>

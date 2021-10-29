@@ -148,7 +148,9 @@ const SettingsForm = () => {
                   width: "100%",
                   backgroundColor: theme.formSectionBackground?.main,
                 }}
-                elevation={3}
+                elevation={0}
+
+                // elevation={1}
               >
                 {snackBarProps.text && snackBarProps.severity && (
                   <PositionedSnackbar

@@ -58,10 +58,12 @@ declare module "@material-ui/core/styles/createTheme" {
 export const theme: ThemeProps = createTheme({
   palette: {
     primary: {
-      main: "#5B676D",
+      // main: "#5B676D",
+      main: "#dbd9d9",
     },
     secondary: {
-      main: "#55341",
+      // main: "#55341",
+      main: "#5B676D",
     },
   },
   typography: {
@@ -91,7 +93,8 @@ export const theme: ThemeProps = createTheme({
     },
   },
   navBar: {
-    main: "#ffffff",
+    // main: "#ffffff",
+    main: "#ececec",
     selected: "#C8C8C8",
     innerBorder: "#afaeae",
     text: "#4B4B4C",
@@ -100,13 +103,15 @@ export const theme: ThemeProps = createTheme({
     main: "#C8C8C8",
   },
   background: {
-    main: "#ececec",
+    // main: "#ececec",
+    main: "#ffffff",
   },
   selectedNavbar: {
     main: "#65737e",
   },
   formSectionBackground: {
-    main: "#dbd9d9",
+    // main: "#dbd9d9",
+    main: "#fbfbfb",
   },
   metaDataContainer: {
     main: "#5B676D",
