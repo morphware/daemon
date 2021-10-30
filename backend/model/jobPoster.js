@@ -5,6 +5,7 @@ const {conf} = require('../conf');
 const {Job} = require('./job');
 const webtorrent = require('../controller/torrent');
 const fs = require('fs-extra');
+const {runJupyterLabServer, stopJupyterLabServer} = require('../model/notebook');
 
 
 /*
@@ -69,6 +70,21 @@ class JobPoster extends Job{
 		}
 	}
 
+	static async startNotebook(){
+		try {
+			await runJupyterLabServer();
+		} catch (error) {
+			console.error('ERROR!!! `Cannot open JupyterLab`', error);
+		}
+	}
+
+	static async stopNotebook(){
+		try {
+			await stopJupyterLabServer();
+		} catch (error) {
+			console.error('ERROR!!! `Cannot open JupyterLab`', error);
+		}
+	}
 
 	// Helpers
 	async __parsePostFile(data){
@@ -292,7 +308,6 @@ class JobPoster extends Job{
 			throw error.message || 'error';
 		}
 	}
-
 
 	/*
 	Events

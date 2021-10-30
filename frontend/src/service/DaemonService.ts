@@ -371,4 +371,17 @@ export class DaemonService implements IDaemonService {
 
     return updatedSettingsResponse;
   };
+
+  public startJupyterLab = async () => {
+    const url = `${this.baseUrl}/api/v0/notebook/start`;
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const startJupyterLabResponse = await response.json();
+    return startJupyterLabResponse;
+  }
 }

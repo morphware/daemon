@@ -43,6 +43,7 @@ interface daemonServiceProps {
   getSettings(): Promise<void>;
   getCurrentSettings(): Promise<void>;
   setActiveJobs(): Promise<void>;
+  startJupyterLab(): Promise<any>;
 }
 
 const MWSBalance = "0xbc40e97e6d665ce77e784349293d716b030711bc";
@@ -138,6 +139,11 @@ const ServiceProviders: React.FC = ({ children }) => {
     setCurrentConfigs(response);
   };
 
+  const startJupyterLab = async () => {
+    let response = await daemonService.startJupyterLab();
+    console.log("Response: ", response);
+  };
+
   const daemonServicContext: daemonServiceProps = {
     MWTAddress: MWSBalance,
     daemonService: daemonService,
@@ -160,6 +166,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     getSettings: getSettings,
     getCurrentSettings: getCurrentSettings,
     setActiveJobs: getActiveJobs,
+    startJupyterLab: startJupyterLab,
   };
 
   useEffect(() => {
