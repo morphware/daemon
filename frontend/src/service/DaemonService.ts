@@ -135,6 +135,7 @@ export interface SettingsRequestProps {
   acceptWork?: boolean;
   torrentListenPort?: number;
   appDownloadPath?: string;
+  jupyterLabPort?: number;
 }
 
 interface trainModelPostDataResponse {
@@ -368,6 +369,8 @@ export class DaemonService implements IDaemonService {
     const response = await fetch(url, requestOptions);
     const updatedSettingsResponse: SettingsResponseProps =
       await response.json();
+
+    console.log("Response: ", updatedSettingsResponse);
 
     return updatedSettingsResponse;
   };

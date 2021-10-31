@@ -117,9 +117,11 @@ const ServiceProviders: React.FC = ({ children }) => {
   };
 
   const updateSettings = async (request: SettingsRequestProps) => {
-    console.log("updateSettings: ", request);
+    console.log("updateSettings VALUES: ", request);
     let response = await daemonService.updateSettings(request);
     response = settingsDaemonResponseToSettingsResponseProps(response);
+    console.log("RESPONSE:  ", request);
+
     setCurrentConfigs(response);
     return response;
   };
@@ -136,6 +138,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     let response = await daemonService.getCurrentSettings();
     response = settingsDaemonResponseToSettingsResponseProps(response);
     console.log("getCurrentSettings: ", response);
+    if (!response.jupyterLabPort) response.jupyterLabPort = 3020; //The default port
     setCurrentConfigs(response);
   };
 

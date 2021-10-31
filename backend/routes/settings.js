@@ -9,7 +9,8 @@ const editKeys = {
 	'privateKey':{ type: 'array'},
 	'acceptWork':{ type: 'boolean'},
 	'torrentListenPort':{ type: 'number'},
-	'appDownloadPath': {type: 'string'}
+	'appDownloadPath': {type: 'string'},
+	'jupyterLabPort': {type: 'number'},
 };
 
 router.get('/', async function(req, res, next){

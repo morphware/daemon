@@ -1,6 +1,6 @@
 var { spawn, exec }  = require('child_process');
-
-const JUPYTER_LAB_PORT = 3020;
+const { conf } = require("../conf")
+const JUPYTER_LAB_PORT = conf.jupyterLabPort || 3020;
 
 async function runJupyterLabServer() {
     console.log("Starting Jupyter Lab...");

@@ -98,6 +98,8 @@ const SettingsForm = () => {
     }
   };
 
+  console.log("Init values: ", currentSettings);
+
   return (
     <div>
       <Form
@@ -149,8 +151,6 @@ const SettingsForm = () => {
                   backgroundColor: theme.formSectionBackground?.main,
                 }}
                 elevation={0}
-
-                // elevation={1}
               >
                 {snackBarProps.text && snackBarProps.severity && (
                   <PositionedSnackbar
@@ -221,6 +221,31 @@ const SettingsForm = () => {
                       <TextField
                         label="Torrent Listening Port"
                         name="torrentListenPort"
+                        required={true}
+                        type="number"
+                        style={{
+                          width: "30%",
+                          display: "flex",
+                          justifyContent: "flex-start",
+                        }}
+                      />
+                    </Grid>{" "}
+                    <Grid xs={4}>
+                      <Typography
+                        variant="h6"
+                        style={{ textAlign: "start", padding: "15px" }}
+                      >
+                        Jupyter Lab Port
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={8}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                      <TextField
+                        label="Jupyter Lab Port"
+                        name="jupyterLabPort"
                         required={true}
                         type="number"
                         style={{

@@ -17,5 +17,8 @@ export const settingsDaemonResponseToSettingsResponseProps = (
   if (Object.keys(daemonResponse).includes("acceptWork")) {
     response.acceptWork = daemonResponse.acceptWork;
   }
+  if (Object.keys(daemonResponse).includes("jupyterLabPort")) {
+    response.jupyterLabPort = daemonResponse.jupyterLabPort;
+  }
   return response;
 };
