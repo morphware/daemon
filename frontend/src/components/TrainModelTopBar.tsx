@@ -36,7 +36,7 @@ const TrainModelTopBar = () => {
         onClick={daemonService.startJupyterLab}
       >
         <Typography style={{ borderBottom: "1px solid grey" }} variant="body1">
-          Start Jupyter Lab
+          Start JupyterLab™
         </Typography>
       </Button>
     </div>
