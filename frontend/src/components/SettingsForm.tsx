@@ -98,8 +98,6 @@ const SettingsForm = () => {
     }
   };
 
-  console.log("Init values: ", currentSettings);
-
   return (
     <div>
       <Form
@@ -229,7 +227,7 @@ const SettingsForm = () => {
                           justifyContent: "flex-start",
                         }}
                       />
-                    </Grid>{" "}
+                    </Grid>
                     <Grid xs={4}>
                       <Typography
                         variant="h6"

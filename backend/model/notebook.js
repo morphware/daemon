@@ -3,14 +3,14 @@ const { conf } = require("../conf")
 const JUPYTER_LAB_PORT = conf.jupyterLabPort || 3020;
 
 async function runJupyterLabServer() {
-    console.log("Starting Jupyter Lab...");
+    console.log(`Starting Jupyter Lab on port ${JUPYTER_LAB_PORT}...`);
     const command = `jupyter lab --port ${JUPYTER_LAB_PORT}`
 	let output = exec(command);
     console.log("Output: ", output);
 }
 
 async function stopJupyterLabServer() {
-    console.log("Stopping Jupyter Lab...");
+    console.log(`Stopping Jupyter Lab on port ${JUPYTER_LAB_PORT}...`);
     const command = `jupyter lab stop ${JUPYTER_LAB_PORT}`
 	let output = exec(command);
     console.log("Output: ", output);

@@ -3,14 +3,11 @@
 
 # In[1]:
 
-import sys
 import tensorflow as     tf
 from   tensorflow import keras
 
 
 # In[2]:
-
-trainedModel = str(sys.argv[0])
 
 fashion_mnist = keras.datasets.fashion_mnist
 (X_train_full, y_train_full), (X_test, y_test) = fashion_mnist.load_data()
@@ -35,9 +32,7 @@ X_test           = X_test / maximum_pixel_intensity
 
 
 # TODO Prepend the downloads directory and the broader path to this filename.
-
-# infile_pathname  = 'unsorted/uploads/trainedModels/trained_model.h5'
-infile_pathname  = trainedModel
+infile_pathname  = 'unsorted/uploads/trainedModels/trained_model.h5'
 model = keras.models.load_model(infile_pathname)
 
 

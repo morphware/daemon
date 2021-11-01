@@ -357,6 +357,7 @@ View and edit settings
 	    "privateKey": [
 	      "0x6644308f8abe578c3598f9749c52e"
 	    ],
+		"jupyterLabPort":3040,
 	    "h": 3099,
 	    "version": "0.0.11",
 	    "appDataPath": "/home/william/.local/share/MorphwareWallet-development/",
@@ -381,12 +382,15 @@ View and edit settings
 	    },
 	    "appDownloadPath": {
 	      "type": "string"
-	    }
+	    },
+		"jupyterLabPort": {
+			"type":"number"
+		},
 	  }
 	}
 	```
 
-	**POST** `settings/`
+* **POST** `settings/`
 
 	Post the new local settings to the client. **THE CHANGES WILL NOT TAKE EFFECT
 	UNTIL THE CLIENT IS RESTARTED**

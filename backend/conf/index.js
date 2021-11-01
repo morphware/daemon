@@ -116,9 +116,6 @@ if(!fs.pathExistsSync(runtimeConf.appDataLocal)){
 // Grab local config
 var localConf = load(runtimeConf.appDataLocal);
 
-console.log("Local Conf");
-console.log(localConf)
-
 // Download data
 
 // Set the correct appDownloadPath if its not specified 

@@ -82,7 +82,7 @@ class JobPoster extends Job{
 		try {
 			await stopJupyterLabServer();
 		} catch (error) {
-			console.error('ERROR!!! `Cannot open JupyterLab`', error);
+			console.error('ERROR!!! `Cannot stop JupyterLab`', error);
 		}
 	}
 

@@ -334,8 +334,6 @@ export class DaemonService implements IDaemonService {
     const response = await fetch(url, requestOptions);
     const settingsConfig: SettingsParamsResponseProps = await response.json();
 
-    console.log("settings: ", settingsConfig);
-
     return settingsConfig;
   };
 

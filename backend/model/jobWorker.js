@@ -10,7 +10,6 @@ const {web3, percentHelper} = require('./contract');
 const {wallet} = require('./morphware');
 const {Job} = require('./job');
 const {exec} = require('./python');
-// const {openNotebook} = require('./notebook');
 
 (async function(){
 	try{
