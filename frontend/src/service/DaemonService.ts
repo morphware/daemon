@@ -135,6 +135,7 @@ export interface SettingsRequestProps {
   acceptWork?: boolean;
   torrentListenPort?: number;
   appDownloadPath?: string;
+  jupyterLabPort?: number;
 }
 
 interface trainModelPostDataResponse {
@@ -333,8 +334,6 @@ export class DaemonService implements IDaemonService {
     const response = await fetch(url, requestOptions);
     const settingsConfig: SettingsParamsResponseProps = await response.json();
 
-    console.log("settings: ", settingsConfig);
-
     return settingsConfig;
   };
 
@@ -369,6 +368,21 @@ export class DaemonService implements IDaemonService {
     const updatedSettingsResponse: SettingsResponseProps =
       await response.json();
 
+    console.log("Response: ", updatedSettingsResponse);
+
     return updatedSettingsResponse;
   };
+
+  public startJupyterLab = async () => {
+    const url = `${this.baseUrl}/api/v0/notebook/start`;
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const startJupyterLabResponse = await response.json();
+    return startJupyterLabResponse;
+  }
 }

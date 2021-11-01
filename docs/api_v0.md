@@ -357,6 +357,7 @@ View and edit settings
 	    "privateKey": [
 	      "0x6644308f8abe578c3598f9749c52e"
 	    ],
+		"jupyterLabPort":3040,
 	    "h": 3099,
 	    "version": "0.0.11",
 	    "appDataPath": "/home/william/.local/share/MorphwareWallet-development/",
@@ -381,12 +382,15 @@ View and edit settings
 	    },
 	    "appDownloadPath": {
 	      "type": "string"
-	    }
+	    },
+		"jupyterLabPort": {
+			"type":"number"
+		},
 	  }
 	}
 	```
 
-	**POST** `settings/`
+* **POST** `settings/`
 
 	Post the new local settings to the client. **THE CHANGES WILL NOT TAKE EFFECT
 	UNTIL THE CLIENT IS RESTARTED**
@@ -409,3 +413,47 @@ View and edit settings
 	curl  -H "Content-Type: application/json" -X POST -d '{"privateKeys":["0x66443098f9749c52e"]}' 127.0.0.1:3099/api/v0/settings
   {"error":"Can not edit privateKeys"}
 	```
+
+
+## Notebook
+
+'api/v0/notebook/start'
+
+* **POST**
+
+	Start a Jupyter Lab on the port set on the settings screen. Default is 3020
+
+	Query **none**
+
+	Response fields:
+	* `status` 'success'
+
+	Example
+
+	``` bash
+		curl -X POST 127.0.0.1:3008/api/v0/notebook/start
+		{"status":"success"}
+	```
+
+'api/v0/notebook/stop'
+
+* **POST**
+
+	Stop a Jupyter Lab in the port set on the settings screen. Default is 3020
+
+	Query **none**
+
+	Response fields:
+	* `status` 'success'
+
+	Example
+
+	``` bash
+		curl -X POST 127.0.0.1:3008/api/v0/notebook/stop
+		{"status":"success"}
+	```
+
+
+
+
+

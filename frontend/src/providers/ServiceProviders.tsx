@@ -43,6 +43,7 @@ interface daemonServiceProps {
   getSettings(): Promise<void>;
   getCurrentSettings(): Promise<void>;
   setActiveJobs(): Promise<void>;
+  startJupyterLab(): Promise<any>;
 }
 
 const MWSBalance = "0xbc40e97e6d665ce77e784349293d716b030711bc";
@@ -116,7 +117,6 @@ const ServiceProviders: React.FC = ({ children }) => {
   };
 
   const updateSettings = async (request: SettingsRequestProps) => {
-    console.log("updateSettings: ", request);
     let response = await daemonService.updateSettings(request);
     response = settingsDaemonResponseToSettingsResponseProps(response);
     setCurrentConfigs(response);
@@ -135,7 +135,13 @@ const ServiceProviders: React.FC = ({ children }) => {
     let response = await daemonService.getCurrentSettings();
     response = settingsDaemonResponseToSettingsResponseProps(response);
     console.log("getCurrentSettings: ", response);
+    if (!response.jupyterLabPort) response.jupyterLabPort = 3020; //The default port
     setCurrentConfigs(response);
+  };
+
+  const startJupyterLab = async () => {
+    let response = await daemonService.startJupyterLab();
+    console.log("Response: ", response);
   };
 
   const daemonServicContext: daemonServiceProps = {
@@ -160,6 +166,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     getSettings: getSettings,
     getCurrentSettings: getCurrentSettings,
     setActiveJobs: getActiveJobs,
+    startJupyterLab: startJupyterLab,
   };
 
   useEffect(() => {

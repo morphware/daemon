@@ -1,17 +1,13 @@
 'use strict';
 
 const fs = require('fs-extra');
-const crypto = require('crypto');
 const checkDiskSpace = require('check-disk-space').default;
 
 const {conf} = require('../conf');
 const webtorrent = require('../controller/torrent');
-const {web3, percentHelper} = require('./contract');
 const {wallet} = require('./morphware');
 const {Job} = require('./job');
 const {exec} = require('./python');
-const moment = require('moment');
-const { stdout } = require('process');
 
 (async function(){
 	try{
