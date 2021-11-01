@@ -140,51 +140,6 @@ class JobValidator extends Job{
 	class for more information.
 	*/
 
-// 	async __JobDescriptionPosted(event){
-// 		// This is prefixed with '__' so its not auto called by Job.events and
-// 		// ONLY called when this class wants to call it.
-
-// 		try{
-
-// 			// Confirm we have enough free space to perform the job
-// /*			if(!await this.__checkDisk(this.trainingDatasetSize, conf.appDownloadPath)){
-// 				console.info('Not enough free disk space, passing');
-
-// 				// Drop this instance instance from the jump table
-// 				this.removeFromJump();
-
-// 				return false;
-// 			}*/
-
-// 			// This setTimeout may not be needed.
-// 			// Calculate start of the reveal window
-// 			// var now = Math.floor(new Date().getTime());
-// 			var now = new Date().getTime();
-// 			// var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now - 180000);
-// 			var revealDeadline = parseInt(this.jobData.revealDeadline);
-
-// 			//Reveal 3 mins before reveal deadline
-// 			var revealTime = (revealDeadline*1000) - 3*60*1000;
-// 			var revealInMS = revealTime - now;
-
-// 			var revealDeadline = new Date(revealTime).toLocaleTimeString();
-
-//             console.log('\n\n\n\nthis.jobData:',this.jobData);
-// 			console.log('Revealing bid in', revealInMS/1000, ' at ', revealDeadline);
-// 			console.log("Reveal Deadline from smartContract: ", parseInt(this.jobData.revealDeadline));
-
-// 			await this.bid();
-
-// 			// reveal the bid during the reveal window
-// 			setTimeout(()=>{
-// 				this.reveal();
-// 			}, revealInMS);
-// 		}catch(error){
-// 			this.removeFromJump();
-// 			console.error(`ERROR!!! JobValidator __JobDescriptionPosted`, error)
-// 		}
-// 	}
-
     async __TestingDatasetShared(event){
         try {
             let job = event.returnValues;
