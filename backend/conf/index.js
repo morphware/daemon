@@ -122,9 +122,7 @@ console.log(localConf)
 // Download data
 
 // Set the correct appDownloadPath if its not specified 
-if(!localConf.appDownloadPath && !runtimeConf.appDownloadPath){
-	console.log("localConf not defined: ", localConf.appDownloadPath);
-	console.log("runtimeConf not defined: ", runtimeConf.appDownloadPath);
+if(!localConf.appDownloadPath || !runtimeConf.appDownloadPath){
 	runtimeConf.appDownloadPath = `${runtimeConf.appDataPath}downloads/`
 }
 
