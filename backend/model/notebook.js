@@ -4,7 +4,8 @@ const JUPYTER_LAB_PORT = conf.jupyterLabPort || 3020;
 
 async function runJupyterLabServer() {
     console.log(`Starting Jupyter Lab on port ${JUPYTER_LAB_PORT}...`);
-    const command = `jupyter lab --port ${JUPYTER_LAB_PORT}`
+    console.log("dataPath: ", conf.appDownloadPath)
+    const command = `jupyter lab --port ${JUPYTER_LAB_PORT} --notebook-dir ${conf.appDownloadPath}`
 	let output = exec(command);
     console.log("Output: ", output);
 }
