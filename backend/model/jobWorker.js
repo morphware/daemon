@@ -81,8 +81,8 @@ class JobWorker extends Job{
 
 			if(name === 'JobDescriptionPosted'){
 
-				// Check to see if this client is accepting work
-				if(!this.canTakeWork()) return;
+				// Check to see if this client is accepting work or attempting to work on its own posted job
+				if(!this.canTakeWork() || event.returnValues.jobPoster === wallet.address)  return;
 
 				// Make the job instance
 				let job = new this(wallet, event.returnValues);
