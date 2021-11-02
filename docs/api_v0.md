@@ -413,8 +413,15 @@ View and edit settings
 	curl  -H "Content-Type: application/json" -X POST -d '{"privateKeys":["0x66443098f9749c52e"]}' 127.0.0.1:3099/api/v0/settings
   {"error":"Can not edit privateKeys"}
 	```
+* **GET** `settings/role`
 
+	Get the role of the user. i.e. Poster, Worker or Validator
 
+	Example
+	```bash
+	curl 127.0.0.1:3010/api/v0/settings/role
+	{"role":"validator"}
+	```
 ## Notebook
 
 'api/v0/notebook/start'

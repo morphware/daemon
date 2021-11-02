@@ -34,4 +34,14 @@ router.post('/', async function(req, res, next) {
 	}
 });
 
+router.get('/role', async function(req, res, next) {
+	try {
+		if(conf.acceptWork) return res.json({role: "worker"});
+		else if(conf.validate) return res.json({role: "validator"});
+		return res.json({role: "poster"});
+	} catch (error) {
+		next(error);
+	}
+})
+
 module.exports = router;
