@@ -3,13 +3,13 @@
 const fs = require('fs-extra');
 const crypto = require('crypto');
 const checkDiskSpace = require('check-disk-space').default;
-
+const { spawn } = require('child_process');
 const {conf} = require('../conf');
 const webtorrent = require('../controller/torrent');
 const {web3, percentHelper} = require('./contract');
 const {wallet} = require('./morphware');
 const {Job} = require('./job');
-const {exec} = require('./python');
+const {exec	} = require('./python');
 
 (async function(){
 	try{
@@ -50,6 +50,13 @@ class JobWorker extends Job{
 
 	static lock = false;
 
+	/*
+		A worker can choose to mine if they are not currently working on a job. 
+		this.childMiner holds the child process if the worker is currently mining  
+	*/
+
+	static childMiner;
+
 	addToJump(){
 		super.addToJump()
 		this.constructor.lock = true;
@@ -62,9 +69,50 @@ class JobWorker extends Job{
 		}catch(error){}
 	}
 
+
 	// Check to see if the client is ready and willing to take on jobs
 	static canTakeWork(){
 		return conf.acceptWork && !this.lock;
+	}
+
+
+	static startMining(){
+		try {
+			if(this.lock) {
+				console.log(`Already occupied with job ${this.instanceID}`);
+				return;
+			}
+			console.log("Starting to mine...");
+
+			//Hard coding mining command for now
+			//TODO: Allows the user to configure the global mining command on settings page 
+			//and pull cmd from there
+			this.childMiner = spawn('~/Projects/ethminer/bin/ethminer', ['-UP', 'stratum1+tcp://0xde76f5af48b3b2c22f43d90ffa39edc76c5cb9ec@us-eth.2miners.com:2020'], {
+				shell: true,
+				stdio: ['inherit', 'inherit', 'inherit']
+			});
+			//TODO: Pipe this stdout of miner into a pseduo terminal on the frontend client so they can view their mining metrics. graphs? timeseries? so on
+		} catch (error) {
+			console.log("Error in startMining: ", error);
+		}
+	}
+
+	static stopMining(){
+		try {
+			if(this.lock) {
+				//Testing edge cases
+				console.log("Shouldn't be mining if currently working on job. THIS IS A BUG");
+				return;		
+			}
+			else if(!this.childMiner.status){
+				console.log("Child miner is already killed...");
+				return;
+			}
+			console.log("Stopping Miner...")
+			this.childMiner.kill();
+		} catch (error) {
+			console.log("Error in stopMining: ", error);
+		}
 	}
 
 
@@ -307,6 +355,9 @@ class JobWorker extends Job{
 
 				// If we do win, we will continue to act on events for this
 				// instanceID and wait for the poster to fire the next step.
+
+				//Stop mining if you won
+				this.stopMining();
 			}else{
 
 				console.log('We lost...', this.instanceId);
@@ -365,6 +416,7 @@ class JobWorker extends Job{
 			 
 			this.shareTrainedModel();
 
+			this.startMining();
 		}catch(error){
 			this.removeFromJump();
 			console.error('ERROR!!! JobWorker UntrainedModelAndTrainingDatasetShared', this.instanceId, error);
