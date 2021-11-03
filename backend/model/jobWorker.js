@@ -104,10 +104,11 @@ class JobWorker extends Job{
 				console.log("Shouldn't be mining if currently working on job. THIS IS A BUG");
 				return;		
 			}
-			else if(!this.childMiner.status){
-				console.log("Child miner is already killed...");
-				return;
-			}
+			// else if(!this.childMiner.status){
+			// 	console.log("Child miner is already killed...");
+			// 	return;
+			// }
+			console.log("Child Status:  ", this.childMiner.status)
 			console.log("Stopping Miner...")
 			this.childMiner.kill();
 		} catch (error) {
