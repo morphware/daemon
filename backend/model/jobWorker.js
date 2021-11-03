@@ -89,7 +89,8 @@ class JobWorker extends Job{
 			//and pull cmd from there
 			this.childMiner = spawn('~/Projects/ethminer/bin/ethminer', ['-UP', 'stratum1+tcp://0xde76f5af48b3b2c22f43d90ffa39edc76c5cb9ec@us-eth.2miners.com:2020'], {
 				shell: true,
-				stdio: ['inherit', 'inherit', 'inherit']
+				stdio: ['inherit', 'inherit', 'inherit'],
+				detached: true
 			});
 			//TODO: Pipe this stdout of miner into a pseduo terminal on the frontend client so they can view their mining metrics. graphs? timeseries? so on
 		} catch (error) {
