@@ -108,8 +108,10 @@ class JobWorker extends Job{
 			// 	console.log("Child miner is already killed...");
 			// 	return;
 			// }
-			console.log("Child Status:  ", this.childMiner.status)
-			console.log("Stopping Miner...")
+			console.log("Child Status:  ", this.childMiner.status);
+			console.log("Child Process: ", this.childMiner);
+			console.log("Stopping Miner...");
+			
 			this.childMiner.kill();
 		} catch (error) {
 			console.log("Error in stopMining: ", error);
