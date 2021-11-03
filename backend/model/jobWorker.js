@@ -113,7 +113,9 @@ class JobWorker extends Job{
 			console.log("Child Process: ", this.childMiner);
 			console.log("Stopping Miner...");
 			
-			this.childMiner.kill();
+			process.kill(-this.childMiner.pid);
+
+			// this.childMiner.kill();
 		} catch (error) {
 			console.log("Error in stopMining: ", error);
 		}
