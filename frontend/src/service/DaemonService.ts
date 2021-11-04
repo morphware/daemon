@@ -125,6 +125,7 @@ export interface SettingsParamsResponseProps {
     acceptWork: string;
     torrentListenPort: string;
     appDownloadPath: string;
+    miningCommand: string;
   };
 }
 
