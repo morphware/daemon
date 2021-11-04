@@ -75,12 +75,14 @@ class JobWorker extends Job{
 		return conf.acceptWork && !this.lock;
 	}
 
-
+	//Create a new process group that starts mining
 	static startMining(){
 		try {
 			if(this.lock) {
-				console.log(`Already occupied with job ${this.instanceID}`);
-				return;
+				throw(`Already occupied with job ${this.instanceID}`);
+			}
+			else if(this.childMiner){
+				throw(`Already mining on process ${this.childMiner.pid}`)
 			}
 			console.log("Starting to mine...");
 
@@ -88,36 +90,34 @@ class JobWorker extends Job{
 			//TODO: Allows the user to configure the global mining command on settings page 
 			//and pull cmd from there
 			this.childMiner = spawn('~/Projects/ethminer/bin/ethminer', ['-UP', 'stratum1+tcp://0xde76f5af48b3b2c22f43d90ffa39edc76c5cb9ec@us-eth.2miners.com:2020'], {
-				shell: true,
+			shell: true,
 				stdio: ['inherit', 'inherit', 'inherit'],
 				detached: true
 			});
 			//TODO: Pipe this stdout of miner into a pseduo terminal on the frontend client so they can view their mining metrics. graphs? timeseries? so on
 		} catch (error) {
 			console.log("Error in startMining: ", error);
+			throw(error);
 		}
 	}
 
+	//Stop the mining process group if the client is currently mining
 	static stopMining(){
 		try {
 			if(this.lock) {
-				//Testing edge cases
-				console.log("Shouldn't be mining if currently working on job. THIS IS A BUG");
-				return;		
+				throw("Shouldn't be mining if currently working on job.");
 			}
-			// else if(!this.childMiner.status){
-			// 	console.log("Child miner is already killed...");
-			// 	return;
-			// }
-			console.log("Child Status:  ", this.childMiner.status);
-			console.log("Child Process: ", this.childMiner);
+			else if(!this.childMiner || !this.childMiner.pid){
+				throw("Miner is not running");																																																																																																																																																																																														
+			}
+			console.log("Child Process PID: ", this.childMiner.pid);
 			console.log("Stopping Miner...");
 			
 			process.kill(-this.childMiner.pid);
-
-			// this.childMiner.kill();
+			this.childMiner = null;
 		} catch (error) {
 			console.log("Error in stopMining: ", error);
+			throw(error);
 		}
 	}
 
