@@ -208,6 +208,31 @@ const SettingsForm = () => {
                         variant="h6"
                         style={{ textAlign: "start", padding: "15px" }}
                       >
+                        Global Mining Command
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={8}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                      <TextField
+                        label="Global Mining Command"
+                        name="miningCommand"
+                        required={true}
+                        type="text"
+                        style={{
+                          width: "80%",
+                          display: "flex",
+                          justifyContent: "flex-start",
+                        }}
+                      />
+                    </Grid>
+                    <Grid xs={4}>
+                      <Typography
+                        variant="h6"
+                        style={{ textAlign: "start", padding: "15px" }}
+                      >
                         Torrent Listening Port
                       </Typography>
                     </Grid>

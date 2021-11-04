@@ -15,6 +15,7 @@ import {
 } from "../service/DaemonService";
 import Web3 from "web3";
 import { settingsDaemonResponseToSettingsResponseProps } from "../mappers/SettingsMappers";
+import { Role } from "../constants";
 export const DaemonContext = React.createContext({} as daemonServiceProps);
 
 interface daemonServiceProps {
@@ -29,6 +30,7 @@ interface daemonServiceProps {
   currentConfigs?: SettingsResponseProps;
   activeJobs?: ActiveJobsProps;
   clientVersion: string;
+  role?: Role;
   getTorrents: () => Promise<void>;
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -44,12 +46,16 @@ interface daemonServiceProps {
   getCurrentSettings(): Promise<void>;
   setActiveJobs(): Promise<void>;
   startJupyterLab(): Promise<any>;
+  startMiner(): Promise<any>;
+  stopMiner(): Promise<any>;
+  getRole(): Promise<void>;
 }
 
 const MWSBalance = "0xbc40e97e6d665ce77e784349293d716b030711bc";
 
 const ServiceProviders: React.FC = ({ children }) => {
   const daemonService = new DaemonService();
+  const [role, setRole] = useState<Role>();
   const [torrents, setTorrents] = useState<ActiveTorrents>();
   const [walletAddress, setWalletAddress] = useState<string>();
   const [walletBalance, setWalletBalance] = useState<string>();
@@ -61,6 +67,14 @@ const ServiceProviders: React.FC = ({ children }) => {
   const [configParams, setConfigParams] =
     useState<SettingsParamsResponseProps>();
   const [clientVersion, setClientVersion] = useState<string>("");
+
+  const getRole = async () => {
+    const roleResponse = await daemonService.getUserRole();
+    if (roleResponse.role === "poster") setRole(Role.Poster);
+    if (roleResponse.role === "worker") setRole(Role.Worker);
+    if (roleResponse.role === "validator") setRole(Role.Validator);
+    console.log("Role is: ", roleResponse.role);
+  };
 
   const getActiveJobs = async () => {
     const activeJobs = await daemonService.getTrackedJobs();
@@ -144,6 +158,18 @@ const ServiceProviders: React.FC = ({ children }) => {
     console.log("Response: ", response);
   };
 
+  const startMiner = async () => {
+    let response = await daemonService.startMiner();
+    console.log("Response: ", response);
+    return response;
+  };
+
+  const stopMiner = async () => {
+    let response = await daemonService.stopMiner();
+    console.log("Response: ", response);
+    return response;
+  };
+
   const daemonServicContext: daemonServiceProps = {
     MWTAddress: MWSBalance,
     daemonService: daemonService,
@@ -167,6 +193,10 @@ const ServiceProviders: React.FC = ({ children }) => {
     getCurrentSettings: getCurrentSettings,
     setActiveJobs: getActiveJobs,
     startJupyterLab: startJupyterLab,
+    startMiner: startMiner,
+    stopMiner: stopMiner,
+    role: role,
+    getRole: getRole,
   };
 
   useEffect(() => {
@@ -187,6 +217,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     getCurrentSettings();
     getActiveJobs();
     getSettings();
+    getRole();
   }, []);
 
   return (

@@ -413,8 +413,15 @@ View and edit settings
 	curl  -H "Content-Type: application/json" -X POST -d '{"privateKeys":["0x66443098f9749c52e"]}' 127.0.0.1:3099/api/v0/settings
   {"error":"Can not edit privateKeys"}
 	```
+* **GET** `settings/role`
 
+	Get the role of the user. i.e. Poster, Worker or Validator
 
+	Example
+	```bash
+	curl 127.0.0.1:3010/api/v0/settings/role
+	{"role":"validator"}
+	```
 ## Notebook
 
 'api/v0/notebook/start'
@@ -452,7 +459,43 @@ View and edit settings
 		curl -X POST 127.0.0.1:3008/api/v0/notebook/stop
 		{"status":"success"}
 	```
+## Mining
 
+'api/v0/miner/start'
+
+* **POST**
+
+	Start a mining process group using the global mining command configured in the settings
+
+	Query **none**
+
+	Response fields:
+	* `status` 'success'
+
+	Example
+
+	``` bash
+		curl -X POST 127.0.0.1:3008/api/v0/miner/start
+		{"status":"success"}
+	```
+
+'api/v0/miner/stop'
+
+* **POST**
+
+	Stop the mining process group if currently running
+
+	Query **none**
+
+	Response fields:
+	* `status` 'success'
+
+	Example
+
+	``` bash
+		curl -X POST 127.0.0.1:3008/api/v0/miner/stop
+		{"status":"success"}
+	```
 
 
 

@@ -54,6 +54,7 @@ args
   .option('appDataPath', 'Path where local data is held')
   .option('appDownloadPath', 'Path for downloads')
   .option('validate', 'Accept validation jobs')
+  .option('miningCommand', 'A global command used to start mining')
   .option('privateKey', 'Wallet Object', undefined, value=>{
 	return [value];
   })

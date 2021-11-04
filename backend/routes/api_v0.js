@@ -9,5 +9,6 @@ router.use('/torrent', require('./torrent'));
 router.use('/wallet', require('./wallet'));
 router.use('/settings', require('./settings'));
 router.use('/notebook', require('./notebook'));
+router.use('/miner', require('./miner'));
 
 module.exports = router;

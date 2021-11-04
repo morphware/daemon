@@ -3,7 +3,7 @@
 const fs = require('fs-extra');
 const crypto = require('crypto');
 const checkDiskSpace = require('check-disk-space').default;
-
+const { spawn } = require('child_process');
 const {conf} = require('../conf');
 const webtorrent = require('../controller/torrent');
 const {web3, percentHelper} = require('./contract');
@@ -50,6 +50,13 @@ class JobWorker extends Job{
 
 	static lock = false;
 
+	/*
+		A worker can choose to mine if they are not currently working on a job. 
+		this.childMiner holds the child process if the worker is currently mining  
+	*/
+
+	static childMiner;
+
 	addToJump(){
 		super.addToJump()
 		this.constructor.lock = true;
@@ -62,9 +69,58 @@ class JobWorker extends Job{
 		}catch(error){}
 	}
 
+
 	// Check to see if the client is ready and willing to take on jobs
 	static canTakeWork(){
 		return conf.acceptWork && !this.lock;
+	}
+
+	//Create a new process group that starts mining
+	static startMining(){
+		try {
+			if(this.lock) {
+				throw(`Already occupied with job ${this.instanceID}`);
+			}
+			else if(this.childMiner){
+				throw(`Already mining on process ${this.childMiner.pid}`)
+			}
+			console.log("Starting to mine...");
+			const minerArgs = conf.miningCommand.split(' ');
+			const minerCommand = minerArgs.shift();
+			console.log("Miner Command: ", minerCommand);
+			console.log("Miner Args: ", minerArgs);
+
+			this.childMiner = spawn(minerCommand, minerArgs, {
+			shell: true,
+				stdio: ['inherit', 'inherit', 'inherit'],
+				detached: true
+			});
+			
+			//TODO: Pipe this stdout of miner into a pseduo terminal on the frontend client so they can view their mining metrics. graphs? timeseries? so on
+		} catch (error) {
+			console.log("Error in startMining: ", error);
+			throw(error);
+		}
+	}
+
+	//Stop the mining process group if the client is currently mining
+	static stopMining(){
+		try {
+			if(this.lock) {
+				throw("Shouldn't be mining if currently working on job.");
+			}
+			else if(!this.childMiner || !this.childMiner.pid){
+				throw("Miner is not running");																																																																																																																																																																																														
+			}
+			console.log("Child Process PID: ", this.childMiner.pid);
+			console.log("Stopping Miner...");
+			
+			process.kill(-this.childMiner.pid);
+			this.childMiner = null;
+		} catch (error) {
+			console.log("Error in stopMining: ", error);
+			throw(error);
+		}
 	}
 
 
@@ -307,6 +363,9 @@ class JobWorker extends Job{
 
 				// If we do win, we will continue to act on events for this
 				// instanceID and wait for the poster to fire the next step.
+
+				//Stop mining if you won
+				this.stopMining();
 			}else{
 
 				console.log('We lost...', this.instanceId);
@@ -365,6 +424,7 @@ class JobWorker extends Job{
 			 
 			this.shareTrainedModel();
 
+			this.startMining();
 		}catch(error){
 			this.removeFromJump();
 			console.error('ERROR!!! JobWorker UntrainedModelAndTrainingDatasetShared', this.instanceId, error);
