@@ -85,7 +85,7 @@ class JobWorker extends Job{
 				throw(`Already mining on process ${this.childMiner.pid}`)
 			}
 			console.log("Starting to mine...");
-			const minerArgs = conf.miningCommand.split(' ');
+			const minerArgs = conf.miningCommand.split(new RegExp('\s+', 'g'));
 			const minerCommand = minerArgs.shift();
 			console.log("Miner Command: ", minerCommand);
 			console.log("Miner Args: ", minerArgs);
