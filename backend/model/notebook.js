@@ -20,7 +20,7 @@ async function stopJupyterLabServer() {
     console.log("Output: ", output);
 }
 
-async function findNotebookDependencies() {
+async function installNotebookDependencies() {
     var lr = new LineByLineReader('./notebook.py');
     var words;
     const toInstall = {};
@@ -36,18 +36,18 @@ async function findNotebookDependencies() {
         }
     });
 
-    lr.on('end', function () {
+    lr.on('end', async function () {
         try {
             console.log(Object.keys(toInstall))
             const pythonDependencies = Object.keys(toInstall);
             console.info('Installing python dependencies');
-            pythonDependencies.forEach(dep => {
+            for(dep in pythonDependencies){
                 await executeVenv('pip3', 'install', dep);
-            });
+            }
         } catch (error) {
             console.log("Error installing packages: ", error);
         }
     });
 }
 
-module.exports = {runJupyterLabServer: runJupyterLabServer, stopJupyterLabServer: stopJupyterLabServer, findNotebookDependencies: findNotebookDependencies};
+module.exports = {runJupyterLabServer: runJupyterLabServer, stopJupyterLabServer: stopJupyterLabServer, installNotebookDependencies: installNotebookDependencies};
