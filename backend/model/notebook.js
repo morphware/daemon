@@ -36,14 +36,14 @@ async function findNotebookDependencies() {
         }
     });
 
-    lr.on('end', function () {
+    lr.on('end', async function () {
         try {
             console.log(Object.keys(toInstall))
             const pythonDependencies = Object.keys(toInstall);
             console.info('Installing python dependencies');
-            pythonDependencies.forEach(dep => {
+            for(dep of pythonDependencies){
                 await executeVenv('pip3', 'install', dep);
-            });
+            }
         } catch (error) {
             console.log("Error installing packages: ", error);
         }
