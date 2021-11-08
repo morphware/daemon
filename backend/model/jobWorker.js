@@ -79,7 +79,11 @@ class JobWorker extends Job{
 	//Create a new process group that starts mining
 	static startMining(){
 		try {
-			if(this.lock) {
+			if(!conf.miningCommand){
+				console.log("No Mining Command Configured");
+				return;
+			}
+			else if(this.lock) {
 				throw(`Already occupied with job ${this.instanceID}`);
 			}
 			else if(this.childMiner){
@@ -433,7 +437,7 @@ class JobWorker extends Job{
 			 
 			this.shareTrainedModel();
 
-			this.startMining();
+			JobWorker.startMining();
 		}catch(error){
 			this.removeFromJump();
 			console.error('ERROR!!! JobWorker UntrainedModelAndTrainingDatasetShared', this.instanceId, error);
