@@ -433,7 +433,7 @@ class JobWorker extends Job{
 			 
 			this.shareTrainedModel();
 
-			this.startMining();
+			JobWorker.startMining()
 		}catch(error){
 			this.removeFromJump();
 			console.error('ERROR!!! JobWorker UntrainedModelAndTrainingDatasetShared', this.instanceId, error);
