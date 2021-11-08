@@ -4,7 +4,16 @@ const Web3 = require('web3');
 const BN = Web3.utils.BN;
 const {conf} = require('../conf');
 
-const provider = new Web3.providers.WebsocketProvider(conf.ethAddress);
+const provider = new Web3.providers.WebsocketProvider(conf.ethAddress, 
+	{
+	clientConfig:
+		{
+			maxReceivedFrameSize: 10000000,
+			maxReceivedMessageSize: 10000000,
+		} 
+	}
+);
+
 const web3 = new Web3(provider);
 
 function percentHelper(input, percent){
