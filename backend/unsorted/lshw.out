@@ -1,0 +1,301 @@
+worker
+    description: Computer
+    width: 64 bits
+    capabilities: smp vsyscall32
+  *-core
+       description: Motherboard
+       physical id: 0
+     *-memory
+          description: System memory
+          physical id: 0
+          size: 8GiB
+     *-cpu
+          product: Intel(R) Core(TM) i5-10400 CPU @ 2.90GHz
+          vendor: Intel Corp.
+          physical id: 1
+          bus info: cpu@0
+          size: 2947MHz
+          capacity: 4300MHz
+          width: 64 bits
+          capabilities: fpu fpu_exception wp vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush dts acpi mmx fxsr sse sse2 ss ht tm pbe syscall nx pdpe1gb rdtscp x86-64 constant_tsc art arch_perfmon pebs bts rep_good nopl xtopology nonstop_tsc cpuid aperfmperf pni pclmulqdq dtes64 monitor ds_cpl est tm2 ssse3 sdbg fma cx16 xtpr pdcm pcid sse4_1 sse4_2 x2apic movbe popcnt tsc_deadline_timer aes xsave avx f16c rdrand lahf_lm abm 3dnowprefetch cpuid_fault epb invpcid_single ssbd ibrs ibpb stibp ibrs_enhanced fsgsbase tsc_adjust bmi1 avx2 smep bmi2 erms invpcid mpx rdseed adx smap clflushopt intel_pt xsaveopt xsavec xgetbv1 xsaves dtherm ida arat pln pts hwp hwp_notify hwp_act_window hwp_epp pku ospke md_clear flush_l1d arch_capabilities cpufreq
+     *-pci
+          description: Host bridge
+          product: Intel Corporation
+          vendor: Intel Corporation
+          physical id: 100
+          bus info: pci@0000:00:00.0
+          version: 05
+          width: 32 bits
+          clock: 33MHz
+        *-pci:0
+             description: PCI bridge
+             product: Xeon E3-1200 v5/E3-1500 v5/6th Gen Core Processor PCIe Controller (x16)
+             vendor: Intel Corporation
+             physical id: 1
+             bus info: pci@0000:00:01.0
+             version: 05
+             width: 32 bits
+             clock: 33MHz
+             capabilities: pci normal_decode bus_master cap_list
+             configuration: driver=pcieport
+             resources: irq:120 ioport:4000(size=4096) memory:80000000-810fffff ioport:6000000000(size=303038464)
+           *-display
+                description: VGA compatible controller
+                product: TU104 [GeForce RTX 2080 Rev. A]
+                vendor: NVIDIA Corporation
+                physical id: 0
+                bus info: pci@0000:01:00.0
+                version: a1
+                width: 64 bits
+                clock: 33MHz
+                capabilities: vga_controller bus_master cap_list rom
+                configuration: driver=nvidia latency=0
+                resources: iomemory:600-5ff iomemory:600-5ff irq:133 memory:80000000-80ffffff memory:6000000000-600fffffff memory:6010000000-6011ffffff ioport:4000(size=128) memory:81000000-8107ffff
+           *-multimedia
+                description: Audio device
+                product: TU104 HD Audio Controller
+                vendor: NVIDIA Corporation
+                physical id: 0.1
+                bus info: pci@0000:01:00.1
+                version: a1
+                width: 32 bits
+                clock: 33MHz
+                capabilities: bus_master cap_list
+                configuration: driver=snd_hda_intel latency=0
+                resources: irq:17 memory:81080000-81083fff
+           *-usb
+                description: USB controller
+                product: TU104 USB 3.1 Host Controller
+                vendor: NVIDIA Corporation
+                physical id: 0.2
+                bus info: pci@0000:01:00.2
+                version: a1
+                width: 64 bits
+                clock: 33MHz
+                capabilities: xhci cap_list
+                configuration: driver=xhci_hcd latency=0
+                resources: iomemory:600-5ff iomemory:600-5ff irq:128 memory:6012000000-601203ffff memory:6012040000-601204ffff
+           *-serial
+                description: Serial bus controller
+                product: TU104 USB Type-C UCSI Controller
+                vendor: NVIDIA Corporation
+                physical id: 0.3
+                bus info: pci@0000:01:00.3
+                version: a1
+                width: 32 bits
+                clock: 33MHz
+                capabilities: bus_master cap_list
+                configuration: driver=nvidia-gpu latency=0
+                resources: irq:125 memory:81084000-81084fff
+        *-display
+             description: VGA compatible controller
+             product: Intel Corporation
+             vendor: Intel Corporation
+             physical id: 2
+             bus info: pci@0000:00:02.0
+             version: 05
+             width: 64 bits
+             clock: 33MHz
+             capabilities: vga_controller bus_master cap_list rom
+             configuration: driver=i915 latency=0
+             resources: iomemory:600-5ff iomemory:400-3ff irq:130 memory:6013000000-6013ffffff memory:4000000000-400fffffff ioport:5000(size=64) memory:c0000-dffff
+        *-usb
+             description: USB controller
+             product: Intel Corporation
+             vendor: Intel Corporation
+             physical id: 14
+             bus info: pci@0000:00:14.0
+             version: 00
+             width: 64 bits
+             clock: 33MHz
+             capabilities: xhci bus_master cap_list
+             configuration: driver=xhci_hcd latency=0
+             resources: iomemory:600-5ff irq:127 memory:6014010000-601401ffff
+        *-communication
+             description: Communication controller
+             product: Intel Corporation
+             vendor: Intel Corporation
+             physical id: 16
+             bus info: pci@0000:00:16.0
+             version: 00
+             width: 64 bits
+             clock: 33MHz
+             capabilities: bus_master cap_list
+             configuration: driver=mei_me latency=0
+             resources: iomemory:600-5ff irq:131 memory:6014025000-6014025fff
+        *-sata
+             description: SATA controller
+             product: Intel Corporation
+             vendor: Intel Corporation
+             physical id: 17
+             bus info: pci@0000:00:17.0
+             version: 00
+             width: 32 bits
+             clock: 66MHz
+             capabilities: sata ahci_1.0 bus_master cap_list
+             configuration: driver=ahci latency=0
+             resources: irq:126 memory:81204000-81205fff memory:81207000-812070ff ioport:5090(size=8) ioport:5080(size=4) ioport:5060(size=32) memory:81206000-812067ff
+        *-pci:1
+             description: PCI bridge
+             product: Intel Corporation
+             vendor: Intel Corporation
+             physical id: 1b
+             bus info: pci@0000:00:1b.0
+             version: f0
+             width: 32 bits
+             clock: 33MHz
+             capabilities: pci normal_decode bus_master cap_list
+             configuration: driver=pcieport
+             resources: irq:121 ioport:6000(size=4096) memory:7f800000-7f9fffff ioport:4010000000(size=2097152)
+        *-pci:2
+             description: PCI bridge
+             product: Intel Corporation
+             vendor: Intel Corporation
+             physical id: 1c
+             bus info: pci@0000:00:1c.0
+             version: f0
+             width: 32 bits
+             clock: 33MHz
+             capabilities: pci normal_decode bus_master cap_list
+             configuration: driver=pcieport
+             resources: irq:122
+           *-pci
+                description: PCI bridge
+                product: ASM1083/1085 PCIe to PCI Bridge
+                vendor: ASMedia Technology Inc.
+                physical id: 0
+                bus info: pci@0000:03:00.0
+                version: 04
+                width: 32 bits
+                clock: 33MHz
+                capabilities: pci normal_decode bus_master cap_list
+        *-pci:3
+             description: PCI bridge
+             product: Intel Corporation
+             vendor: Intel Corporation
+             physical id: 1c.3
+             bus info: pci@0000:00:1c.3
+             version: f0
+             width: 32 bits
+             clock: 33MHz
+             capabilities: pci normal_decode bus_master cap_list
+             configuration: driver=pcieport
+             resources: irq:123 ioport:3000(size=4096) memory:81100000-811fffff
+           *-network
+                description: Ethernet interface
+                product: RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller
+                vendor: Realtek Semiconductor Co., Ltd.
+                physical id: 0
+                bus info: pci@0000:05:00.0
+                logical name: enp5s0
+                version: 15
+                serial: fc:34:97:10:35:ee
+                size: 1Gbit/s
+                capacity: 1Gbit/s
+                width: 64 bits
+                clock: 33MHz
+                capabilities: bus_master cap_list ethernet physical tp mii 10bt 10bt-fd 100bt 100bt-fd 1000bt-fd autonegotiation
+                configuration: autonegotiation=on broadcast=yes driver=r8169 driverversion=5.8.0-53-generic duplex=full firmware=rtl8168h-2_0.0.2 02/26/15 ip=192.168.1.177 latency=0 link=yes multicast=yes port=MII speed=1Gbit/s
+                resources: irq:19 ioport:3000(size=256) memory:81104000-81104fff memory:81100000-81103fff
+        *-pci:4
+             description: PCI bridge
+             product: Intel Corporation
+             vendor: Intel Corporation
+             physical id: 1d
+             bus info: pci@0000:00:1d.0
+             version: f0
+             width: 32 bits
+             clock: 33MHz
+             capabilities: pci normal_decode bus_master cap_list
+             configuration: driver=pcieport
+             resources: irq:124 ioport:7000(size=4096) memory:7fa00000-7fbfffff ioport:4010200000(size=2097152)
+        *-isa
+             description: ISA bridge
+             product: Intel Corporation
+             vendor: Intel Corporation
+             physical id: 1f
+             bus info: pci@0000:00:1f.0
+             version: 00
+             width: 32 bits
+             clock: 33MHz
+             capabilities: isa bus_master
+             configuration: latency=0
+        *-memory UNCLAIMED
+             description: Memory controller
+             product: Intel Corporation
+             vendor: Intel Corporation
+             physical id: 1f.2
+             bus info: pci@0000:00:1f.2
+             version: 00
+             width: 32 bits
+             clock: 33MHz (30.3ns)
+             configuration: latency=0
+             resources: memory:81200000-81203fff
+        *-multimedia
+             description: Audio device
+             product: Intel Corporation
+             vendor: Intel Corporation
+             physical id: 1f.3
+             bus info: pci@0000:00:1f.3
+             version: 00
+             width: 64 bits
+             clock: 33MHz
+             capabilities: bus_master cap_list
+             configuration: driver=snd_hda_intel latency=32
+             resources: iomemory:600-5ff iomemory:600-5ff irq:132 memory:6014020000-6014023fff memory:6014000000-601400ffff
+        *-serial
+             description: SMBus
+             product: Intel Corporation
+             vendor: Intel Corporation
+             physical id: 1f.4
+             bus info: pci@0000:00:1f.4
+             version: 00
+             width: 64 bits
+             clock: 33MHz
+             configuration: driver=i801_smbus latency=0
+             resources: iomemory:600-5ff irq:16 memory:6014024000-60140240ff ioport:efa0(size=32)
+     *-pnp00:00
+          product: PnP device PNP0c02
+          physical id: 2
+          capabilities: pnp
+          configuration: driver=system
+     *-pnp00:01
+          product: PnP device PNP0c02
+          physical id: 3
+          capabilities: pnp
+          configuration: driver=system
+     *-pnp00:02
+          product: PnP device PNP0501
+          physical id: 4
+          capabilities: pnp
+          configuration: driver=serial
+     *-pnp00:03
+          product: PnP device PNP0c02
+          physical id: 5
+          capabilities: pnp
+          configuration: driver=system
+     *-pnp00:04
+          product: PnP device INT3f0d
+          physical id: 6
+          capabilities: pnp
+          configuration: driver=system
+     *-pnp00:05
+          product: PnP device PNP0c02
+          physical id: 7
+          capabilities: pnp
+          configuration: driver=system
+     *-pnp00:06
+          product: PnP device PNP0c02
+          physical id: 8
+          capabilities: pnp
+          configuration: driver=system
+     *-pnp00:07
+          product: PnP device PNP0c02
+          physical id: 9
+          capabilities: pnp
+          configuration: driver=system
+     *-pnp00:08
+          product: PnP device PNP0c02
+          physical id: a
+          capabilities: pnp
+          configuration: driver=system
