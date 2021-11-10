@@ -10,7 +10,7 @@ const {web3, percentHelper} = require('./contract');
 const {wallet} = require('./morphware');
 const {Job} = require('./job');
 const {exec} = require('./python');
-const{installNotebookDependencies} = require('./notebook');
+const{installNotebookDependencies, updateNotebookMorphwareTerms} = require('./notebook');
 
 (async function(){
 	try{
@@ -421,6 +421,8 @@ class JobWorker extends Job{
 			await exec('jupyter nbconvert --to script', jupyterNotebookPathname);
 
 			await installNotebookDependencies(pythonPathname);
+
+			await updateNotebookMorphwareTerms(pythonPathname);
 
 			await exec('python3', pythonPathname, trainingDataPathname);
 			 

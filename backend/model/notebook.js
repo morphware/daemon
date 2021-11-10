@@ -5,6 +5,7 @@ const pyExec = require('./python').exec;
 const { conf } = require("../conf")
 var LineByLineReader = require('line-by-line');
 const fs = require('fs-extra');
+const replace = require('replace-in-file');
 
 
 const JUPYTER_LAB_PORT = conf.jupyterLabPort || 3020;
@@ -64,4 +65,14 @@ async function installNotebookDependencies(pythonFilePath) {
     });
 }
 
-module.exports = {runJupyterLabServer: runJupyterLabServer, stopJupyterLabServer: stopJupyterLabServer, installNotebookDependencies: installNotebookDependencies};
+async function updateNotebookMorphwareTerms(pythonFilePath) {
+    //For now updating 'MWSTORE' with worker defined appDataPath
+    const options = {
+        files: pythonFilePath,
+        from: /MWSTORE:/g,
+        to: conf.appDownloadPath,
+    };
+    return replace(options);
+}
+
+module.exports = {runJupyterLabServer: runJupyterLabServer, stopJupyterLabServer: stopJupyterLabServer, installNotebookDependencies: installNotebookDependencies, updateNotebookMorphwareTerms: updateNotebookMorphwareTerms};
