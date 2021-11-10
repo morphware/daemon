@@ -30,6 +30,19 @@ function load(filePath, required){
 // Apply changes to local conf
 function editLocalConf(args){
 	localConf = {...localConf, ...args};
+	console.log("BEFORE: ", localConf.appDownloadPath);
+	switch (process.platform){
+		case 'linux':
+			localConf.appDownloadPath += "/";
+			break;
+		case 'darwin':
+			localConf.appDownloadPath += "/";
+			break;
+		case 'win32':
+			localConf.appDownloadPath += "\\"
+			break;
+	}
+	console.log("AFTER: ", localConf.appDownloadPath);
 	fs.writeJsonSync(runtimeConf.appDataLocal, localConf);
 
 	return localConf;
