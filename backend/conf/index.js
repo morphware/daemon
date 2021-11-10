@@ -30,21 +30,27 @@ function load(filePath, required){
 // Apply changes to local conf
 function editLocalConf(args){
 	localConf = {...localConf, ...args};
-	console.log("BEFORE: ", localConf.appDownloadPath);
+	fs.writeJsonSync(runtimeConf.appDataLocal, localConf);
+	console.log("BEFORE: ", localConf.appDownloadPath)
 	switch (process.platform){
 		case 'linux':
-			localConf.appDownloadPath += "/";
+			if(localConf.appDownloadPath && localConf.appDownloadPath.slice(-1) !== "/"){
+				localConf.appDownloadPath += "/";
+			}
+			console.log('')
 			break;
 		case 'darwin':
-			localConf.appDownloadPath += "/";
+			if(localConf.appDownloadPath && localConf.appDownloadPath.slice(-1) !== "/"){
+				localConf.appDownloadPath += "/";
+			}
 			break;
 		case 'win32':
-			localConf.appDownloadPath += "\\"
+			if(localConf.appDownloadPath && localConf.appDownloadPath.slice(-1) !== "\\"){
+				localConf.appDownloadPath += "\\";
+			}
 			break;
 	}
-	console.log("AFTER: ", localConf.appDownloadPath);
-	fs.writeJsonSync(runtimeConf.appDataLocal, localConf);
-
+	console.log("After: ", localConf.appDownloadPath)
 	return localConf;
 }
 
@@ -140,7 +146,7 @@ console.log("Runtime AppDownloadPath: ", runtimeConf.appDownloadPath);
 // Set the correct appDownloadPath if its not specified 
 if(!localConf.appDownloadPath){
 	runtimeConf.appDownloadPath = `${runtimeConf.appDataPath}downloads/`
-}
+} 
 // if(localConf.appDownloadPath){
 // 	console.log("FIRST")
 // 	runtimeConf.appDownloadPath = localConf.appDownloadPath
