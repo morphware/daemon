@@ -50,7 +50,6 @@ function executeVenv(command, ...args){
 
 		console.log("Executing");
 		console.log("Command:  ", command);
-		console.log("Args:  ", ...args);
 		console.log("PATH:  ", PATH)
 		console.log("VIRTUAL_ENV:  ", VIRTUAL_ENV);
 

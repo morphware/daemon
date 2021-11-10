@@ -31,13 +31,11 @@ function load(filePath, required){
 function editLocalConf(args){
 	localConf = {...localConf, ...args};
 	fs.writeJsonSync(runtimeConf.appDataLocal, localConf);
-	console.log("BEFORE: ", localConf.appDownloadPath)
 	switch (process.platform){
 		case 'linux':
 			if(localConf.appDownloadPath && localConf.appDownloadPath.slice(-1) !== "/"){
 				localConf.appDownloadPath += "/";
 			}
-			console.log('')
 			break;
 		case 'darwin':
 			if(localConf.appDownloadPath && localConf.appDownloadPath.slice(-1) !== "/"){
@@ -50,7 +48,6 @@ function editLocalConf(args){
 			}
 			break;
 	}
-	console.log("After: ", localConf.appDownloadPath)
 	return localConf;
 }
 

@@ -83,9 +83,6 @@ class JobWorker extends Job{
 				console.log("No Mining Command Configured");
 				return;
 			}
-			else if(this.lock) {
-				throw(`Already occupied with job ${this.instanceID}`);
-			}
 			else if(this.childMiner){
 				throw(`Already mining on process ${this.childMiner.pid}`)
 			}
@@ -111,11 +108,6 @@ class JobWorker extends Job{
 	//Stop the mining process group if the client is currently mining
 	static stopMining(){
 		try {
-			//This is set when JobDescriptionPoster is first emmited, you should be able to mine
-			//Up intil the point where you win the auction.
-			// if(this.lock) {
-			// 	throw("Shouldn't be mining if currently working on job.");
-			// }
 			if(!this.childMiner || !this.childMiner.pid){
 				throw("Miner is not running");																																																																																																																																																																																														
 			}
@@ -395,9 +387,6 @@ class JobWorker extends Job{
 
 	async UntrainedModelAndTrainingDatasetShared(event){
 		try{
-			//Can any worker pick this up?
-			console.log("UntrainedModel RECIEVED")
-
 			this.downloadPath = `${conf.appDownloadPath}${this.jobData.jobPoster}/${this.id}`;
 
 			// Make sure download spot exists
