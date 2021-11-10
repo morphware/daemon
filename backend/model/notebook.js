@@ -26,37 +26,41 @@ async function stopJupyterLabServer() {
 }
 
 async function installNotebookDependencies(pythonFilePath) {
-    //Ensure the python file exists
-    fs.ensureFileSync(pythonFilePath)
+    return new Promise((res, rej) => {
+        //Ensure the python file exists
+        fs.ensureFileSync(pythonFilePath)
 
-    var lr = new LineByLineReader(pythonFilePath);
-    var words;
-    const toInstall = {};
+        var lr = new LineByLineReader(pythonFilePath);
+        var words;
+        const toInstall = {};
 
-    lr.on('error', function (err) {
-        console.log("Error finding dependencies", err)
-    });
+        lr.on('error', function (err) {
+            console.log("Error finding dependencies", err)
+        });
 
-    lr.on('line', function (line) {
-        words = line.split(new RegExp(/\s+/, 'g'));
-        if((words[0] === "from" || words[0] === "import") && !toInstall[words[1]] && !builtInPythonLibraries.includes(words[1])){
-            //If the module is being deconstructed, get the parent module name (e.g. matplotlib.pyplot)
-            let dependency = words[1].split('.')[0];
-            toInstall[dependency] = true;
-        }
-    });
-
-    lr.on('end', async function () {
-        try {
-            console.log(Object.keys(toInstall))
-            const pythonDependencies = Object.keys(toInstall);
-            console.info('Installing python dependencies');
-            for(let dep of pythonDependencies){
-                await pyExec('pip3', 'install', dep);
+        lr.on('line', function (line) {
+            words = line.split(new RegExp(/\s+/, 'g'));
+            if((words[0] === "from" || words[0] === "import") && !toInstall[words[1]] && !builtInPythonLibraries.includes(words[1])){
+                //If the module is being deconstructed, get the parent module name (e.g. matplotlib.pyplot)
+                let dependency = words[1].split('.')[0];
+                toInstall[dependency] = true;
             }
-        } catch (error) {
-            console.log("Error installing packages: ", error);
-        }
+        });
+
+        lr.on('end', async function () {
+            try {
+                console.log(Object.keys(toInstall))
+                const pythonDependencies = Object.keys(toInstall);
+                console.info('Installing python dependencies');
+                for(let dep of pythonDependencies){
+                    await pyExec('pip3', 'install', dep);
+                }
+                res();
+            } catch (error) {
+                console.log("Error installing packages: ", error);
+                rej(error);
+            }
+        });
     });
 }
 
