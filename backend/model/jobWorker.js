@@ -252,8 +252,6 @@ class JobWorker extends Job{
 
 		console.log("TRAINED MODEL PATH: ", this.trainedModelPath);
 
-		//let pathToTrainedModel = '/home/darshan/Desktop/morphware/daemon/backend/uploads/trainedModels/trained_model.h5';
-
 		let { magnetURI } = await webtorrent().findOrSeed(this.trainedModelPath);
 
 		console.log("Magnet Link to trained mode: ", magnetURI);
@@ -423,7 +421,6 @@ class JobWorker extends Job{
 			await exec('jupyter nbconvert --to script', jupyterNotebookPathname);
 
 			const trainedModelFileName = await installNotebookDependencies(pythonPathname);
-
 
 			await updateNotebookMorphwareTerms(pythonPathname, this.downloadPath + "/");
 
