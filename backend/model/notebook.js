@@ -27,6 +27,9 @@ async function stopJupyterLabServer() {
 }
 
 async function installNotebookDependencies(pythonFilePath) {
+
+    var fileName;
+
     return new Promise((res, rej) => {
         //Ensure the python file exists
         fs.ensureFileSync(pythonFilePath)
@@ -45,6 +48,15 @@ async function installNotebookDependencies(pythonFilePath) {
                 //If the module is being deconstructed, get the parent module name (e.g. matplotlib.pyplot)
                 let dependency = words[1].split('.')[0];
                 toInstall[dependency] = true;
+            } else {
+                for(let word of words){
+                    //e.g. Find "MWSTORE:FILENAME"
+                    if(/MWSTORE:/.test(word)){
+                        //Remove surrounding quotes -> MWSTORE:FILENAME
+                        word = word.substring(1, word.length - 1);
+                        fileName = word.split(":")[1];
+                    }
+                }
             }
         });
 
@@ -56,7 +68,7 @@ async function installNotebookDependencies(pythonFilePath) {
                 for(let dep of pythonDependencies){
                     await pyExec('pip3', 'install', dep);
                 }
-                res();
+                res(fileName);
             } catch (error) {
                 console.log("Error installing packages: ", error);
                 rej(error);
@@ -65,12 +77,14 @@ async function installNotebookDependencies(pythonFilePath) {
     });
 }
 
-async function updateNotebookMorphwareTerms(pythonFilePath) {
+async function updateNotebookMorphwareTerms(pythonFilePath, downloadPath) {
+    console.log("RECIEVED FILE PATH: ", pythonFilePath);
+    console.log("RECIEVED DOWNLOAD PATH: ", downloadPath);
     //For now updating 'MWSTORE' with worker defined appDataPath
     const options = {
         files: pythonFilePath,
         from: /MWSTORE:/g,
-        to: conf.appDownloadPath,
+        to: downloadPath,
     };
     return replace(options);
 }

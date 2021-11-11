@@ -250,9 +250,11 @@ class JobWorker extends Job{
 
 		console.log("Sharing Trained Model")
 
-		let pathToTrainedModel = '/home/darshan/Desktop/morphware/daemon/backend/uploads/trainedModels/trained_model.h5';
+		console.log("TRAINED MODEL PATH: ", this.trainedModelPath);
 
-		let { magnetURI } = await webtorrent().findOrSeed(pathToTrainedModel);
+		//let pathToTrainedModel = '/home/darshan/Desktop/morphware/daemon/backend/uploads/trainedModels/trained_model.h5';
+
+		let { magnetURI } = await webtorrent().findOrSeed(this.trainedModelPath);
 
 		console.log("Magnet Link to trained mode: ", magnetURI);
 
@@ -420,12 +422,15 @@ class JobWorker extends Job{
 			//Convert .ipynb => .py
 			await exec('jupyter nbconvert --to script', jupyterNotebookPathname);
 
-			await installNotebookDependencies(pythonPathname);
+			const trainedModelFileName = await installNotebookDependencies(pythonPathname);
 
-			await updateNotebookMorphwareTerms(pythonPathname);
+
+			await updateNotebookMorphwareTerms(pythonPathname, this.downloadPath + "/");
 
 			await exec('python3', pythonPathname, trainingDataPathname);
-			 
+			
+			this.trainedModelPath = this.downloadPath + "/" + trainedModelFileName;
+
 			this.shareTrainedModel();
 
 			JobWorker.startMining();
