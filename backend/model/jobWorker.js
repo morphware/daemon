@@ -10,6 +10,7 @@ const {web3, percentHelper} = require('./contract');
 const {wallet} = require('./morphware');
 const {Job} = require('./job');
 const {exec} = require('./python');
+const{installNotebookDependencies, updateNotebookMorphwareTerms} = require('./notebook');
 
 (async function(){
 	try{
@@ -78,14 +79,15 @@ class JobWorker extends Job{
 	//Create a new process group that starts mining
 	static startMining(){
 		try {
-			if(this.lock) {
-				throw(`Already occupied with job ${this.instanceID}`);
+			if(!conf.miningCommand){
+				console.log("No Mining Command Configured");
+				return;
 			}
 			else if(this.childMiner){
 				throw(`Already mining on process ${this.childMiner.pid}`)
 			}
 			console.log("Starting to mine...");
-			const minerArgs = conf.miningCommand.split(' ');
+			const minerArgs = conf.miningCommand.split(new RegExp('\s+', 'g'));
 			const minerCommand = minerArgs.shift();
 			console.log("Miner Command: ", minerCommand);
 			console.log("Miner Args: ", minerArgs);
@@ -106,10 +108,7 @@ class JobWorker extends Job{
 	//Stop the mining process group if the client is currently mining
 	static stopMining(){
 		try {
-			if(this.lock) {
-				throw("Shouldn't be mining if currently working on job.");
-			}
-			else if(!this.childMiner || !this.childMiner.pid){
+			if(!this.childMiner || !this.childMiner.pid){
 				throw("Miner is not running");																																																																																																																																																																																														
 			}
 			console.log("Child Process PID: ", this.childMiner.pid);
@@ -251,9 +250,9 @@ class JobWorker extends Job{
 
 		console.log("Sharing Trained Model")
 
-		let pathToTrainedModel = '/home/darshan/Desktop/morphware/daemon/backend/uploads/trainedModels/trained_model.h5';
+		console.log("TRAINED MODEL PATH: ", this.trainedModelPath);
 
-		let { magnetURI } = await webtorrent().findOrSeed(pathToTrainedModel);
+		let { magnetURI } = await webtorrent().findOrSeed(this.trainedModelPath);
 
 		console.log("Magnet Link to trained mode: ", magnetURI);
 
@@ -364,8 +363,10 @@ class JobWorker extends Job{
 				// If we do win, we will continue to act on events for this
 				// instanceID and wait for the poster to fire the next step.
 
-				//Stop mining if you won
-				this.stopMining();
+				//Stop mining if you are 
+				if(this.childMiner){
+					JobWorker.stopMining();
+				}
 			}else{
 
 				console.log('We lost...', this.instanceId);
@@ -386,7 +387,6 @@ class JobWorker extends Job{
 
 	async UntrainedModelAndTrainingDatasetShared(event){
 		try{
-
 			this.downloadPath = `${conf.appDownloadPath}${this.jobData.jobPoster}/${this.id}`;
 
 			// Make sure download spot exists
@@ -420,11 +420,17 @@ class JobWorker extends Job{
 			//Convert .ipynb => .py
 			await exec('jupyter nbconvert --to script', jupyterNotebookPathname);
 
+			const trainedModelFileName = await installNotebookDependencies(pythonPathname);
+
+			await updateNotebookMorphwareTerms(pythonPathname, this.downloadPath + "/");
+
 			await exec('python3', pythonPathname, trainingDataPathname);
-			 
+			
+			this.trainedModelPath = this.downloadPath + "/" + trainedModelFileName;
+
 			this.shareTrainedModel();
 
-			this.startMining();
+			JobWorker.startMining();
 		}catch(error){
 			this.removeFromJump();
 			console.error('ERROR!!! JobWorker UntrainedModelAndTrainingDatasetShared', this.instanceId, error);

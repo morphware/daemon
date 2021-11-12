@@ -1,6 +1,15 @@
+'use strict';
+
 var { spawn, exec }  = require('child_process');
+const pyExec = require('./python').exec;
 const { conf } = require("../conf")
+var LineByLineReader = require('line-by-line');
+const fs = require('fs-extra');
+const replace = require('replace-in-file');
+
+
 const JUPYTER_LAB_PORT = conf.jupyterLabPort || 3020;
+const builtInPythonLibraries = ['_abc', '_ast', '_bisect', '_blake2', '_codecs', '_codecs_cn', '_codecs_hk', '_codecs_iso2022', '_codecs_jp', '_codecs_kr', '_codecs_tw', '_collections', '_contextvars', '_csv', '_datetime', '_functools', '_heapq', '_imp', '_io', '_json', '_locale', '_lsprof', '_md5', '_multibytecodec', '_opcode', '_operator', '_peg_parser', '_pickle', '_random', '_sha1', '_sha256', '_sha3', '_sha512', '_signal', '_sre', '_stat', '_statistics', '_string', '_struct', '_symtable', '_thread', '_tracemalloc', '_warnings', '_weakref', '_winapi', '_xxsubinterpreters', 'array', 'atexit', 'audioop', 'binascii', 'builtins', 'cmath', 'errno', 'faulthandler', 'gc', 'itertools', 'marshal', 'math', 'mmap', 'msvcrt', 'nt', 'parser', 'sys', 'time', 'winreg', 'xxsubtype', 'zlib']
 
 async function runJupyterLabServer() {
     console.log(`Starting Jupyter Lab on port ${JUPYTER_LAB_PORT}...`);
@@ -17,5 +26,67 @@ async function stopJupyterLabServer() {
     console.log("Output: ", output);
 }
 
+async function installNotebookDependencies(pythonFilePath) {
 
-module.exports = {runJupyterLabServer: runJupyterLabServer, stopJupyterLabServer: stopJupyterLabServer};
+    var fileName;
+
+    return new Promise((res, rej) => {
+        //Ensure the python file exists
+        fs.ensureFileSync(pythonFilePath)
+
+        var lr = new LineByLineReader(pythonFilePath);
+        var words;
+        const toInstall = {};
+
+        lr.on('error', function (err) {
+            console.log("Error finding dependencies", err)
+        });
+
+        lr.on('line', function (line) {
+            words = line.split(new RegExp(/\s+/, 'g'));
+            if((words[0] === "from" || words[0] === "import") && !toInstall[words[1]] && !builtInPythonLibraries.includes(words[1])){
+                //If the module is being deconstructed, get the parent module name (e.g. matplotlib.pyplot)
+                let dependency = words[1].split('.')[0];
+                toInstall[dependency] = true;
+            } else {
+                for(let word of words){
+                    //e.g. Find "MWSTORE:FILENAME"
+                    if(/MWSTORE:/.test(word)){
+                        //Remove surrounding quotes -> MWSTORE:FILENAME
+                        word = word.substring(1, word.length - 1);
+                        fileName = word.split(":")[1];
+                    }
+                }
+            }
+        });
+
+        lr.on('end', async function () {
+            try {
+                console.log(Object.keys(toInstall))
+                const pythonDependencies = Object.keys(toInstall);
+                console.info('Installing python dependencies');
+                for(let dep of pythonDependencies){
+                    await pyExec('pip3', 'install', dep);
+                }
+                res(fileName);
+            } catch (error) {
+                console.log("Error installing packages: ", error);
+                rej(error);
+            }
+        });
+    });
+}
+
+async function updateNotebookMorphwareTerms(pythonFilePath, downloadPath) {
+    console.log("RECIEVED FILE PATH: ", pythonFilePath);
+    console.log("RECIEVED DOWNLOAD PATH: ", downloadPath);
+    //For now updating 'MWSTORE' with worker defined appDataPath
+    const options = {
+        files: pythonFilePath,
+        from: /MWSTORE:/g,
+        to: downloadPath,
+    };
+    return replace(options);
+}
+
+module.exports = {runJupyterLabServer: runJupyterLabServer, stopJupyterLabServer: stopJupyterLabServer, installNotebookDependencies: installNotebookDependencies, updateNotebookMorphwareTerms: updateNotebookMorphwareTerms};
