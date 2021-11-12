@@ -10,7 +10,7 @@ import "./AuctionsTable.css";
 
 import React, { useContext, useState } from "react";
 import Web3 from "web3";
-import { auctionStatusMapper } from "../utils";
+import { auctionStatusMapper, formatFileSize } from "../utils";
 import { DaemonContext } from "../providers/ServiceProviders";
 import { makeStyles, Typography } from "@material-ui/core";
 import { theme } from "../providers/MorphwareTheme";
@@ -99,6 +99,17 @@ const AuctionsTable = () => {
     return <span className="dib no-select">{status}</span>;
   };
 
+  const trainingDatasetSizeRenderer = ({ cellData }: any) => {
+    const sizeInBytes = parseInt(cellData);
+    if (sizeInBytes == null)
+      return (
+        <span className="dib o-40 no-select" style={{ width: "100%" }}>
+          -
+        </span>
+      );
+    return <span className="dib no-select">{formatFileSize(sizeInBytes)}</span>;
+  };
+
   const sort = ({
     sortBy,
     sortDirection,
@@ -143,6 +154,7 @@ const AuctionsTable = () => {
               />
               <Column
                 label="Training Data Size"
+                cellRenderer={trainingDatasetSizeRenderer}
                 dataKey="trainingDataSize"
                 width={width * 0.4}
                 className="f6 charcoal truncate pl2"
