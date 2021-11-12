@@ -12,6 +12,7 @@ import React, { InputHTMLAttributes, useEffect, useRef, useState } from "react";
 import { Field, useForm } from "react-final-form";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import { theme } from "../providers/MorphwareTheme";
+import { formatFileSize } from "../utils";
 
 interface FileFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -51,15 +52,6 @@ const FileField = ({
   const accept = acceptedValues ? acceptedValues.join(",") : "*";
 
   const form = useForm();
-
-  const formatFileSize = (bytes: number, decimalPoint?: number) => {
-    if (bytes == 0) return "0 Bytes";
-    var k = 1000,
-      dm = decimalPoint || 2,
-      sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
-      i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
-  };
 
   const fileName = (files?: FileList | null) => {
     const fileName = fileUploaded && files?.length === 1 ? files[0].name : "";

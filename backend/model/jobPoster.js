@@ -110,6 +110,16 @@ class JobPoster extends Job{
 		}
 	}
 
+	async __getFileSize(dataPath){
+		try {
+			console.log("Checking size of ", dataPath);
+			const stats = await fs.promises.stat(dataPath);
+			return stats.size;
+		} catch (error) {
+			console.log('error __getFileSize', error);
+			throw error;
+		}
+	}
 
 	/*
 	Actions
@@ -149,10 +159,13 @@ class JobPoster extends Job{
 			let biddingDeadline = now + parseInt(parseInt(this.postData.biddingTime) + buffer) * 1000;
 			let revealDeadline = now + parseInt(parseInt(this.postData.biddingTime) + revealTime) * 1000;
 
+			let trainingDatasetSize = await this.__getFileSize(this.postData.trainingData);
+			console.log("Total Size: ", trainingDatasetSize);
+
 			// Post the new job
 			let action = this.jobContract.methods.postJobDescription(
 				parseInt(this.postData.trainingTime),
-				parseInt(32), // get size this.postData['training-data']
+				parseInt(trainingDatasetSize),
 				parseInt(this.postData.errorRate),
 				percentHelper(this.postData.workerReward, 10),
 				parseInt(biddingDeadline/1000),
