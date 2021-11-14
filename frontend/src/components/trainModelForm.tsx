@@ -230,7 +230,7 @@ const TrainModelForm = () => {
                 <Grid container xs={8} spacing={2}>
                   <Grid item xs={6}>
                     <TextField
-                      label="Training Time (estimate)"
+                      label="Training Time (h) (estimate)"
                       name="trainingTime"
                       required={true}
                       type="number"
