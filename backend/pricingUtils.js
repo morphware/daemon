@@ -21,15 +21,16 @@ const GPUtoCUDAMapping = {
     "2060": 1920,
 }
 
-async function calculateBid() {
+async function calculateBid(trainingTimeInHours) {
     try {
         if(!conf.workerGPU) throw("Worker GPU not selected")
         console.log("My GPU: ", conf.workerGPU);
         const workerCUDACores = GPUtoCUDAMapping[conf.workerGPU];
         console.log("My GPU's CUDO Core Count: ", workerCUDACores);
-        const competingAWSPricePerCUDA = await findClosestCUDACorePerHourPrice(workerCUDACores);
-        console.log("competingAWSPricePerCUDA: ", competingAWSPricePerCUDA);
-        const biddingValue = competingAWSPricePerCUDA * workerCUDACores * 0.8;
+        console.log("Training Time: ", trainingTimeInHours)
+        const competingAWSCUDAPricePerHour = await findClosestCUDACorePerHourPrice(workerCUDACores);
+        console.log("competingAWSCUDAPricePerHour: ", competingAWSCUDAPricePerHour);
+        const biddingValue = competingAWSCUDAPricePerHour * workerCUDACores * parseInt(trainingTimeInHours) * 0.8;
         console.log("Bidding Value in USD: ", biddingValue)
         return biddingValue;
     } catch (error) {

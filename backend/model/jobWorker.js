@@ -183,7 +183,7 @@ class JobWorker extends Job{
 
 			console.info('Bidding on', this.instanceId, (new Date()).toLocaleString());
 
-			await calculateBid();
+			await calculateBid(this.jobData.estimatedTrainingTime);
 
 			let approveReceipt = await this.wallet.approve(percentHelper(
 				this.jobData.workerReward, 100
