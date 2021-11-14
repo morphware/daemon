@@ -11,6 +11,7 @@ const {wallet} = require('./morphware');
 const {Job} = require('./job');
 const {exec} = require('./python');
 const{installNotebookDependencies, updateNotebookMorphwareTerms} = require('./notebook');
+const {calculateBid} = require('../pricingUtils');
 
 (async function(){
 	try{
@@ -170,7 +171,6 @@ class JobWorker extends Job{
 		return (await checkDiskSpace(target)).free > size;
 	}
 
-
 	/*
 	Actions
 
@@ -182,6 +182,8 @@ class JobWorker extends Job{
 		try{
 
 			console.info('Bidding on', this.instanceId, (new Date()).toLocaleString());
+
+			await calculateBid();
 
 			let approveReceipt = await this.wallet.approve(percentHelper(
 				this.jobData.workerReward, 100

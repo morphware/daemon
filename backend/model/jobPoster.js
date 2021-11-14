@@ -162,6 +162,9 @@ class JobPoster extends Job{
 			let trainingDatasetSize = await this.__getFileSize(this.postData.trainingData);
 			console.log("Total Size: ", trainingDatasetSize);
 
+		    console.log("Time: ", this.postData.trainingTime);
+			console.log("GPU: ", conf.workerGPU)
+
 			// Post the new job
 			let action = this.jobContract.methods.postJobDescription(
 				parseInt(this.postData.trainingTime),

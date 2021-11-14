@@ -1,0 +1,11 @@
+Instance Type,On-demand Price per Hour,Number of CPUs,Number of GPUs,CUDA Cores per GPU,CUDA Cores,Cost per CUDA Core per Hour
+g2.2xlarge,0.65,8,1,1536,1536,0.00042
+g4dn.xlarge,0.53,4,1,2560,2560,0.00021
+g4dn.2xlarge,0.75,8,1,2560,2560,0.00029
+g4dn.4xlarge,1.20,16,1,2560,2560,0.00047
+g4dn.8xlarge,2.18,32,1,2560,2560,0.00085
+g4dn.16xlarge,4.35,64,1,2560,2560,0.00170
+g3s.xlarge,0.75,4,1,4096,4096,0.00018
+g3.4xlarge,1.14,16,1,4096,4096,0.00028
+p2.xlarge,0.90,4,1,4992,4992,0.00018
+p3.2xlarge,3.06,8,1,5120,5120,0.00060
