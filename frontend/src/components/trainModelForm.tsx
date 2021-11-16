@@ -161,6 +161,9 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
         if (values.errorRate <= 0) {
           errors.errorRate = "Must be greater than 0";
         }
+        if (values.errorRate > 100) {
+          errors.errorRate = "Must be less than 100";
+        }
         if (values.workerReward <= 0) {
           errors.bounty = "Must be greater than 0";
         }

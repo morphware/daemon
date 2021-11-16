@@ -36,7 +36,7 @@ async function calculateBid(trainingTimeInHours) {
         
         //TODO: THIS IS TEMPORARY. Assuming    1 MWT = 0.1 USD
         let biddingValueMWT = Math.round(biddingValueUSD * 10);
-        biddingValueMWT =  Web3.utils.toWei(biddingValueMWT, "ether");
+        biddingValueMWT =  Web3.utils.toWei(biddingValueMWT.toString(), "ether");
         console.log("Bidding Value in MWT in Wei: ", biddingValueMWT);
         return biddingValueMWT;
     } catch (error) {
