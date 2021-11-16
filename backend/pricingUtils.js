@@ -30,9 +30,13 @@ async function calculateBid(trainingTimeInHours) {
         console.log("Training Time: ", trainingTimeInHours)
         const competingAWSCUDAPricePerHour = await findClosestCUDACorePerHourPrice(workerCUDACores);
         console.log("competingAWSCUDAPricePerHour: ", competingAWSCUDAPricePerHour);
-        const biddingValue = competingAWSCUDAPricePerHour * workerCUDACores * parseInt(trainingTimeInHours) * 0.8;
-        console.log("Bidding Value in USD: ", biddingValue)
-        return biddingValue;
+        const biddingValueUSD = competingAWSCUDAPricePerHour * workerCUDACores * parseInt(trainingTimeInHours) * 0.8;
+        console.log("Bidding Value in USD: ", biddingValueUSD)
+        
+        //TODO: THIS IS TEMPORARY. Assuming    1 MWT = 0.1 USD
+        const biddingValueMWT = Math.round(biddingValueUSD * 10);
+        console.log("Bidding Value in MWT: ", biddingValueMWT)
+        return biddingValueMWT;
     } catch (error) {
         console.log("Error calculateBid: ", error);
         throw(error);
@@ -58,6 +62,7 @@ async function findClosestCUDACorePerHourPrice(workerCUDACores) {
             fs.createReadStream('./us_east_1.csv')
                 .pipe(csv())
                 .on('data', (currInstance) => {
+                    //Always have a closest match
                     if(!closestMatch) closestMatch = currInstance;
 
                     let instanceCUDACores = parseInt(currInstance["CUDA Cores"]);

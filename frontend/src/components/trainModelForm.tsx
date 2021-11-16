@@ -23,6 +23,8 @@ import PositionedSnackbar from "./PositionedSnackbar";
 import { snackBarProps } from "./PositionedSnackbar";
 import FileField from "./FileField";
 import { Switches } from "mui-rff";
+import { bountySetter } from "./Util";
+import { FormApi } from "final-form";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;
@@ -61,14 +63,53 @@ interface formFieldsErrors {
   testModel: string;
 }
 
+interface ICalculatedBounty {
+  form: FormApi<formFields, Partial<formFields>>;
+  bounty?: number;
+  setBounty: React.Dispatch<React.SetStateAction<number>>;
+}
+
+const CalculatedBounty = ({ form, bounty, setBounty }: ICalculatedBounty) => {
+  useEffect(() => {
+    setBounty(bountySetter(form.getState().values.trainingTime));
+  }, [form.getState().values.trainingTime]);
+
+  console.log("BOUNTY: ", bounty);
+
+  return (
+    <Grid item xs={6}>
+      <TextField
+        label="Bounty"
+        name="workerReward"
+        type="number"
+        required={true}
+        style={{
+          width: "80%",
+          display: "flex",
+          justifyContent: "flex-start",
+        }}
+        value={bounty}
+        focused
+      />
+    </Grid>
+  );
+};
+
 const TrainModelForm = () => {
   const daemonService = useContext(DaemonContext);
   const [removeFilesSignal, setRemoveFilesSignal] = useState<boolean>(true);
   const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
+  const [bounty, setBounty] = useState<number>(0);
 
   const onSubmit = async (values: formFields) => {
     values.biddingTime = 60;
+    values.testModel = true;
+    values.workerReward = bounty;
+    values.stopTrainingAutomatic = "max_num_epochs";
+    console.log("Values Before: ", values);
     const formFields = formFieldsMapper(values);
+    console.log("Values After: ", formFields);
+
     const responseV2 = await daemonService.submitTrainModelRequest(formFields);
 
     if (Object.keys(responseV2).includes("status")) {
@@ -92,6 +133,8 @@ const TrainModelForm = () => {
     <Form
       onSubmit={onSubmit}
       validate={(values: formFields) => {
+        console.log("VALUES: ", values);
+
         const errors = {} as formFieldsErrors;
 
         if (!values.jupyterNotebook) {
@@ -141,6 +184,7 @@ const TrainModelForm = () => {
               }}
               elevation={0}
             >
+              {console.log("FormValues: ", form.getState().values.trainingTime)}
               <FileField
                 name="jupyterNotebook"
                 buttonText="Upload your Jupyter Notebook"
@@ -168,8 +212,6 @@ const TrainModelForm = () => {
                 backgroundColor: theme.formSectionBackground?.main,
               }}
               elevation={0}
-
-              // elevation={3}
             >
               <Grid container alignItems="flex-start" spacing={2}>
                 {/* <Grid item xs={4} style={{ textAlign: "start" }}>
@@ -218,9 +260,14 @@ const TrainModelForm = () => {
                       {
                         label: "Maximum number of epochs (not fallback)",
                         value: "max_num_epochs",
+                        checked: true,
                       },
-                      { label: "Other", value: "other" },
+                      // { label: "Other", value: "other" },
                     ]}
+                    value="max_num_epochs"
+                    defaultValue="max_num_epochs"
+                    // readOnly={true}
+                    radioGroupProps={{ defaultValue: "max_num_epochs" }}
                   />
                 </Grid>
                 <Grid item xs={4} style={{ textAlign: "start" }}>
@@ -256,11 +303,11 @@ const TrainModelForm = () => {
                   </Grid>
                   <Grid item xs={6}>
                     <TextField
-                      label="Bidding Time"
+                      label="Bidding Tim (m)"
                       name="biddingTime"
                       required={true}
                       type="number"
-                      value={60}
+                      value={4}
                       style={{
                         width: "80%",
                         display: "flex",
@@ -268,25 +315,44 @@ const TrainModelForm = () => {
                       }}
                     />
                   </Grid>
-                  <Grid item xs={6}>
-                    <TextField
+                  {/* <Grid item xs={6}> */}
+                  {/* <TextField
                       label="Bounty"
                       name="workerReward"
                       type="number"
                       required={true}
+                      value={4}
                       style={{
                         width: "80%",
                         display: "flex",
                         justifyContent: "flex-start",
                       }}
-                    />
-                  </Grid>
+                    /> */}
+                  {/* <TextField
+                      label="Bounty"
+                      name="workerReward"
+                      required={true}
+                      type="number"
+                      value={4}
+                      style={{
+                        width: "80%",
+                        display: "flex",
+                        justifyContent: "flex-start",
+                      }}
+                    /> */}
+                  {/* </Grid> */}
+                  <CalculatedBounty
+                    form={form}
+                    bounty={bounty}
+                    setBounty={setBounty}
+                  />
                 </Grid>
                 <Grid item xs={4}>
                   <Switches
                     label="Test Model"
                     name="testModel"
                     data={{ label: "", value: true }}
+                    checked={true}
                   />
                 </Grid>
               </Grid>

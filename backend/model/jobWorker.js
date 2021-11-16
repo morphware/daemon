@@ -183,14 +183,17 @@ class JobWorker extends Job{
 
 			console.info('Bidding on', this.instanceId, (new Date()).toLocaleString());
 
-			await calculateBid(this.jobData.estimatedTrainingTime);
+			const biddingAmount = await calculateBid(this.jobData.estimatedTrainingTime);
+
+			console.log("BiddingAmount: ", biddingAmount);
 
 			let approveReceipt = await this.wallet.approve(percentHelper(
 				this.jobData.workerReward, 100
 			));
 
 			this.bidData = {
-				bidAmount: percentHelper(this.jobData.workerReward, 25), // How do we figure out the correct bid?
+				// bidAmount: percentHelper(this.jobData.workerReward, 25), // How do we figure out the correct bid?
+				bidAmount: biddingAmount, // How do we figure out the correct bid?
 				fakeBid: false, // How do we know when to fake bid?
 				secret: `0x${crypto.randomBytes(32).toString('hex')}`
 			};
