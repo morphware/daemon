@@ -11,7 +11,8 @@ const editKeys = {
 	'torrentListenPort':{ type: 'number'},
 	'appDownloadPath': {type: 'string'},
 	'jupyterLabPort': {type: 'number'},
-	'miningCommand': {type: 'string'}
+	'miningCommand': {type: 'string'},
+	'workerGPU': {type: 'string'},
 };
 
 router.get('/', async function(req, res, next){

@@ -30,6 +30,7 @@ export interface RadioData {
   label: ReactNode;
   value: unknown;
   disabled?: boolean;
+  checked?: boolean;
 }
 
 export interface RadiosProps extends Partial<Omit<MuiRadioProps, "onChange">> {
@@ -98,7 +99,7 @@ export function Radios(props: RadiosProps) {
                           name={name}
                           value={value}
                           onChange={onChange}
-                          checked={checked}
+                          checked={item.checked ? true : checked}
                           disabled={item.disabled}
                           required={required}
                           inputProps={{ required, ...restInput }}

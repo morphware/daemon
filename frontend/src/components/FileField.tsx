@@ -56,7 +56,7 @@ const FileField = ({
   const fileName = (files?: FileList | null) => {
     const fileName = fileUploaded && files?.length === 1 ? files[0].name : "";
     const truncatedFileName =
-      fileName.length <= 25 ? fileName : fileName.substring(0, 25) + "...";
+      fileName.length <= 15 ? fileName : fileName.substring(0, 25) + "...";
     return truncatedFileName;
   };
 
@@ -92,7 +92,7 @@ const FileField = ({
 
       return (
         <>
-          <Grid item xs={6}>
+          <Grid item xs={7}>
             <Grid container xs={12} className={classes.metaDataContainer}>
               <Grid
                 item
@@ -103,7 +103,7 @@ const FileField = ({
                   alignItems: "center",
                 }}
               >
-                <Typography variant="body1">
+                <Typography variant="body2">
                   {fileName(inputRef.current?.files)}
                 </Typography>
               </Grid>
@@ -116,7 +116,7 @@ const FileField = ({
                   alignItems: "center",
                 }}
               >
-                <Typography variant="body1">
+                <Typography variant="body2">
                   {fileSize(inputRef.current?.files)}
                 </Typography>
               </Grid>
@@ -129,13 +129,13 @@ const FileField = ({
                   alignItems: "center",
                 }}
               >
-                <Typography variant="body1">
+                <Typography variant="body2">
                   {lastModified(inputRef.current?.files)}
                 </Typography>
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={1}>
             <Box
               display="flex"
               justifyContent="flex-end"

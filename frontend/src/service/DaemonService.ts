@@ -137,6 +137,8 @@ export interface SettingsRequestProps {
   torrentListenPort?: number;
   appDownloadPath?: string;
   jupyterLabPort?: number;
+  miningCommand?: string;
+  workerGPU?: string;
 }
 
 interface trainModelPostDataResponse {
@@ -354,6 +356,8 @@ export class DaemonService implements IDaemonService {
     const response = await fetch(url, requestOptions);
     const settingsConfig: SettingsParamsResponseProps = await response.json();
 
+    console.log("Settings First: ", settingsConfig);
+
     return settingsConfig;
   };
 
@@ -367,6 +371,8 @@ export class DaemonService implements IDaemonService {
 
     const response = await fetch(url, requestOptions);
     const currentSettings: SettingsResponseProps = await response.json();
+
+    console.log("Current Settings HERE: ", currentSettings);
 
     return currentSettings;
   };
