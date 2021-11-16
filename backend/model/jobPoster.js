@@ -165,6 +165,9 @@ class JobPoster extends Job{
 		    console.log("Time: ", this.postData.trainingTime);
 			console.log("GPU: ", conf.workerGPU)
 
+			console.log("Minimum Payout: ", percentHelper(this.postData.workerReward, 10));
+			console.log("Worker Reward: ", this.postData.workerReward.toString());
+
 			// Post the new job
 			let action = this.jobContract.methods.postJobDescription(
 				parseInt(this.postData.trainingTime),

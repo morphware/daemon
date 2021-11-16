@@ -3,6 +3,7 @@ const csv = require('csv-parser');
 const fs = require('fs');
 const {conf} = require('./conf');
 const os = require("os");
+const Web3 = require("web3");
 
 const GPUtoCUDAMapping = {
     "3090": 10496,
@@ -34,8 +35,9 @@ async function calculateBid(trainingTimeInHours) {
         console.log("Bidding Value in USD: ", biddingValueUSD)
         
         //TODO: THIS IS TEMPORARY. Assuming    1 MWT = 0.1 USD
-        const biddingValueMWT = Math.round(biddingValueUSD * 10);
-        console.log("Bidding Value in MWT: ", biddingValueMWT)
+        let biddingValueMWT = Math.round(biddingValueUSD * 10);
+        biddingValueMWT =  Web3.utils.toWei(biddingValueMWT, "ether");
+        console.log("Bidding Value in MWT in Wei: ", biddingValueMWT);
         return biddingValueMWT;
     } catch (error) {
         console.log("Error calculateBid: ", error);
