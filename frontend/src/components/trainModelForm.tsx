@@ -63,6 +63,10 @@ interface formFieldsErrors {
   testModel: string;
 }
 
+interface ITrainModelForm {
+  setSendingRequest: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
 interface ICalculatedBounty {
   form: FormApi<formFields, Partial<formFields>>;
   bounty?: number;
@@ -95,13 +99,14 @@ const CalculatedBounty = ({ form, bounty, setBounty }: ICalculatedBounty) => {
   );
 };
 
-const TrainModelForm = () => {
+const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
   const daemonService = useContext(DaemonContext);
   const [removeFilesSignal, setRemoveFilesSignal] = useState<boolean>(true);
   const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
   const [bounty, setBounty] = useState<number>(0);
 
   const onSubmit = async (values: formFields) => {
+    setSendingRequest(true);
     values.biddingTime = 60;
     values.testModel = true;
     values.workerReward = bounty;
@@ -127,6 +132,7 @@ const TrainModelForm = () => {
 
     await daemonService.getTorrents();
     await daemonService.getWalletHistory();
+    setSendingRequest(false);
   };
 
   return (
