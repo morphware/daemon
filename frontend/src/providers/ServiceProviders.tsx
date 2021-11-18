@@ -17,7 +17,7 @@ import Web3 from "web3";
 import { settingsDaemonResponseToSettingsResponseProps } from "../mappers/SettingsMappers";
 import { Role } from "../constants";
 export const DaemonContext = React.createContext({} as daemonServiceProps);
-
+import { snackBarProps } from "../components/PositionedSnackbar";
 interface daemonServiceProps {
   MWTAddress: string;
   daemonService: DaemonService;
@@ -31,6 +31,7 @@ interface daemonServiceProps {
   activeJobs?: ActiveJobsProps;
   clientVersion: string;
   role?: Role;
+  snackBarProps: snackBarProps;
   getTorrents: () => Promise<void>;
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -49,6 +50,7 @@ interface daemonServiceProps {
   startMiner(): Promise<any>;
   stopMiner(): Promise<any>;
   getRole(): Promise<void>;
+  updateSnackbarProps: (snackBarProps: snackBarProps) => void;
 }
 
 const MWSBalance = "0xbc40e97e6d665ce77e784349293d716b030711bc";
@@ -67,6 +69,7 @@ const ServiceProviders: React.FC = ({ children }) => {
   const [configParams, setConfigParams] =
     useState<SettingsParamsResponseProps>();
   const [clientVersion, setClientVersion] = useState<string>("");
+  const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
 
   const getRole = async () => {
     const roleResponse = await daemonService.getUserRole();
@@ -170,6 +173,10 @@ const ServiceProviders: React.FC = ({ children }) => {
     return response;
   };
 
+  const updateSnackbarProps = (snackBarProps: snackBarProps) => {
+    setSnackBarProps(snackBarProps);
+  };
+
   const daemonServicContext: daemonServiceProps = {
     MWTAddress: MWSBalance,
     daemonService: daemonService,
@@ -197,6 +204,8 @@ const ServiceProviders: React.FC = ({ children }) => {
     stopMiner: stopMiner,
     role: role,
     getRole: getRole,
+    updateSnackbarProps: updateSnackbarProps,
+    snackBarProps: snackBarProps,
   };
 
   useEffect(() => {

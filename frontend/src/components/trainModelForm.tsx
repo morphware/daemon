@@ -1,26 +1,11 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useRef, useState, useContext, useEffect } from "react";
-import { Form, Field } from "react-final-form";
-import {
-  Box,
-  Button,
-  FormControl,
-  Grid,
-  IconButton,
-  Paper,
-  Typography,
-} from "@material-ui/core";
+import React, { useState, useContext, useEffect } from "react";
+import { Form } from "react-final-form";
+import { Button, Grid, Paper, Typography } from "@material-ui/core";
 import { TextField } from "mui-rff";
-import type { InputHTMLAttributes } from "react";
-import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import { Radios } from "./Radios";
-import { useForm } from "react-final-form";
 import { DaemonContext } from "../providers/ServiceProviders";
 import { formFieldsMapper } from "../mappers/TrainModelFormMappers";
 import { theme } from "../providers/MorphwareTheme";
-import { makeStyles } from "@material-ui/core";
-import PositionedSnackbar from "./PositionedSnackbar";
-import { snackBarProps } from "./PositionedSnackbar";
 import FileField from "./FileField";
 import { Switches } from "mui-rff";
 import { bountySetter } from "./Util";
@@ -29,12 +14,7 @@ import { FormApi } from "final-form";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;
 export type FileListProps = Array<FileProps>;
-interface FileFieldProps extends InputHTMLAttributes<HTMLInputElement> {
-  name: string;
-  buttonText: string;
-  acceptedValues: Array<string>;
-  removeFilesSignal: boolean;
-}
+
 interface FileProps extends File {
   path: string;
 }
@@ -102,7 +82,6 @@ const CalculatedBounty = ({ form, bounty, setBounty }: ICalculatedBounty) => {
 const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
   const daemonService = useContext(DaemonContext);
   const [removeFilesSignal, setRemoveFilesSignal] = useState<boolean>(true);
-  const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
   const [bounty, setBounty] = useState<number>(0);
 
   const onSubmit = async (values: formFields) => {
@@ -118,13 +97,13 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
     const responseV2 = await daemonService.submitTrainModelRequest(formFields);
 
     if (Object.keys(responseV2).includes("status")) {
-      setSnackBarProps({
+      daemonService.updateSnackbarProps({
         text: `Training request recieved. JobID: ${responseV2.job}`,
         severity: "success",
       });
     } else if (Object.keys(responseV2).includes("error")) {
-      setSnackBarProps({
-        //TODO: Update when failed requests return error message
+      //TODO: Update when failed requests return error message
+      daemonService.updateSnackbarProps({
         text: `${responseV2.error}`,
         severity: "error",
       });
@@ -176,13 +155,6 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
           style={{ height: "100%" }}
         >
           <Grid container alignItems="flex-start" spacing={2}>
-            {snackBarProps.text && snackBarProps.severity && (
-              <PositionedSnackbar
-                text={snackBarProps.text}
-                severity={snackBarProps.severity}
-                setSnackBarProps={setSnackBarProps}
-              />
-            )}
             <Paper
               style={{
                 padding: 30,
@@ -197,7 +169,7 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
               <FileField
                 name="jupyterNotebook"
                 buttonText="Upload your Jupyter Notebook"
-                acceptedValues={[".py", " .ipymb"]}
+                acceptedValues={[".py", " .ipynb", ""]}
                 removeFilesSignal={removeFilesSignal}
               />
 
@@ -271,11 +243,9 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
                         value: "max_num_epochs",
                         checked: true,
                       },
-                      // { label: "Other", value: "other" },
                     ]}
                     value="max_num_epochs"
                     defaultValue="max_num_epochs"
-                    // readOnly={true}
                     radioGroupProps={{ defaultValue: "max_num_epochs" }}
                   />
                 </Grid>
@@ -324,32 +294,6 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
                       }}
                     />
                   </Grid>
-                  {/* <Grid item xs={6}> */}
-                  {/* <TextField
-                      label="Bounty"
-                      name="workerReward"
-                      type="number"
-                      required={true}
-                      value={4}
-                      style={{
-                        width: "80%",
-                        display: "flex",
-                        justifyContent: "flex-start",
-                      }}
-                    /> */}
-                  {/* <TextField
-                      label="Bounty"
-                      name="workerReward"
-                      required={true}
-                      type="number"
-                      value={4}
-                      style={{
-                        width: "80%",
-                        display: "flex",
-                        justifyContent: "flex-start",
-                      }}
-                    /> */}
-                  {/* </Grid> */}
                   <CalculatedBounty
                     form={form}
                     bounty={bounty}

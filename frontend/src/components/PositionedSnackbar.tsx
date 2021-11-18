@@ -18,7 +18,7 @@ interface PositionedSnackbarProps {
   severity: "error" | "warning" | "info" | "success";
   text: string;
   openProp?: boolean;
-  setSnackBarProps: React.Dispatch<React.SetStateAction<snackBarProps>>;
+  setSnackBarProps: (snackBarProps: snackBarProps) => void;
 }
 
 function TransitionRight(props: TransitionProps) {

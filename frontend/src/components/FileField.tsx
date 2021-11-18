@@ -193,6 +193,7 @@ const FileField = ({
                   id={`${name}-html-for`}
                   ref={inputRef}
                   onClick={() => setFileUploaded(true)}
+                  accept={accept}
                 />
                 <label
                   htmlFor={`${name}-html-for`}
