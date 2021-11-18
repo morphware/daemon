@@ -404,26 +404,35 @@ class JobWorker extends Job{
 
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
 
-
             let jupyterNotebookPathname;
             let trainingDataPathname;
+			let pythonPathname;
 
             for (let download of downloads) {
+				console.log("Download Path: ", download.path);
+				console.log("Download DN: ", download.dn);
                 if (download.dn.slice(-5) == 'ipynb') {
+					console.log("FIRST: ", download.dn);
         			jupyterNotebookPathname = download.path + '/' + download.dn;
-                } else {
+					pythonPathname = jupyterNotebookPathname.slice(0,-5).concat('py');
+                } else if (download.dn.slice(-2) == 'py') {
+					console.log("SECOND: ", download.dn);
+					pythonPathname = download.path + '/' + download.dn;
+				} else {
         			//TODO: Unzip if needed
+					console.log("THIRD: ", download.dn);
         			trainingDataPathname = download.path + '/' + download.dn;
                 }
             }
 
-			let pythonPathname = jupyterNotebookPathname.slice(0,-5).concat('py');
+			// let pythonPathname = jupyterNotebookPathname.slice(0,-5).concat('py');
 
             console.log('pythonPathname:', pythonPathname);
 
-
 			//Convert .ipynb => .py
-			await exec('jupyter nbconvert --to script', jupyterNotebookPathname);
+			if(jupyterNotebookPathname){
+				await exec('jupyter nbconvert --to script', jupyterNotebookPathname);
+			}
 
 			const trainedModelFileName = await installNotebookDependencies(pythonPathname);
 
