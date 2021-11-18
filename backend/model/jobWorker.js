@@ -409,23 +409,16 @@ class JobWorker extends Job{
 			let pythonPathname;
 
             for (let download of downloads) {
-				console.log("Download Path: ", download.path);
-				console.log("Download DN: ", download.dn);
                 if (download.dn.slice(-5) == 'ipynb') {
-					console.log("FIRST: ", download.dn);
         			jupyterNotebookPathname = download.path + '/' + download.dn;
 					pythonPathname = jupyterNotebookPathname.slice(0,-5).concat('py');
                 } else if (download.dn.slice(-2) == 'py') {
-					console.log("SECOND: ", download.dn);
 					pythonPathname = download.path + '/' + download.dn;
 				} else {
         			//TODO: Unzip if needed
-					console.log("THIRD: ", download.dn);
         			trainingDataPathname = download.path + '/' + download.dn;
                 }
             }
-
-			// let pythonPathname = jupyterNotebookPathname.slice(0,-5).concat('py');
 
             console.log('pythonPathname:', pythonPathname);
 
