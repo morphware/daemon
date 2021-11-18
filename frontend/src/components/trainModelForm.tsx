@@ -161,7 +161,7 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
         if (values.errorRate <= 0) {
           errors.errorRate = "Must be greater than 0";
         }
-        if (values.errorRate > 100) {
+        if (values.errorRate >= 100) {
           errors.errorRate = "Must be less than 100";
         }
         if (values.workerReward <= 0) {
@@ -299,7 +299,7 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
                   </Grid>
                   <Grid item xs={6}>
                     <TextField
-                      label="Error Rate"
+                      label="Acceptable Accuracy"
                       name="errorRate"
                       required={true}
                       type="number"
