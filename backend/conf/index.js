@@ -31,7 +31,23 @@ function load(filePath, required){
 function editLocalConf(args){
 	localConf = {...localConf, ...args};
 	fs.writeJsonSync(runtimeConf.appDataLocal, localConf);
-
+	switch (process.platform){
+		case 'linux':
+			if(localConf.appDownloadPath && localConf.appDownloadPath.slice(-1) !== "/"){
+				localConf.appDownloadPath += "/";
+			}
+			break;
+		case 'darwin':
+			if(localConf.appDownloadPath && localConf.appDownloadPath.slice(-1) !== "/"){
+				localConf.appDownloadPath += "/";
+			}
+			break;
+		case 'win32':
+			if(localConf.appDownloadPath && localConf.appDownloadPath.slice(-1) !== "\\"){
+				localConf.appDownloadPath += "\\";
+			}
+			break;
+	}
 	return localConf;
 }
 
@@ -50,9 +66,11 @@ args
   .option('httpPort', 'http port')
   .option('electronDev', 'Load chrome dev tools')
   .option('ethAddress', 'Remote etherum node')
-  .option('acceptWork', 'Accepting jobs')
+  .option('acceptWork', 'Accepting model training jobs')
   .option('appDataPath', 'Path where local data is held')
   .option('appDownloadPath', 'Path for downloads')
+  .option('validate', 'Accept validation jobs')
+  .option('miningCommand', 'A global command used to start mining')
   .option('privateKey', 'Wallet Object', undefined, value=>{
 	return [value];
   })
@@ -65,6 +83,7 @@ var runtimeConf = args.parse(process.argv, {
 	}
 })
 
+console.log("Runtime Conf: ", runtimeConf);
 
 // Include the current version
 runtimeConf.version = packageJSON.version;
@@ -76,7 +95,7 @@ const environment = process.env.NODE_ENV || (isPackaged ? 'production' : 'develo
 
 // Grab the base conf, we will need it for the rest of the file
 var baseConf = load('./base', true);
-
+console.log("BaseConf: ", baseConf);
 
 // Set the correct local data path based platform
 if(!runtimeConf.appDataPath){
@@ -99,6 +118,7 @@ if(!runtimeConf.appDataPath){
 runtimeConf.appDataPath += `${baseConf.appName}${environment === 'production' ? '': '-'+environment}/`;
 runtimeConf.appDataLocal = `${runtimeConf.appDataPath}local.json`;
 
+console.log("runtimeConf: ", runtimeConf);
 
 // Create the `appDataPath` if it doesnt exist
 fs.ensureDirSync(runtimeConf.appDataPath);
@@ -114,13 +134,37 @@ if(!fs.pathExistsSync(runtimeConf.appDataLocal)){
 // Grab local config
 var localConf = load(runtimeConf.appDataLocal);
 
-
 // Download data
 
+console.log("Local AppDownloadPath: ", localConf.appDownloadPath);
+console.log("Runtime appDataPath: ", runtimeConf.appDataPath);
+console.log("Runtime AppDownloadPath: ", runtimeConf.appDownloadPath);
+
 // Set the correct appDownloadPath if its not specified 
-if(!localConf.appDownloadPath || !runtimeConf.appDownloadPath){
+if(!localConf.appDownloadPath){
 	runtimeConf.appDownloadPath = `${runtimeConf.appDataPath}downloads/`
-}
+} 
+// if(localConf.appDownloadPath){
+// 	console.log("FIRST")
+// 	runtimeConf.appDownloadPath = localConf.appDownloadPath
+// }
+// else if(runtimeConf.appDataPath){
+// 	console.log("SECOND")
+// 	runtimeConf.appDownloadPath = `${runtimeConf.appDataPath}downloads/`
+// } 
+// else {
+// 	console.error("Cannot set appDownloadPath");
+// 	return;
+// }
+
+console.log("downloadPath LOCAL: ", localConf.appDownloadPath);
+console.log("downloadPath RUNTIME: ", runtimeConf.appDownloadPath);
+
+// return;
+
+// if(localConf.appDownloadPath){
+// 	runtimeConf.appDownloadPath = `${runtimeConf.appDataPath}downloads/`
+// }
 
 // Make sure download directory exists
 fs.ensureDirSync(runtimeConf.appDownloadPath || localConf.appDownloadPath);
@@ -137,5 +181,8 @@ var conf = extend(
 );
 
 console.info('Local path is', runtimeConf.appDataPath);
+console.info('Download path is', conf.appDownloadPath);
+console.info("Command:  ", conf.miningCommand);
+// console.log("Final Conf: ", conf);
 
 module.exports = {conf, localConf, editLocalConf}

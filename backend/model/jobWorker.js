@@ -3,19 +3,19 @@
 const fs = require('fs-extra');
 const crypto = require('crypto');
 const checkDiskSpace = require('check-disk-space').default;
-
+const { spawn } = require('child_process');
 const {conf} = require('../conf');
 const webtorrent = require('../controller/torrent');
 const {web3, percentHelper} = require('./contract');
 const {wallet} = require('./morphware');
 const {Job} = require('./job');
-
 const {exec} = require('./python');
+const{installNotebookDependencies, updateNotebookMorphwareTerms} = require('./notebook');
+const {calculateBid} = require('../pricingUtils');
 
 (async function(){
 	try{
-		console.log(await exec('python', '/home/william/test.py'))
-
+		console.log("pwd");
 	}catch(error){
 		console.error('here error', error)
 	}
@@ -52,6 +52,13 @@ class JobWorker extends Job{
 
 	static lock = false;
 
+	/*
+		A worker can choose to mine if they are not currently working on a job. 
+		this.childMiner holds the child process if the worker is currently mining  
+	*/
+
+	static childMiner;
+
 	addToJump(){
 		super.addToJump()
 		this.constructor.lock = true;
@@ -64,9 +71,56 @@ class JobWorker extends Job{
 		}catch(error){}
 	}
 
+
 	// Check to see if the client is ready and willing to take on jobs
 	static canTakeWork(){
 		return conf.acceptWork && !this.lock;
+	}
+
+	//Create a new process group that starts mining
+	static startMining(){
+		try {
+			if(!conf.miningCommand){
+				console.log("No Mining Command Configured");
+				return;
+			}
+			else if(this.childMiner){
+				throw(`Already mining on process ${this.childMiner.pid}`)
+			}
+			console.log("Starting to mine...");
+			const minerArgs = conf.miningCommand.split(new RegExp('\s+', 'g'));
+			const minerCommand = minerArgs.shift();
+			console.log("Miner Command: ", minerCommand);
+			console.log("Miner Args: ", minerArgs);
+
+			this.childMiner = spawn(minerCommand, minerArgs, {
+			shell: true,
+				stdio: ['inherit', 'inherit', 'inherit'],
+				detached: true
+			});
+			
+			//TODO: Pipe this stdout of miner into a pseduo terminal on the frontend client so they can view their mining metrics. graphs? timeseries? so on
+		} catch (error) {
+			console.log("Error in startMining: ", error);
+			throw(error);
+		}
+	}
+
+	//Stop the mining process group if the client is currently mining
+	static stopMining(){
+		try {
+			if(!this.childMiner || !this.childMiner.pid){
+				throw("Miner is not running");																																																																																																																																																																																														
+			}
+			console.log("Child Process PID: ", this.childMiner.pid);
+			console.log("Stopping Miner...");
+			
+			process.kill(-this.childMiner.pid);
+			this.childMiner = null;
+		} catch (error) {
+			console.log("Error in stopMining: ", error);
+			throw(error);
+		}
 	}
 
 
@@ -83,8 +137,8 @@ class JobWorker extends Job{
 
 			if(name === 'JobDescriptionPosted'){
 
-				// Check to see if this client is accepting work
-				if(!this.canTakeWork()) return;
+				// Check to see if this client is accepting work or attempting to work on its own posted job
+				if(!this.canTakeWork() || event.returnValues.jobPoster === wallet.address)  return;
 
 				// Make the job instance
 				let job = new this(wallet, event.returnValues);
@@ -117,7 +171,6 @@ class JobWorker extends Job{
 		return (await checkDiskSpace(target)).free > size;
 	}
 
-
 	/*
 	Actions
 
@@ -130,16 +183,20 @@ class JobWorker extends Job{
 
 			console.info('Bidding on', this.instanceId, (new Date()).toLocaleString());
 
+			const biddingAmount = await calculateBid(this.jobData.estimatedTrainingTime);
+
+			console.log("BiddingAmount: ", biddingAmount);
+
 			let approveReceipt = await this.wallet.approve(percentHelper(
 				this.jobData.workerReward, 100
 			));
 
 			this.bidData = {
-				bidAmount: percentHelper(this.jobData.workerReward, 25), // How do we figure out the correct bid?
+				// bidAmount: percentHelper(this.jobData.workerReward, 25), // How do we figure out the correct bid?
+				bidAmount: biddingAmount, // How do we figure out the correct bid?
 				fakeBid: false, // How do we know when to fake bid?
 				secret: `0x${crypto.randomBytes(32).toString('hex')}`
 			};
-
 			console.log('bidding data', this.bidData, this.instanceId);
 
 			let action = this.auctionContract.methods.bid(
@@ -154,7 +211,7 @@ class JobWorker extends Job{
 			);
 
 			let receipt = await action.send({
-				gas: await action.estimateGas(),
+				gas: parseInt(parseInt(await action.estimateGas()) * 2),
 			});
 
 			this.transactions.push({...receipt, event:'bid'});
@@ -182,7 +239,7 @@ class JobWorker extends Job{
 			);
 
 			let receipt = await action.send({
-				gas: await action.estimateGas()
+				gas: parseInt(parseInt(await action.estimateGas()) * 2),
 			});
 
 			this.transactions.push({...receipt, event:'reveal'});
@@ -195,18 +252,34 @@ class JobWorker extends Job{
 	}
 
 	async shareTrainedModel(){
-		let action = jobFactoryContract.methods.shareTrainedModel(
+
+		console.log("Sharing Trained Model")
+
+		console.log("TRAINED MODEL PATH: ", this.trainedModelPath);
+
+		let { magnetURI } = await webtorrent().findOrSeed(this.trainedModelPath);
+
+		console.log("Magnet Link to trained mode: ", magnetURI);
+
+		// let action = this.jobFactoryContract.methods.shareTrainedModel(
+		let action = this.jobContract.methods.shareTrainedModel(
 			this.jobData.jobPoster,
 			parseInt(this.id),
-			trainedModelMagnetLink, // get this data
-			parseInt(trainingErrorRate) // get this data
+			magnetURI, // get this data
+			// parseInt(trainingErrorRate) // get this data\
+			6 //is 0.06 a uint64
 		);
 
+		console.log("Action: ", action);
+
 		let receipt = await action.send({
-			gas: await action.estimateGas()
+			gas: await action.estimateGas(),
 		});
 
+		console.log("Reciept: ", receipt);
+
 		this.transactions.push({...receipt, event: 'shareTrainedModel'});
+		// this.transactions.push({...receipt, event:'postJobDescription'});
 
 		return receipt;
 	}
@@ -220,7 +293,6 @@ class JobWorker extends Job{
 
 			let receipt = await action.send({
 				gas: parseInt(parseInt(await action.estimateGas()) * 1.101),
-				// gas: await action.estimateGas()
 			});
 
 			this.transactions.push({...receipt, event: 'withdraw'});
@@ -257,22 +329,29 @@ class JobWorker extends Job{
 				return false;
 			}*/
 
-			// This setTimeout may not bee needed.
+			// This setTimeout may not be needed.
 			// Calculate start of the reveal window
-			var now = Math.floor(new Date().getTime());
-			var biddingDeadline = parseInt(this.jobData.biddingDeadline);
-			var waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
+			// var now = Math.floor(new Date().getTime());
+			var now = new Date().getTime();
+			// var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now - 180000);
+			var revealDeadline = parseInt(this.jobData.revealDeadline);
 
-			console.log('Revealing bid in', waitTimeInMS1/1000, 'at', new Date(now + waitTimeInMS1).toLocaleString());
+			//Reveal 3 mins before reveal deadline
+			var revealTime = (revealDeadline*1000) - 3*60*1000;
+			var revealInMS = revealTime - now;
+
+			var revealDeadline = new Date(revealTime).toLocaleTimeString();
+
+            console.log('\n\n\n\nthis.jobData:',this.jobData);
+			console.log('Revealing bid in', revealInMS/1000, ' at ', revealDeadline);
+			console.log("Reveal Deadline from smartContract: ", parseInt(this.jobData.revealDeadline));
 
 			await this.bid();
-
-			waitTimeInMS1 = ((biddingDeadline*1000 - now)+10000);
 
 			// reveal the bid during the reveal window
 			setTimeout(()=>{
 				this.reveal();
-			}, ((biddingDeadline+10)*1000)-now);
+			}, revealInMS);
 		}catch(error){
 			this.removeFromJump();
 			console.error(`ERROR!!! JobWorker __JobDescriptionPosted`, error)
@@ -288,6 +367,11 @@ class JobWorker extends Job{
 
 				// If we do win, we will continue to act on events for this
 				// instanceID and wait for the poster to fire the next step.
+
+				//Stop mining if you are 
+				if(this.childMiner){
+					JobWorker.stopMining();
+				}
 			}else{
 
 				console.log('We lost...', this.instanceId);
@@ -308,7 +392,6 @@ class JobWorker extends Job{
 
 	async UntrainedModelAndTrainingDatasetShared(event){
 		try{
-
 			this.downloadPath = `${conf.appDownloadPath}${this.jobData.jobPoster}/${this.id}`;
 
 			// Make sure download spot exists
@@ -321,9 +404,38 @@ class JobWorker extends Job{
 
 			console.info('Download done!', this.instanceId, (new Date()).toLocaleString());
 
-			await exec('python', downloads[0].file.path, downloads[1].file.path);
+
+            let jupyterNotebookPathname;
+            let trainingDataPathname;
+
+            for (let download of downloads) {
+                if (download.dn.slice(-5) == 'ipynb') {
+        			jupyterNotebookPathname = download.path + '/' + download.dn;
+                } else {
+        			//TODO: Unzip if needed
+        			trainingDataPathname = download.path + '/' + download.dn;
+                }
+            }
+
+			let pythonPathname = jupyterNotebookPathname.slice(0,-5).concat('py');
+
+            console.log('pythonPathname:', pythonPathname);
 
 
+			//Convert .ipynb => .py
+			await exec('jupyter nbconvert --to script', jupyterNotebookPathname);
+
+			const trainedModelFileName = await installNotebookDependencies(pythonPathname);
+
+			await updateNotebookMorphwareTerms(pythonPathname, this.downloadPath + "/");
+
+			await exec('python3', pythonPathname, trainingDataPathname);
+			
+			this.trainedModelPath = this.downloadPath + "/" + trainedModelFileName;
+
+			this.shareTrainedModel();
+
+			JobWorker.startMining();
 		}catch(error){
 			this.removeFromJump();
 			console.error('ERROR!!! JobWorker UntrainedModelAndTrainingDatasetShared', this.instanceId, error);

@@ -17,5 +17,14 @@ export const settingsDaemonResponseToSettingsResponseProps = (
   if (Object.keys(daemonResponse).includes("acceptWork")) {
     response.acceptWork = daemonResponse.acceptWork;
   }
+  if (Object.keys(daemonResponse).includes("jupyterLabPort")) {
+    response.jupyterLabPort = daemonResponse.jupyterLabPort;
+  }
+  if (Object.keys(daemonResponse).includes("miningCommand")) {
+    response.miningCommand = daemonResponse.miningCommand;
+  }
+  if (Object.keys(daemonResponse).includes("workerGPU")) {
+    response.workerGPU = daemonResponse.workerGPU;
+  }
   return response;
 };

@@ -9,7 +9,10 @@ const editKeys = {
 	'privateKey':{ type: 'array'},
 	'acceptWork':{ type: 'boolean'},
 	'torrentListenPort':{ type: 'number'},
-	'appDownloadPath': {type: 'string'}
+	'appDownloadPath': {type: 'string'},
+	'jupyterLabPort': {type: 'number'},
+	'miningCommand': {type: 'string'},
+	'workerGPU': {type: 'string'},
 };
 
 router.get('/', async function(req, res, next){
@@ -32,5 +35,15 @@ router.post('/', async function(req, res, next) {
 		next(error);
 	}
 });
+
+router.get('/role', async function(req, res, next) {
+	try {
+		if(conf.acceptWork) return res.json({role: "worker"});
+		else if(conf.validate) return res.json({role: "validator"});
+		return res.json({role: "poster"});
+	} catch (error) {
+		next(error);
+	}
+})
 
 module.exports = router;

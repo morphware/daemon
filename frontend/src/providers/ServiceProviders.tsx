@@ -15,6 +15,7 @@ import {
 } from "../service/DaemonService";
 import Web3 from "web3";
 import { settingsDaemonResponseToSettingsResponseProps } from "../mappers/SettingsMappers";
+import { Role } from "../constants";
 export const DaemonContext = React.createContext({} as daemonServiceProps);
 
 interface daemonServiceProps {
@@ -29,6 +30,7 @@ interface daemonServiceProps {
   currentConfigs?: SettingsResponseProps;
   activeJobs?: ActiveJobsProps;
   clientVersion: string;
+  role?: Role;
   getTorrents: () => Promise<void>;
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -43,12 +45,17 @@ interface daemonServiceProps {
   getSettings(): Promise<void>;
   getCurrentSettings(): Promise<void>;
   setActiveJobs(): Promise<void>;
+  startJupyterLab(): Promise<any>;
+  startMiner(): Promise<any>;
+  stopMiner(): Promise<any>;
+  getRole(): Promise<void>;
 }
 
 const MWSBalance = "0xbc40e97e6d665ce77e784349293d716b030711bc";
 
 const ServiceProviders: React.FC = ({ children }) => {
   const daemonService = new DaemonService();
+  const [role, setRole] = useState<Role>();
   const [torrents, setTorrents] = useState<ActiveTorrents>();
   const [walletAddress, setWalletAddress] = useState<string>();
   const [walletBalance, setWalletBalance] = useState<string>();
@@ -60,6 +67,14 @@ const ServiceProviders: React.FC = ({ children }) => {
   const [configParams, setConfigParams] =
     useState<SettingsParamsResponseProps>();
   const [clientVersion, setClientVersion] = useState<string>("");
+
+  const getRole = async () => {
+    const roleResponse = await daemonService.getUserRole();
+    if (roleResponse.role === "poster") setRole(Role.Poster);
+    if (roleResponse.role === "worker") setRole(Role.Worker);
+    if (roleResponse.role === "validator") setRole(Role.Validator);
+    console.log("Role is: ", roleResponse.role);
+  };
 
   const getActiveJobs = async () => {
     const activeJobs = await daemonService.getTrackedJobs();
@@ -116,7 +131,6 @@ const ServiceProviders: React.FC = ({ children }) => {
   };
 
   const updateSettings = async (request: SettingsRequestProps) => {
-    console.log("updateSettings: ", request);
     let response = await daemonService.updateSettings(request);
     response = settingsDaemonResponseToSettingsResponseProps(response);
     setCurrentConfigs(response);
@@ -135,7 +149,25 @@ const ServiceProviders: React.FC = ({ children }) => {
     let response = await daemonService.getCurrentSettings();
     response = settingsDaemonResponseToSettingsResponseProps(response);
     console.log("getCurrentSettings: ", response);
+    if (!response.jupyterLabPort) response.jupyterLabPort = 3020; //The default port
     setCurrentConfigs(response);
+  };
+
+  const startJupyterLab = async () => {
+    let response = await daemonService.startJupyterLab();
+    console.log("Response: ", response);
+  };
+
+  const startMiner = async () => {
+    let response = await daemonService.startMiner();
+    console.log("Response: ", response);
+    return response;
+  };
+
+  const stopMiner = async () => {
+    let response = await daemonService.stopMiner();
+    console.log("Response: ", response);
+    return response;
   };
 
   const daemonServicContext: daemonServiceProps = {
@@ -160,6 +192,11 @@ const ServiceProviders: React.FC = ({ children }) => {
     getSettings: getSettings,
     getCurrentSettings: getCurrentSettings,
     setActiveJobs: getActiveJobs,
+    startJupyterLab: startJupyterLab,
+    startMiner: startMiner,
+    stopMiner: stopMiner,
+    role: role,
+    getRole: getRole,
   };
 
   useEffect(() => {
@@ -180,6 +217,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     getCurrentSettings();
     getActiveJobs();
     getSettings();
+    getRole();
   }, []);
 
   return (

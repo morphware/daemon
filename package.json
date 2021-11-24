@@ -65,6 +65,7 @@
     }
   },
   "dependencies": {
-    "ethers": "^4.0.46"
+    "ethers": "^4.0.46",
+    "moment": "^2.29.1"
   }
 }

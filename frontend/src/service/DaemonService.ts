@@ -125,6 +125,7 @@ export interface SettingsParamsResponseProps {
     acceptWork: string;
     torrentListenPort: string;
     appDownloadPath: string;
+    miningCommand: string;
   };
 }
 
@@ -135,6 +136,9 @@ export interface SettingsRequestProps {
   acceptWork?: boolean;
   torrentListenPort?: number;
   appDownloadPath?: string;
+  jupyterLabPort?: number;
+  miningCommand?: string;
+  workerGPU?: string;
 }
 
 interface trainModelPostDataResponse {
@@ -195,6 +199,10 @@ export interface ActiveJobsProps {
   };
 }
 
+export interface ClientRole {
+  role: string;
+}
+
 export interface IDaemonService {
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -209,12 +217,27 @@ export interface IDaemonService {
     requestValues: SettingsRequestProps
   ): Promise<SettingsResponseProps>;
   getCurrentSettings(): Promise<SettingsResponseProps>;
+  startJupyterLab(): Promise<any>
+  getUserRole(): Promise<ClientRole>
 }
 export class DaemonService implements IDaemonService {
   private readonly baseUrl: string =
     "http://" + (window.localStorage.getItem("url") || "127.0.0.1:3001");
 
   constructor() {}
+
+  public getUserRole = async (): Promise<ClientRole> => {
+    const url = `${this.baseUrl}/api/V0/settings/role`;
+
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const activeJobs: ClientRole = await response.json();
+    return activeJobs;
+  }
 
   public getTrackedJobs = async (): Promise<ActiveJobsProps> => {
     const url = `${this.baseUrl}/api/V0/job`;
@@ -333,7 +356,7 @@ export class DaemonService implements IDaemonService {
     const response = await fetch(url, requestOptions);
     const settingsConfig: SettingsParamsResponseProps = await response.json();
 
-    console.log("settings: ", settingsConfig);
+    console.log("Settings First: ", settingsConfig);
 
     return settingsConfig;
   };
@@ -348,6 +371,8 @@ export class DaemonService implements IDaemonService {
 
     const response = await fetch(url, requestOptions);
     const currentSettings: SettingsResponseProps = await response.json();
+
+    console.log("Current Settings HERE: ", currentSettings);
 
     return currentSettings;
   };
@@ -369,6 +394,47 @@ export class DaemonService implements IDaemonService {
     const updatedSettingsResponse: SettingsResponseProps =
       await response.json();
 
+    console.log("Response: ", updatedSettingsResponse);
+
     return updatedSettingsResponse;
   };
+
+  public startJupyterLab = async () => {
+    const url = `${this.baseUrl}/api/v0/notebook/start`;
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const startJupyterLabResponse = await response.json();
+    return startJupyterLabResponse;
+  }
+
+  public startMiner = async () => {
+    const url = `${this.baseUrl}/api/v0/miner/start`;
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const startLocalMinerResponse = await response.json();
+    return startLocalMinerResponse;
+  }
+  
+  public stopMiner = async () => {
+    const url = `${this.baseUrl}/api/v0/miner/stop`;
+
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const stopLocalMinerResponse = await response.json();
+    return stopLocalMinerResponse;
+  }
 }

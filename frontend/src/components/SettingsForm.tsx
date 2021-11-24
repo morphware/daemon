@@ -1,7 +1,15 @@
-import { Button, Grid, IconButton, Paper, Typography } from "@material-ui/core";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import {
+  Button,
+  Grid,
+  IconButton,
+  Paper,
+  Typography,
+  MenuItem,
+} from "@material-ui/core";
 import React, { useContext, useState } from "react";
 import { theme } from "../providers/MorphwareTheme";
-import { TextField } from "mui-rff";
+import { TextField, Select } from "mui-rff";
 import { Form, useForm } from "react-final-form";
 import { Switches } from "mui-rff";
 import { DaemonContext } from "../providers/ServiceProviders";
@@ -69,6 +77,7 @@ const SettingsForm = () => {
   const daemonService = useContext(DaemonContext);
 
   const currentSettings = daemonService.currentConfigs;
+  console.log("Current Settings: ", currentSettings);
   const currentAppDownloadPath = currentSettings?.appDownloadPath
     ? currentSettings.appDownloadPath
     : "";
@@ -148,7 +157,7 @@ const SettingsForm = () => {
                   width: "100%",
                   backgroundColor: theme.formSectionBackground?.main,
                 }}
-                elevation={3}
+                elevation={0}
               >
                 {snackBarProps.text && snackBarProps.severity && (
                   <PositionedSnackbar
@@ -208,6 +217,67 @@ const SettingsForm = () => {
                         variant="h6"
                         style={{ textAlign: "start", padding: "15px" }}
                       >
+                        Global Mining Command
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={8}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                      <TextField
+                        label="Global Mining Command"
+                        name="miningCommand"
+                        required={true}
+                        type="text"
+                        style={{
+                          width: "80%",
+                          display: "flex",
+                          justifyContent: "flex-start",
+                        }}
+                      />
+                    </Grid>
+                    <Grid xs={4}>
+                      <Typography
+                        variant="h6"
+                        style={{ textAlign: "start", padding: "15px" }}
+                      >
+                        Select your GPU
+                      </Typography>
+                    </Grid>
+                    <Grid xs={5} />
+                    <Grid
+                      item
+                      xs={3}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                      <Select
+                        name="workerGPU"
+                        label="Select your GPU"
+                        formControlProps={{ margin: "normal" }}
+                        required={true}
+                      >
+                        <MenuItem value="3090">3090</MenuItem>
+                        <MenuItem value="3080Ti">3080 Ti</MenuItem>
+                        <MenuItem value="3080">3080</MenuItem>
+                        <MenuItem value="3070Ti">3070 Ti</MenuItem>
+                        <MenuItem value="3070">3070</MenuItem>
+                        <MenuItem value="3060Ti">3060 Ti</MenuItem>
+                        <MenuItem value="3060">3060</MenuItem>
+                        <MenuItem value="2080Ti">2080 Ti</MenuItem>
+                        <MenuItem value="2080s">2080 Super</MenuItem>
+                        <MenuItem value="2080">2080</MenuItem>
+                        <MenuItem value="2070s">2070 Super</MenuItem>
+                        <MenuItem value="2070">2070</MenuItem>
+                        <MenuItem value="2060s">2060 Super</MenuItem>
+                        <MenuItem value="2060">2060</MenuItem>
+                      </Select>
+                    </Grid>
+                    <Grid xs={4}>
+                      <Typography
+                        variant="h6"
+                        style={{ textAlign: "start", padding: "15px" }}
+                      >
                         Torrent Listening Port
                       </Typography>
                     </Grid>
@@ -219,6 +289,31 @@ const SettingsForm = () => {
                       <TextField
                         label="Torrent Listening Port"
                         name="torrentListenPort"
+                        required={true}
+                        type="number"
+                        style={{
+                          width: "30%",
+                          display: "flex",
+                          justifyContent: "flex-start",
+                        }}
+                      />
+                    </Grid>
+                    <Grid xs={4}>
+                      <Typography
+                        variant="h6"
+                        style={{ textAlign: "start", padding: "15px" }}
+                      >
+                        Jupyter Lab Port
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={8}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                      <TextField
+                        label="Jupyter Lab Port"
+                        name="jupyterLabPort"
                         required={true}
                         type="number"
                         style={{

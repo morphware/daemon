@@ -12,6 +12,7 @@ import React, { InputHTMLAttributes, useEffect, useRef, useState } from "react";
 import { Field, useForm } from "react-final-form";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import { theme } from "../providers/MorphwareTheme";
+import { formatFileSize } from "../utils";
 
 interface FileFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   name: string;
@@ -52,17 +53,11 @@ const FileField = ({
 
   const form = useForm();
 
-  const formatFileSize = (bytes: number, decimalPoint?: number) => {
-    if (bytes == 0) return "0 Bytes";
-    var k = 1000,
-      dm = decimalPoint || 2,
-      sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"],
-      i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
-  };
-
   const fileName = (files?: FileList | null) => {
-    return fileUploaded && files?.length === 1 ? files[0].name : "";
+    const fileName = fileUploaded && files?.length === 1 ? files[0].name : "";
+    const truncatedFileName =
+      fileName.length <= 15 ? fileName : fileName.substring(0, 25) + "...";
+    return truncatedFileName;
   };
 
   const fileSize = (files?: FileList | null) => {
@@ -97,7 +92,7 @@ const FileField = ({
 
       return (
         <>
-          <Grid item xs={6}>
+          <Grid item xs={7}>
             <Grid container xs={12} className={classes.metaDataContainer}>
               <Grid
                 item
@@ -108,7 +103,7 @@ const FileField = ({
                   alignItems: "center",
                 }}
               >
-                <Typography variant="body1">
+                <Typography variant="body2">
                   {fileName(inputRef.current?.files)}
                 </Typography>
               </Grid>
@@ -121,7 +116,7 @@ const FileField = ({
                   alignItems: "center",
                 }}
               >
-                <Typography variant="body1">
+                <Typography variant="body2">
                   {fileSize(inputRef.current?.files)}
                 </Typography>
               </Grid>
@@ -134,13 +129,13 @@ const FileField = ({
                   alignItems: "center",
                 }}
               >
-                <Typography variant="body1">
+                <Typography variant="body2">
                   {lastModified(inputRef.current?.files)}
                 </Typography>
               </Grid>
             </Grid>
           </Grid>
-          <Grid item xs={2}>
+          <Grid item xs={1}>
             <Box
               display="flex"
               justifyContent="flex-end"
@@ -204,7 +199,7 @@ const FileField = ({
                   style={{ height: "100%", width: "80%" }}
                 >
                   <Button
-                    style={{ width: "100%", display: "flex", height: "80%" }}
+                    style={{ width: "100%", display: "flex", height: "50px" }}
                     component="span"
                     variant="contained"
                     // variant="outlined"

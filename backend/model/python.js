@@ -52,6 +52,13 @@ function executeVenv(command, ...args){
 	};
 
 	return new Promise((resolve, reject)=>{
+
+		console.log("Executing");
+		console.log("Command:  ", command);
+		console.log("PATH:  ", PATH)
+		console.log("VIRTUAL_ENV:  ", VIRTUAL_ENV);
+
+
 		const child = spawn(command, args, {
 			shell: true,
 			env: {
@@ -90,8 +97,11 @@ function executeVenv(command, ...args){
 async function executeWrapper(...args){
 
 	if(!checkVenv()){
+		console.log("Creating Environment");
 		await makeVenv();
 	}
+
+	console.log("Environment Created");
 
 	return await executeVenv(...args);
 
