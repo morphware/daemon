@@ -28,25 +28,33 @@ const styles = makeStyles(() =>
 );
 
 interface ConnectionStatusProps {
+  text: string;
   connected: boolean;
   network: string;
 }
 
-const ConnectionStatus = ({ connected, network }: ConnectionStatusProps) => {
+export const ConnectionStatus = ({
+  text,
+  connected,
+  network,
+}: ConnectionStatusProps) => {
   return connected ? (
     <Box display="flex">
       <Typography variant="body2">
-        Connection:&nbsp;&nbsp;&nbsp;{network}&nbsp;
+        {text}:&nbsp;&nbsp;&nbsp;{network}&nbsp;
       </Typography>
       <CheckCircleIcon
-        style={{ fontSize: 25, color: "green" }}
+        style={{ fontSize: 25, color: "#6ACE6D" }}
         color="secondary"
       />
     </Box>
   ) : (
     <Box display="flex">
-      <Typography variant="body2">Connection:&nbsp;&nbsp;&nbsp;</Typography>
-      <CancelIcon style={{ fontSize: 25, color: "red" }} color="secondary" />
+      <Typography variant="body2">{text}:&nbsp;&nbsp;&nbsp;</Typography>
+      <CancelIcon
+        style={{ fontSize: 25, color: "#FF6666" }}
+        color="secondary"
+      />
     </Box>
   );
 };
@@ -110,9 +118,13 @@ const WalletInfo = () => {
         }}
       >
         {daemonService.connectionStatus && daemonService.network ? (
-          <ConnectionStatus connected={true} network={daemonService.network} />
+          <ConnectionStatus
+            text="Connection"
+            connected={true}
+            network={daemonService.network}
+          />
         ) : (
-          <ConnectionStatus connected={false} network={""} />
+          <ConnectionStatus text="Connection" connected={false} network={""} />
         )}
       </Grid>
     </Grid>

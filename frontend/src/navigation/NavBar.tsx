@@ -72,9 +72,9 @@ const styles = makeStyles({
     paddingTop: "20px",
     paddingBottom: "20px",
     width: "100%",
-    // "&:hover": {
-    //   curser: "pointer",
-    // },
+    "&:hover": {
+      curser: "pointer",
+    },
   },
 });
 
@@ -118,11 +118,11 @@ const NavBar = () => {
       <Grid
         item
         className={classes.logoContainer}
-        // onClick={() => setSelectedNavItem(navOptions.Home)}
+        onClick={() => setSelectedNavItem(navOptions.Home)}
       >
-        {/* <Link className={classes.itemLink} to={"/"}> */}
-        <img src={logo} alt="Morphware Logo" width="85%" />
-        {/* </Link> */}
+        <Link className={classes.itemLink} to={"/home"}>
+          <img src={logo} alt="Morphware Logo" width="85%" />
+        </Link>
       </Grid>
       <Grid item className="navbar-content">
         <NavLink

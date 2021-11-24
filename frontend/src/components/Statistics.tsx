@@ -7,7 +7,7 @@ import {
 } from "@material-ui/core";
 import React from "react";
 import { theme } from "../providers/MorphwareTheme";
-// import { theme } from "../providers/MorphwareTheme";
+import ConnectedBanner from "./ConnectedBanner";
 
 const styles = makeStyles(() =>
   createStyles({
@@ -27,14 +27,22 @@ const styles = makeStyles(() =>
 const Statistics = () => {
   const classes = styles();
 
-  const modelsTrained = 27;
-  const earnedMWT = 1382;
-  const liveJobs = 712;
-
   return (
     <React.Fragment>
       <Grid container style={{ height: "50%" }}>
-        <Grid item xs={4}>
+        <Paper
+          style={{
+            padding: 30,
+            backgroundColor: theme.formSectionBackground?.main,
+            height: "80%",
+            display: "flex",
+            alignContent: "center",
+          }}
+          elevation={0}
+        >
+          <ConnectedBanner />
+        </Paper>
+        {/* <Grid item xs={4}>
           <Typography variant="h4" className={classes.statisticNumber}>
             {earnedMWT}
           </Typography>
@@ -51,7 +59,7 @@ const Statistics = () => {
             {liveJobs}
           </Typography>
           <Typography variant="h5">Live Morphware Jobs</Typography>
-        </Grid>
+        </Grid> */}
       </Grid>
       <Grid container style={{ height: "50%" }} spacing={5}>
         <Grid item xs={6}>
@@ -61,12 +69,12 @@ const Statistics = () => {
               backgroundColor: theme.formSectionBackground?.main,
               height: "80%",
             }}
-            elevation={3}
+            elevation={0}
           >
             <Typography variant="h5">In this app, you can …</Typography>
             <Typography variant="body2">
-              Assume the role of either a Data Scientist End User or a Worker
-              Node
+              Assume the role of either a Data Scientist, Worker Node or
+              Validator Node
               <ul>
                 <li style={{ textAlign: "left" }}>
                   <Typography className={classes.appRoles}>End User</Typography>
@@ -83,12 +91,12 @@ const Statistics = () => {
                 {/* <br /> */}
                 <li style={{ textAlign: "left" }}>
                   <Typography className={classes.appRoles}>
-                    Validator Node (Coming Soon)
+                    Validator Node
                   </Typography>{" "}
                   — Earn tokens by testing models trained by the worker nodes.
                 </li>
               </ul>
-            </Typography>{" "}
+            </Typography>
           </Paper>
         </Grid>
 
@@ -99,7 +107,7 @@ const Statistics = () => {
               backgroundColor: theme.formSectionBackground?.main,
               height: "80%",
             }}
-            elevation={3}
+            elevation={0}
           >
             <Typography variant="h5">What is Morphware?</Typography>
             <Typography variant="body2" style={{ textAlign: "left" }}>
