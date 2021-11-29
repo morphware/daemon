@@ -122,7 +122,6 @@ export interface SettingsParamsResponseProps {
     httpBindAddress: string;
     httpPort: string;
     privateKey: string;
-    acceptWork: string;
     torrentListenPort: string;
     appDownloadPath: string;
     miningCommand: string;
@@ -133,12 +132,12 @@ export interface SettingsRequestProps {
   httpBindAddress?: string;
   httpPort?: string;
   privateKey?: string;
-  acceptWork?: boolean;
   torrentListenPort?: number;
   appDownloadPath?: string;
   jupyterLabPort?: number;
   miningCommand?: string;
   workerGPU?: string;
+  role?: string;
 }
 
 interface trainModelPostDataResponse {

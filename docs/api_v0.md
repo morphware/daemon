@@ -374,9 +374,6 @@ View and edit settings
 	    "privateKey": {
 	      "type": "array"
 	    },
-	    "acceptWork": {
-	      "type": "boolean"
-	    },
 	    "torrentListenPort": {
 	      "type": "number"
 	    },
@@ -385,6 +382,15 @@ View and edit settings
 	    },
 		"jupyterLabPort": {
 			"type":"number"
+		},
+		"miningCommand": {
+			"type":"string"
+		},
+		"workerGPU": {
+			"type":"string"
+		},
+		"role": {
+			"type":"string"
 		},
 	  }
 	}

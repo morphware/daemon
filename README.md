@@ -110,7 +110,6 @@ would like to allow all conf options to be set via the CLI.
     version  Display version
   
   Options:
-    -a, --acceptWork   Accepting jobs
     -A, --appDataPath  Path where local data is held
     -e, --electronDev  Load chrome dev tools
     -E, --ethAddress   Remote etherum node
@@ -118,6 +117,7 @@ would like to allow all conf options to be set via the CLI.
     -h, --httpPort     http port
     -p, --privateKey   Wallet Object
     -v, --version      Output the version number
+    -r, --role         Clients assumed role. "Poster", "Worker" or "Validator"
 
 ```
 
