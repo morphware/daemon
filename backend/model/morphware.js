@@ -121,7 +121,7 @@ class MorphwareWallet{
 			try {
 				//Here is where we would call the MWT price feed oracle, and convert it to USD
 				//Hard coded. 1 USD = 10 MWT
-				res(0.1);
+				res("0.1");
 			}
 			catch (error) {
 				console.error('ERROR!!!, MorphwareWallet MWTPrice', error);

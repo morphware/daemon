@@ -33,11 +33,9 @@ async function calculateBid(trainingTimeInHours, USDMWTPrice) {
         const competingAWSCUDAPricePerHour = await findClosestCUDACorePerHourPrice(workerCUDACores);
         console.log("competingAWSCUDAPricePerHour: ", competingAWSCUDAPricePerHour);
         const biddingValueUSD = competingAWSCUDAPricePerHour * workerCUDACores * parseInt(trainingTimeInHours) * 0.8;
-        console.log("Bidding Value in USD: ", biddingValueUSD)
-        
-        //TODO: THIS IS TEMPORARY. Assuming    1 MWT = 0.1 USD
+        console.log("Bidding Value in USD: ", biddingValueUSD)        
         console.log("MWT PRICE: ", USDMWTPrice);
-        let biddingValueMWT = Math.round(biddingValueUSD / USDMWTPrice);
+        let biddingValueMWT = Math.round(biddingValueUSD / parseFloat(USDMWTPrice));
         biddingValueMWT =  Web3.utils.toWei(biddingValueMWT.toString(), "ether");
         console.log("Bidding Value in MWT in Wei: ", biddingValueMWT);
         return biddingValueMWT;
