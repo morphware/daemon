@@ -203,7 +203,12 @@ export interface ClientRole {
   role: string;
 }
 
+export interface MWTPrice {
+  price: string;
+}
+
 export interface IDaemonService {
+  getMWTPrice(): Promise<string>
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
   ): Promise<SubmitTrainingModelResponse>;
@@ -225,6 +230,19 @@ export class DaemonService implements IDaemonService {
     "http://" + (window.localStorage.getItem("url") || "127.0.0.1:3001");
 
   constructor() {}
+
+  public getMWTPrice = async (): Promise<string> => {
+     const url = `${this.baseUrl}/api/V0/wallet/price`;
+
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const MWTPrice: MWTPrice = await response.json();
+    return MWTPrice.price;
+  }
 
   public getUserRole = async (): Promise<ClientRole> => {
     const url = `${this.baseUrl}/api/V0/settings/role`;

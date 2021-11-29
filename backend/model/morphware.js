@@ -115,8 +115,21 @@ class MorphwareWallet{
 			return false
 		}
 	}
-}
 
+	async USDMWTPrice(){
+		return new Promise((res, rej) => {
+			try {
+				//Here is where we would call the MWT price feed oracle, and convert it to USD
+				//Hard coded. 1 USD = 10 MWT
+				res(0.1);
+			}
+			catch (error) {
+				console.error('ERROR!!!, MorphwareWallet MWTPrice', error);
+				rej(error);
+			}
+		})
+	}
+}
 
 // Listen for transfer events to keep the tracked wallets transactions history
 // fresh.

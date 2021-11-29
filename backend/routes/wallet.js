@@ -47,4 +47,14 @@ router.post('/sign', async function(req, res, next){
 	}
 });
 
+router.get('/price', async function(req, res, next) {
+	try{
+		return res.json({
+			price: await wallet.USDMWTPrice()
+		});
+	}catch(error){
+		next(error);
+	}
+})
+
 module.exports = router;
