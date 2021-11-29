@@ -327,10 +327,10 @@ View and send MWT associated with the current wallet
 	Gets the current price of MWT to USD
 	NOTE: At the moment this is hardcoded to 0.1, but will be updated to use the MWT price feed oracle when its live.
 
-		Query **none**
+	Query **none**
 
-		Response fields:
-		* `price` *string* MWT price in USD.
+	Response fields:
+	* `price` *string* MWT price in USD.
 	
 	Example
 
