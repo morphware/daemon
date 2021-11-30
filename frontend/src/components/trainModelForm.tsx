@@ -102,7 +102,6 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
         severity: "success",
       });
     } else if (Object.keys(responseV2).includes("error")) {
-      //TODO: Update when failed requests return error message
       daemonService.updateSnackbarProps({
         text: `${responseV2.error}`,
         severity: "error",

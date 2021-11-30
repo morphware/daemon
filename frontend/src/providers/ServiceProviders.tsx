@@ -135,8 +135,10 @@ const ServiceProviders: React.FC = ({ children }) => {
 
   const updateSettings = async (request: SettingsRequestProps) => {
     let response = await daemonService.updateSettings(request);
-    response = settingsDaemonResponseToSettingsResponseProps(response);
-    setCurrentConfigs(response);
+    if (!response.error) {
+      response = settingsDaemonResponseToSettingsResponseProps(response);
+      setCurrentConfigs(response);
+    }
     return response;
   };
 

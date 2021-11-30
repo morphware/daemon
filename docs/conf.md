@@ -39,10 +39,12 @@ placed in any file file that makes sense.
 on.
 * `privateKey` *ARRAY* **REQUIRED** The private key for the Etherum account
   . This should be stored in `secrets.js`
-* `acceptWork` *BOOL* If the current node is a accepting jobs.
+* `role` *STRING* The clients role. "Poster", "Worker" or "Validator"
 * `electronDev` *BOOL* Bring up the chrome dev tools in electron.
 * `appDownloadPath` *STRING* Absolute path where downloads are kept.
 * `torrentListenPort` *STRING* TCP port for the torrent client to listen on
+* `miningCommand` *STRING* A global mining command the worker can run
+* `workerGPU` *STRING* Name of GPU worker is using
 
 ## Dev fields
 User may edit these fields, but they are mostly meant for dev issues.

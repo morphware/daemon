@@ -201,7 +201,7 @@ class JobValidator extends Job{
 /*
 Listen for `JobPostedDescription` events. This runs in addition to `Job.events`
 */
-if(conf.validate){
+if(conf.role === "Validator"){
 	JobValidator.events();
 }
 

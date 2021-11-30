@@ -7,12 +7,12 @@ const editKeys = {
 	'httpBindAddress':{ type: 'string'},
 	'httpPort':{ type: 'number'},
 	'privateKey':{ type: 'array'},
-	'acceptWork':{ type: 'boolean'},
 	'torrentListenPort':{ type: 'number'},
 	'appDownloadPath': {type: 'string'},
 	'jupyterLabPort': {type: 'number'},
 	'miningCommand': {type: 'string'},
 	'workerGPU': {type: 'string'},
+	'role': {type: 'string'},
 };
 
 router.get('/', async function(req, res, next){
@@ -38,9 +38,12 @@ router.post('/', async function(req, res, next) {
 
 router.get('/role', async function(req, res, next) {
 	try {
-		if(conf.acceptWork) return res.json({role: "worker"});
-		else if(conf.validate) return res.json({role: "validator"});
-		return res.json({role: "poster"});
+		switch(conf.role) {
+			case("Poster"): return res.json({role: "poster"});
+			case("Worker"): return res.json({role: "worker"});
+			case("Validator"): return res.json({role: "validator"});
+			default: return res.json({role: "Role Not Set"});
+		}
 	} catch (error) {
 		next(error);
 	}

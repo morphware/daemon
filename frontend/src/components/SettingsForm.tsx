@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Button,
   Grid,
@@ -11,19 +10,15 @@ import React, { useContext, useState } from "react";
 import { theme } from "../providers/MorphwareTheme";
 import { TextField, Select } from "mui-rff";
 import { Form, useForm } from "react-final-form";
-import { Switches } from "mui-rff";
 import { DaemonContext } from "../providers/ServiceProviders";
 import { SettingsRequestProps } from "../service/DaemonService";
 import { ethers } from "ethers";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { IpcRenderer } from "electron";
-import PositionedSnackbar from "./PositionedSnackbar";
-import { snackBarProps } from "../components/PositionedSnackbar";
 interface SettingsRequestPropsErrors {
   httpBindAddress?: string;
   httpPort?: string;
   privateKey?: string;
-  acceptWork?: string;
   torrentListenPort?: string;
   appDownloadPath?: string;
 }
@@ -75,7 +70,6 @@ const AddAppDownloadPath = ({
 
 const SettingsForm = () => {
   const daemonService = useContext(DaemonContext);
-
   const currentSettings = daemonService.currentConfigs;
   console.log("Current Settings: ", currentSettings);
   const currentAppDownloadPath = currentSettings?.appDownloadPath
@@ -85,22 +79,18 @@ const SettingsForm = () => {
   const [appDownloadPath, setAppDownloadPath] = useState<string>(
     currentAppDownloadPath
   );
-  const [snackBarProps, setSnackBarProps] = useState<snackBarProps>({});
 
   const updateConfigurations = async (values: SettingsRequestProps) => {
     console.log("values: ", values);
-    if (!Object.keys(values).includes("acceptWork")) {
-      values.acceptWork = false;
-    }
-
     const response = await daemonService.updateSettings(values);
-    if (response.error!) {
-      setSnackBarProps({
+
+    if (response.error) {
+      daemonService.updateSnackbarProps({
         text: response.error,
         severity: "error",
       });
     } else {
-      setSnackBarProps({
+      daemonService.updateSnackbarProps({
         text: "Changes have been saved. Please restart client to apply changes",
         severity: "success",
       });
@@ -159,13 +149,6 @@ const SettingsForm = () => {
                 }}
                 elevation={0}
               >
-                {snackBarProps.text && snackBarProps.severity && (
-                  <PositionedSnackbar
-                    text={snackBarProps.text}
-                    severity={snackBarProps.severity}
-                    setSnackBarProps={setSnackBarProps}
-                  />
-                )}
                 <Grid container alignItems="flex-start" spacing={2}>
                   <Grid item xs={12} style={{ textAlign: "start" }} />
                   <Grid container xs={12} spacing={2}>
@@ -242,42 +225,6 @@ const SettingsForm = () => {
                         variant="h6"
                         style={{ textAlign: "start", padding: "15px" }}
                       >
-                        Select your GPU
-                      </Typography>
-                    </Grid>
-                    <Grid xs={5} />
-                    <Grid
-                      item
-                      xs={3}
-                      style={{ display: "flex", justifyContent: "flex-end" }}
-                    >
-                      <Select
-                        name="workerGPU"
-                        label="Select your GPU"
-                        formControlProps={{ margin: "normal" }}
-                        required={true}
-                      >
-                        <MenuItem value="3090">3090</MenuItem>
-                        <MenuItem value="3080Ti">3080 Ti</MenuItem>
-                        <MenuItem value="3080">3080</MenuItem>
-                        <MenuItem value="3070Ti">3070 Ti</MenuItem>
-                        <MenuItem value="3070">3070</MenuItem>
-                        <MenuItem value="3060Ti">3060 Ti</MenuItem>
-                        <MenuItem value="3060">3060</MenuItem>
-                        <MenuItem value="2080Ti">2080 Ti</MenuItem>
-                        <MenuItem value="2080s">2080 Super</MenuItem>
-                        <MenuItem value="2080">2080</MenuItem>
-                        <MenuItem value="2070s">2070 Super</MenuItem>
-                        <MenuItem value="2070">2070</MenuItem>
-                        <MenuItem value="2060s">2060 Super</MenuItem>
-                        <MenuItem value="2060">2060</MenuItem>
-                      </Select>
-                    </Grid>
-                    <Grid xs={4}>
-                      <Typography
-                        variant="h6"
-                        style={{ textAlign: "start", padding: "15px" }}
-                      >
                         Torrent Listening Port
                       </Typography>
                     </Grid>
@@ -328,18 +275,69 @@ const SettingsForm = () => {
                         variant="h6"
                         style={{ textAlign: "start", padding: "15px" }}
                       >
-                        Accept Work
+                        Select your GPU
                       </Typography>
                     </Grid>
+                    <Grid xs={5} />
                     <Grid
                       item
-                      xs={8}
-                      style={{ display: "flex", justifyContent: "flex-end" }}
+                      xs={3}
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        paddingBottom: "0",
+                      }}
                     >
-                      <Switches
-                        name="acceptWork"
-                        data={{ label: "", value: true }}
-                      />
+                      <Select
+                        name="workerGPU"
+                        label="Select your GPU"
+                        formControlProps={{ margin: "normal" }}
+                        required={true}
+                      >
+                        <MenuItem value="3090">3090</MenuItem>
+                        <MenuItem value="3080Ti">3080 Ti</MenuItem>
+                        <MenuItem value="3080">3080</MenuItem>
+                        <MenuItem value="3070Ti">3070 Ti</MenuItem>
+                        <MenuItem value="3070">3070</MenuItem>
+                        <MenuItem value="3060Ti">3060 Ti</MenuItem>
+                        <MenuItem value="3060">3060</MenuItem>
+                        <MenuItem value="2080Ti">2080 Ti</MenuItem>
+                        <MenuItem value="2080s">2080 Super</MenuItem>
+                        <MenuItem value="2080">2080</MenuItem>
+                        <MenuItem value="2070s">2070 Super</MenuItem>
+                        <MenuItem value="2070">2070</MenuItem>
+                        <MenuItem value="2060s">2060 Super</MenuItem>
+                        <MenuItem value="2060">2060</MenuItem>
+                      </Select>
+                    </Grid>
+                    <Grid xs={4}>
+                      <Typography
+                        variant="h6"
+                        style={{ textAlign: "start", padding: "15px" }}
+                      >
+                        Select your Role
+                      </Typography>
+                    </Grid>
+                    <Grid xs={5} />
+                    <Grid
+                      item
+                      xs={3}
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        paddingBottom: "0",
+                      }}
+                    >
+                      <Select
+                        name="role"
+                        label="Select your role"
+                        formControlProps={{ margin: "normal" }}
+                        required={true}
+                      >
+                        <MenuItem value="Poster">Poster</MenuItem>
+                        <MenuItem value="Worker">Worker</MenuItem>
+                        <MenuItem value="Validator">Validator</MenuItem>
+                      </Select>
                     </Grid>
                   </Grid>
                 </Grid>
