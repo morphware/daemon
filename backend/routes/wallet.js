@@ -50,7 +50,7 @@ router.post('/sign', async function(req, res, next){
 router.get('/price', async function(req, res, next) {
 	try{
 		return res.json({
-			price: await wallet.USDMWTPrice()
+			price: await wallet.MWTUSDPrice()
 		});
 	}catch(error){
 		next(error);

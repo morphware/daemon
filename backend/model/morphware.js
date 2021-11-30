@@ -116,7 +116,7 @@ class MorphwareWallet{
 		}
 	}
 
-	async USDMWTPrice(){
+	async MWTUSDPrice(){
 		return new Promise((res, rej) => {
 			try {
 				//Here is where we would call the MWT price feed oracle, and convert it to USD
