@@ -319,6 +319,26 @@ View and send MWT associated with the current wallet
   }
 
 	```
+
+
+
+* **GET** `wallet/price`
+
+	Gets the current price of MWT to USD
+	NOTE: At the moment this is hardcoded to 0.1, but will be updated to use the MWT price feed oracle when its live.
+
+	Query **none**
+
+	Response fields:
+	* `price` *string* MWT price in USD.
+	
+	Example
+
+	``` bash
+	curl 127.0.0.1:3010/api/v0/wallet/price
+	{
+		"price":0.1
+	}
 ## Settings 
 
 `api/v0/settings`

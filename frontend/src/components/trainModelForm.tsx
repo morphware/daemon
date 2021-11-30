@@ -54,8 +54,12 @@ interface ICalculatedBounty {
 }
 
 const CalculatedBounty = ({ form, bounty, setBounty }: ICalculatedBounty) => {
+  const daemonService = useContext(DaemonContext);
+
   useEffect(() => {
-    setBounty(bountySetter(form.getState().values.trainingTime));
+    setBounty(
+      bountySetter(daemonService.MWTPrice, form.getState().values.trainingTime)
+    );
   }, [form.getState().values.trainingTime]);
 
   console.log("BOUNTY: ", bounty);

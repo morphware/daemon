@@ -183,7 +183,7 @@ class JobWorker extends Job{
 
 			console.info('Bidding on', this.instanceId, (new Date()).toLocaleString());
 
-			const biddingAmount = await calculateBid(this.jobData.estimatedTrainingTime);
+			const biddingAmount = await calculateBid(this.jobData.estimatedTrainingTime, await wallet.MWTUSDPrice());
 
 			console.log("BiddingAmount: ", biddingAmount);
 
