@@ -74,7 +74,7 @@ class JobWorker extends Job{
 
 	// Check to see if the client is ready and willing to take on jobs
 	static canTakeWork(){
-		return conf.acceptWork && !this.lock;
+		return conf.role === "Worker" && !this.lock;
 	}
 
 	//Create a new process group that starts mining
@@ -183,7 +183,7 @@ class JobWorker extends Job{
 
 			console.info('Bidding on', this.instanceId, (new Date()).toLocaleString());
 
-			const biddingAmount = await calculateBid(this.jobData.estimatedTrainingTime);
+			const biddingAmount = await calculateBid(this.jobData.estimatedTrainingTime, await wallet.MWTUSDPrice());
 
 			console.log("BiddingAmount: ", biddingAmount);
 
@@ -450,7 +450,7 @@ class JobWorker extends Job{
 /*
 Listen for `JobPostedDescription` events. This runs in addition to `Job.events`
 */
-if(conf.acceptWork){
+if(conf.role === "Worker"){
 	JobWorker.events();
 }
 

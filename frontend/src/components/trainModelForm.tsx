@@ -54,8 +54,12 @@ interface ICalculatedBounty {
 }
 
 const CalculatedBounty = ({ form, bounty, setBounty }: ICalculatedBounty) => {
+  const daemonService = useContext(DaemonContext);
+
   useEffect(() => {
-    setBounty(bountySetter(form.getState().values.trainingTime));
+    setBounty(
+      bountySetter(daemonService.MWTPrice, form.getState().values.trainingTime)
+    );
   }, [form.getState().values.trainingTime]);
 
   console.log("BOUNTY: ", bounty);
@@ -102,7 +106,6 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
         severity: "success",
       });
     } else if (Object.keys(responseV2).includes("error")) {
-      //TODO: Update when failed requests return error message
       daemonService.updateSnackbarProps({
         text: `${responseV2.error}`,
         severity: "error",

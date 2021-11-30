@@ -20,6 +20,7 @@ export const DaemonContext = React.createContext({} as daemonServiceProps);
 import { snackBarProps } from "../components/PositionedSnackbar";
 interface daemonServiceProps {
   MWTAddress: string;
+  MWTPrice?: string;
   daemonService: DaemonService;
   torrents?: ActiveTorrents;
   walletBalance?: string;
@@ -32,6 +33,7 @@ interface daemonServiceProps {
   clientVersion: string;
   role?: Role;
   snackBarProps: snackBarProps;
+  getMWTPrice: () => Promise<void>;
   getTorrents: () => Promise<void>;
   submitTrainModelRequest(
     modelRequest: ITrainingModelValuesV2
@@ -58,6 +60,7 @@ const MWSBalance = "0xbc40e97e6d665ce77e784349293d716b030711bc";
 const ServiceProviders: React.FC = ({ children }) => {
   const daemonService = new DaemonService();
   const [role, setRole] = useState<Role>();
+  const [MWTPrice, setMWTPrice] = useState<string>();
   const [torrents, setTorrents] = useState<ActiveTorrents>();
   const [walletAddress, setWalletAddress] = useState<string>();
   const [walletBalance, setWalletBalance] = useState<string>();
@@ -77,6 +80,12 @@ const ServiceProviders: React.FC = ({ children }) => {
     if (roleResponse.role === "worker") setRole(Role.Worker);
     if (roleResponse.role === "validator") setRole(Role.Validator);
     console.log("Role is: ", roleResponse.role);
+  };
+
+  const getMWTPrice = async () => {
+    const MWTPrice = await daemonService.getMWTPrice();
+    console.log("MWT PRICE: ", MWTPrice);
+    setMWTPrice(MWTPrice);
   };
 
   const getActiveJobs = async () => {
@@ -135,8 +144,10 @@ const ServiceProviders: React.FC = ({ children }) => {
 
   const updateSettings = async (request: SettingsRequestProps) => {
     let response = await daemonService.updateSettings(request);
-    response = settingsDaemonResponseToSettingsResponseProps(response);
-    setCurrentConfigs(response);
+    if (!response.error) {
+      response = settingsDaemonResponseToSettingsResponseProps(response);
+      setCurrentConfigs(response);
+    }
     return response;
   };
 
@@ -206,6 +217,8 @@ const ServiceProviders: React.FC = ({ children }) => {
     getRole: getRole,
     updateSnackbarProps: updateSnackbarProps,
     snackBarProps: snackBarProps,
+    MWTPrice: MWTPrice,
+    getMWTPrice: getMWTPrice,
   };
 
   useEffect(() => {
@@ -227,6 +240,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     getActiveJobs();
     getSettings();
     getRole();
+    getMWTPrice();
   }, []);
 
   return (

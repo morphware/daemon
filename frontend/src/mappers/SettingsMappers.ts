@@ -14,9 +14,6 @@ export const settingsDaemonResponseToSettingsResponseProps = (
   if (Object.keys(daemonResponse).includes("torrentListenPort")) {
     response.torrentListenPort = daemonResponse.torrentListenPort;
   }
-  if (Object.keys(daemonResponse).includes("acceptWork")) {
-    response.acceptWork = daemonResponse.acceptWork;
-  }
   if (Object.keys(daemonResponse).includes("jupyterLabPort")) {
     response.jupyterLabPort = daemonResponse.jupyterLabPort;
   }
@@ -25,6 +22,9 @@ export const settingsDaemonResponseToSettingsResponseProps = (
   }
   if (Object.keys(daemonResponse).includes("workerGPU")) {
     response.workerGPU = daemonResponse.workerGPU;
+  }
+  if (Object.keys(daemonResponse).includes("role")) {
+    response.role = daemonResponse.role;
   }
   return response;
 };

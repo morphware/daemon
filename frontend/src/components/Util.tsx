@@ -2,8 +2,6 @@ import React from "react";
 import { FieldMetaState, useField } from "react-final-form";
 import { FormHelperText, FormHelperTextProps } from "@material-ui/core";
 
-const MWT_PRICE = 0.1;
-
 export interface ErrorMessageProps {
   showError: boolean;
   meta: FieldMetaState<any>;
@@ -63,8 +61,12 @@ export const showErrorOnBlur: ShowErrorFunc = ({
 }: ShowErrorProps) =>
   !!(((submitError && !dirtySinceLastSubmit) || error) && touched);
 
-export const bountySetter = (estimatedTrainingTime?: number) => {
+export const bountySetter = (
+  MWTPrice?: string,
+  estimatedTrainingTime?: number
+) => {
   if (!estimatedTrainingTime) return 0;
+  if (!MWTPrice) throw "MWTPrice is not defined";
   //Assuming the average worker has a 2080;
   const CUDACores = 2944;
 
@@ -75,8 +77,9 @@ export const bountySetter = (estimatedTrainingTime?: number) => {
     CUDACorePerHour * CUDACores * estimatedTrainingTime;
 
   console.log("estimatedBountyUSD: ", estimatedBountyUSD);
+  console.log("MWTPrice: ", MWTPrice);
 
-  const estimatedBountyMWT = estimatedBountyUSD / MWT_PRICE;
+  const estimatedBountyMWT = estimatedBountyUSD / parseFloat(MWTPrice);
 
   return Math.round(estimatedBountyMWT);
 };

@@ -1,7 +1,7 @@
 'use strict';
 const csv = require('csv-parser');
 const fs = require('fs');
-const {conf} = require('./conf');
+const {conf} = require('../conf');
 const os = require("os");
 const Web3 = require("web3");
 
@@ -22,10 +22,9 @@ const GPUtoCUDAMapping = {
     "2060": 1920,
 }
 
-async function calculateBid(trainingTimeInHours, MWTUSDPrice) {
+async function calculateBid(trainingTimeInHours) {
     try {
         if(!conf.workerGPU) throw("Worker GPU not selected")
-        if(!MWTUSDPrice) throw("MWT to USD Price not defined")
         console.log("My GPU: ", conf.workerGPU);
         const workerCUDACores = GPUtoCUDAMapping[conf.workerGPU];
         console.log("My GPU's CUDO Core Count: ", workerCUDACores);
@@ -33,9 +32,10 @@ async function calculateBid(trainingTimeInHours, MWTUSDPrice) {
         const competingAWSCUDAPricePerHour = await findClosestCUDACorePerHourPrice(workerCUDACores);
         console.log("competingAWSCUDAPricePerHour: ", competingAWSCUDAPricePerHour);
         const biddingValueUSD = competingAWSCUDAPricePerHour * workerCUDACores * parseInt(trainingTimeInHours) * 0.8;
-        console.log("Bidding Value in USD: ", biddingValueUSD)        
-        console.log("MWT PRICE: ", MWTUSDPrice);
-        let biddingValueMWT = Math.round(biddingValueUSD / parseFloat(MWTUSDPrice));
+        console.log("Bidding Value in USD: ", biddingValueUSD)
+        
+        //TODO: THIS IS TEMPORARY. Assuming    1 MWT = 0.1 USD
+        let biddingValueMWT = Math.round(biddingValueUSD * 10);
         biddingValueMWT =  Web3.utils.toWei(biddingValueMWT.toString(), "ether");
         console.log("Bidding Value in MWT in Wei: ", biddingValueMWT);
         return biddingValueMWT;

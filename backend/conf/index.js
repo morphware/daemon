@@ -5,7 +5,6 @@ const fs = require('fs-extra');
 var args = require('args');
 const packageJSON = require('../package');
 
-
 // Throw errors letting users know if required conf files are missing
 function load(filePath, required){
 	try {
@@ -25,7 +24,6 @@ function load(filePath, required){
 		}
 	}
 }
-
 
 // Apply changes to local conf
 function editLocalConf(args){
@@ -51,7 +49,6 @@ function editLocalConf(args){
 	return localConf;
 }
 
-
 // Determine if this is being called from a packages electron app;
 try{
 	const { app } = require('electron');
@@ -60,21 +57,18 @@ try{
 	var isPackaged = false;
 }
 
-
 // Set the command line argument options
 args
   .option('httpPort', 'http port')
   .option('electronDev', 'Load chrome dev tools')
   .option('ethAddress', 'Remote etherum node')
-  .option('acceptWork', 'Accepting model training jobs')
   .option('appDataPath', 'Path where local data is held')
   .option('appDownloadPath', 'Path for downloads')
-  .option('validate', 'Accept validation jobs')
+  .option('role', 'The role your client will assume.  Provide "Poster" (Post model training jobs), "Worker" (Accept model training jobs) or "Validator" (Accept model training jobs)')
   .option('miningCommand', 'A global command used to start mining')
   .option('privateKey', 'Wallet Object', undefined, value=>{
 	return [value];
   })
-
 
 // Parse command line arguments
 var runtimeConf = args.parse(process.argv, {
@@ -88,10 +82,8 @@ console.log("Runtime Conf: ", runtimeConf);
 // Include the current version
 runtimeConf.version = packageJSON.version;
 
-
 // Set the correct `NODE_ENV`
 const environment = process.env.NODE_ENV || (isPackaged ? 'production' : 'development');
-
 
 // Grab the base conf, we will need it for the rest of the file
 var baseConf = load('./base', true);
@@ -113,7 +105,6 @@ if(!runtimeConf.appDataPath){
 	}
 }
 
-
 // Set a unique path for Morphware
 runtimeConf.appDataPath += `${baseConf.appName}${environment === 'production' ? '': '-'+environment}/`;
 runtimeConf.appDataLocal = `${runtimeConf.appDataPath}local.json`;
@@ -123,52 +114,22 @@ console.log("runtimeConf: ", runtimeConf);
 // Create the `appDataPath` if it doesnt exist
 fs.ensureDirSync(runtimeConf.appDataPath);
 
-
 // Create `local.json` if it doesnt exist
 if(!fs.pathExistsSync(runtimeConf.appDataLocal)){
 	console.log('making appData file ', runtimeConf.appDataLocal);
 	fs.writeJsonSync(runtimeConf.appDataLocal, {});
 }
 
-
 // Grab local config
 var localConf = load(runtimeConf.appDataLocal);
-
-// Download data
-
-console.log("Local AppDownloadPath: ", localConf.appDownloadPath);
-console.log("Runtime appDataPath: ", runtimeConf.appDataPath);
-console.log("Runtime AppDownloadPath: ", runtimeConf.appDownloadPath);
 
 // Set the correct appDownloadPath if its not specified 
 if(!localConf.appDownloadPath){
 	runtimeConf.appDownloadPath = `${runtimeConf.appDataPath}downloads/`
 } 
-// if(localConf.appDownloadPath){
-// 	console.log("FIRST")
-// 	runtimeConf.appDownloadPath = localConf.appDownloadPath
-// }
-// else if(runtimeConf.appDataPath){
-// 	console.log("SECOND")
-// 	runtimeConf.appDownloadPath = `${runtimeConf.appDataPath}downloads/`
-// } 
-// else {
-// 	console.error("Cannot set appDownloadPath");
-// 	return;
-// }
-
-console.log("downloadPath LOCAL: ", localConf.appDownloadPath);
-console.log("downloadPath RUNTIME: ", runtimeConf.appDownloadPath);
-
-// return;
-
-// if(localConf.appDownloadPath){
-// 	runtimeConf.appDownloadPath = `${runtimeConf.appDataPath}downloads/`
-// }
 
 // Make sure download directory exists
 fs.ensureDirSync(runtimeConf.appDownloadPath || localConf.appDownloadPath);
-
 
 // Build the complete conf object
 var conf = extend(
