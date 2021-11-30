@@ -1,5 +1,6 @@
 'use strict';
 
+const {conf} = require("../conf");
 var instance;
 
 import ('webtorrent-hybrid').then(mod=>{
@@ -19,7 +20,12 @@ import ('webtorrent-hybrid').then(mod=>{
 
 	*/
 
-	instance = new mod.default();
+	if(conf.torrentListenPort){
+		instance = new mod.default({torrentPort: conf.torrentListenPort});	
+	} else{
+		instance = new mod.default();	
+	}
+
 
 	instance.findOrSeed = function(path){
 		return new Promise((resolve, reject)=>{
