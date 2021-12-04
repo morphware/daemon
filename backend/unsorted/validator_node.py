@@ -56,7 +56,7 @@ X_test           = X_test / maximum_pixel_intensity
 # TODO Merge Validator_node.py with Sample_Image_Classification. The node
 # (worker/validator) should know how to run the model, and which dataset 
 # (training/testing) to use
-infile_pathname  = 'unsorted/uploads/trainedModels/trained_model.h5'
+infile_pathname  = 'uploads/trainedModels/trained_model.h5'
 model = keras.models.load_model(infile_pathname)
 
 
