@@ -4,8 +4,15 @@ const bodyParser = require('body-parser');
 const express = require('express');
 const {conf} = require('./conf');
 const cors = require('cors');
+const {exec} = require('./model/python');
 
 const app = express();
+
+const findingPWD = async () => {
+	console.log("FINDING PWD");
+	const std = await exec('pwd');
+	console.log("STDOUT TEST: ", std);
+}
 
 // app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
@@ -15,6 +22,9 @@ app.use('/api/V0/', require('./routes/api_v0'));
 
 app.listen(conf.httpPort, conf.httpAdress, () => {
 	console.log(`Server running at http://${conf.httpAddress}:${conf.httpPort}`);
+	const {buildAuctionState} = require('./projection/auctions');
+	findingPWD();
+	buildAuctionState();
 });
 
 // Catch 404 and forward to error handler. If none of the above routes are
