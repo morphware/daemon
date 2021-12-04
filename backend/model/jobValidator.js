@@ -63,7 +63,7 @@ class JobValidator extends Job{
 
 	// Check to see if the client is ready and willing to take on jobs
 	static canValidate(){
-		return conf.validate && !this.lock;
+		return !this.lock;
 	}
 
 
