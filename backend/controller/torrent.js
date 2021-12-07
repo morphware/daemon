@@ -21,7 +21,7 @@ import ('webtorrent-hybrid').then(mod=>{
 	*/
 
 	if(conf.torrentListenPort){
-		instance = new mod.default({torrentPort: conf.torrentListenPort});	
+		instance = new mod.default();	
 	} else{
 		instance = new mod.default();	
 	}
