@@ -156,9 +156,16 @@ class JobValidator extends Job{
 
             //Test the modal and get loss
 			// await exec('python3 unsorted/validator_node.py 2> /dev/null | tail -n 1', trainingDataPathname);
-			const std = await exec('python3 unsorted/validator_node.py 2> /dev/null | tail -n 1');
-			//TODO: Check if std returns correct array		
+			let std = await exec('pwd');
+			console.log("pwd STDOUT: ", std);
+
+			std = await exec('python3 unsorted/validator_node.py');
+			console.log("Python STDOUT (removed 2> /dev/null): ", std);
+
+
+			std = await exec('python3 unsorted/validator_node.py 2> /dev/null | tail -n 1');
 			console.log("Python STDOUT: ", std);
+			//TODO: Check if std returns correct array		
 
             let retVal = std.out[0].slice(0,-1);
             console.log('retVal', retVal);
