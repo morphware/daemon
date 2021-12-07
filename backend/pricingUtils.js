@@ -33,17 +33,15 @@ async function calculateBid(trainingTimeInHours, MWTUSDPrice) {
         const competingAWSCUDAPricePerHour = await findClosestCUDACorePerHourPrice(workerCUDACores);
         console.log("competingAWSCUDAPricePerHour: ", competingAWSCUDAPricePerHour);
         const biddingValueUSD = competingAWSCUDAPricePerHour * workerCUDACores * parseInt(trainingTimeInHours) * 0.8;
-        console.log("Bidding Value in USD: ", biddingValueUSD)        
-        console.log("MWT PRICE: ", MWTUSDPrice);
+        console.log("Bidding Value in USD: ", biddingValueUSD)        //2.156...
+        console.log("MWT PRICE: ", MWTUSDPrice);                      //0.1
 
-        // let biddingValueMWT = Math.round(biddingValueUSD / parseFloat(MWTUSDPrice));
-        // biddingValueMWT =  Web3.utils.toWei(biddingValueMWT.toString(), "ether");
-        // console.log("Bidding Value in MWT in Wei: ", biddingValueMWT);
-
-        let biddingValueMWT =  Web3.utils.toWei(biddingValueUSD.toString(), "ether");
-        biddingValueMWT = Math.round(biddingValueMWT / parseFloat(MWTUSDPrice));
-
+        let biddingValueMWT = Math.round(biddingValueUSD / parseFloat(MWTUSDPrice));
+        biddingValueMWT =  Web3.utils.toWei(biddingValueMWT.toString(), "ether");
         console.log("Bidding Value in MWT in Wei: ", biddingValueMWT);
+
+        // let biddingValueMWT =  Web3.utils.toWei(biddingValueUSD.toString(), "ether"); 
+        // biddingValueMWT = Math.round(biddingValueMWT / parseFloat(MWTUSDPrice));
         return biddingValueMWT;
     } catch (error) {
         console.log("Error calculateBid: ", error);
