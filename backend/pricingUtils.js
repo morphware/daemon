@@ -35,8 +35,14 @@ async function calculateBid(trainingTimeInHours, MWTUSDPrice) {
         const biddingValueUSD = competingAWSCUDAPricePerHour * workerCUDACores * parseInt(trainingTimeInHours) * 0.8;
         console.log("Bidding Value in USD: ", biddingValueUSD)        
         console.log("MWT PRICE: ", MWTUSDPrice);
-        let biddingValueMWT = Math.round(biddingValueUSD / parseFloat(MWTUSDPrice));
-        biddingValueMWT =  Web3.utils.toWei(biddingValueMWT.toString(), "ether");
+
+        // let biddingValueMWT = Math.round(biddingValueUSD / parseFloat(MWTUSDPrice));
+        // biddingValueMWT =  Web3.utils.toWei(biddingValueMWT.toString(), "ether");
+        // console.log("Bidding Value in MWT in Wei: ", biddingValueMWT);
+
+        let biddingValueMWT =  Web3.utils.toWei(biddingValueUSD.toString(), "ether");
+        biddingValueMWT = Math.round(biddingValueMWT / parseFloat(MWTUSDPrice));
+
         console.log("Bidding Value in MWT in Wei: ", biddingValueMWT);
         return biddingValueMWT;
     } catch (error) {
