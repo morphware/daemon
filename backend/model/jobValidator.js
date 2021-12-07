@@ -76,8 +76,8 @@ class JobValidator extends Job{
 	static __process_event(name, instanceId, event){
 		try{
 
-            console.log("Processing Event: ", name);
-            console.log("Event Return Values: ", event.returnValues);
+            // console.log("Processing Event: ", name);
+            // console.log("Event Return Values: ", event.returnValues);
 
 			// Check to see if job is already tracked by this client
 			if(Object.keys(Job.jobs).includes(instanceId)) return;
