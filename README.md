@@ -5,7 +5,7 @@ the end user functionality:
 
 * Morphware wallet
   * View balance
-  * Send founds
+  * Send funds
   * Receive funds
   * View transaction history
 * Create job
