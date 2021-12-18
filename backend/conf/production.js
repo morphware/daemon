@@ -3,11 +3,11 @@ module.exports = {
   morphwareTokenABIPath: "MorphwareToken-MainnetABI",
   morphwareTokenContractAddress: "0x5f80d31044d8b15acffa3454dffda9f022453461",
 
-  // https://ropsten.etherscan.io/address/0x0f96cf29c8d9f65f83e6992cad3ebbe9a395f332#code
+  // https://etherscan.io/address/0x03e99193e929535133afde27f293826783908109#code
   auctionFactoryABIPath: "VickreyAuction-RopstenABI",
   auctionFactoryContractAddress: "0x03e99193e929535133afde27f293826783908109",
 
-  // https://ropsten.etherscan.io/address/0xb2da7fcc212fe1c747048d7c7caca6a2bd8ec0bc#code
+  // https://etherscan.io/address/0x094FC2c1fa685977F608ec5B0a571fc8d9eC9273#code
   jobFactoryAbiPath: "JobFactory-RopstenABI",
   jobFactoryContractAddress: "0x094FC2c1fa685977F608ec5B0a571fc8d9eC9273",
 
