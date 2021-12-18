@@ -5,11 +5,11 @@ module.exports = {
 
   // https://ropsten.etherscan.io/address/0x0f96cf29c8d9f65f83e6992cad3ebbe9a395f332#code
   auctionFactoryABIPath: "VickreyAuction-RopstenABI",
-  auctionFactoryContractAddress: "0x094FC2c1fa685977F608ec5B0a571fc8d9eC9273",
+  auctionFactoryContractAddress: "0x03e99193e929535133afde27f293826783908109",
 
   // https://ropsten.etherscan.io/address/0xb2da7fcc212fe1c747048d7c7caca6a2bd8ec0bc#code
   jobFactoryAbiPath: "JobFactory-RopstenABI",
-  jobFactoryContractAddress: "0xb2da7fcc212fe1c747048d7c7caca6a2bd8ec0bc",
+  jobFactoryContractAddress: "0x094FC2c1fa685977F608ec5B0a571fc8d9eC9273",
 
   ethAddress: "wss://mainnet.infura.io/ws/v3/b953c0b0ccd34ab69751fb492c9c5f04",
   // ethAddress: 'wss://geth.vm42.us',
