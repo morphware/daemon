@@ -21,7 +21,7 @@ back end express.js project for the business logic and the electron project we
 use mostly as a multi platform build system. Here is a general overview of the 
 files and folders:
 
-* deamon - *project root*
+* daemon - *project root*
   * app-src/ - *temporary directory that is built during the build process. This
     is not tracked*
   * backend/ - *express.js project*
@@ -41,7 +41,7 @@ files and folders:
   * electron - *Electron run file. This also starts express when packaged.*
   * preload.js - *data to be preloaded in the electron UI. This file is not
     required, built at runtime and not tracked*
-  * package.json - *Manages build and electron dependencies. Contains npm scrips*
+  * package.json - *Manages build and electron dependencies. Contains npm scripts*
 
 ## Local development
 
@@ -58,7 +58,7 @@ You will also need Git to clone and push the code.
 Once you have all the required system dependencies, clone this repo and move to
 it.
 
-This will call npm install for each of the sub projects the repo.
+This will call npm install for each of the sub projects in the repo.
 Install the node dependencies with the following command:
 
 ```bash
@@ -70,7 +70,7 @@ To get a full envelopment run of the project, execute:
 npm run dev
 ```
 
-You can also move into `forntend` or `backend` and just run each project in dev
+You can also move into `frontend` or `backend` and just run each project in dev
 mode.
 
 ```bash
@@ -86,7 +86,7 @@ and is coming soon.
 
 At some point soon, we will set up a CI/CD pipeline to build.
 
-**This requires alot of system packages, run with care**
+**This requires a lot of system packages, run with care**
 
 To execute a build, run:
 
