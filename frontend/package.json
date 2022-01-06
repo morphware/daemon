@@ -10,7 +10,7 @@
     "@material-ui/icons": "^4.11.2",
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@material-ui/pickers": "^3.3.10",
-    "@mui/icons-material": "^5.0.0",
+    "@mui/icons-material": "^5.2.1",
     "@mui/material": "^5.0.0-rc.0",
     "@react-spring/web": "^9.2.4",
     "@testing-library/jest-dom": "^5.16.1",
