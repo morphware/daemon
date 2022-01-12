@@ -59,16 +59,20 @@ try{
 
 // Set the command line argument options
 args
-  .option('httpPort', 'http port')
-  .option('electronDev', 'Load chrome dev tools')
-  .option('ethAddress', 'Remote etherum node')
-  .option('appDataPath', 'Path where local data is held')
-  .option('appDownloadPath', 'Path for downloads')
-  .option('role', 'The role your client will assume.  Provide "Poster" (Post model training jobs), "Worker" (Accept model training jobs) or "Validator" (Accept model training jobs)')
-  .option('miningCommand', 'A global command used to start mining')
-  .option('privateKey', 'Wallet Object', undefined, value=>{
-	return [value];
-  })
+  .option("httpPort", "http port")
+  .option("electronDev", "Load chrome dev tools")
+  .option("ethAddress", "Remote etherum node")
+  .option("appDataPath", "Path where local data is held")
+  .option("appDownloadPath", "Path for downloads")
+  .option(
+    "role",
+    'The role your client will assume.  Provide "Poster" (Post model training jobs), "Worker" (Accept model training jobs) or "Validator" (Accept model training jobs)'
+  )
+  .option("torrentListenPort", "The port to seed and peer files from")
+  .option("miningCommand", "A global command used to start mining")
+  .option("privateKey", "Wallet Object", undefined, (value) => {
+    return [value];
+  });
 
 // Parse command line arguments
 var runtimeConf = args.parse(process.argv, {
