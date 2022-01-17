@@ -10,7 +10,7 @@ const exec = util.promisify(require('child_process').exec);
 	//the correct packages
 	const basePackage = require('./package');
 	const daemonPackage = require('./backend/package');
-	const buildPackage = extend(true, daemonPackage, {/*devDependencies: basePackage.devDependencies,*/ main: 'electron.js', scripts:{postinstall:null}});
+	const buildPackage = extend(true, daemonPackage, {devDependencies: basePackage.devDependencies, main: 'electron.js', scripts:{postinstall:null}});
 
 	console.info('Remove old build contents');
 	await fs.remove('./app-src');
@@ -40,12 +40,12 @@ const exec = util.promisify(require('child_process').exec);
 	await fs.move('./frontend/build', './app-src/www');
 
 	try{
-		// console.info('Install build Dependencies');
-		// console.log(await exec('npm --prefix app-src install'));
-		// console.log(await exec('./app-src/node_modules/.bin/electron-builder install-app-deps'));
+		console.info('Install build Dependencies');
+		console.log(await exec('npm --prefix app-src install'));
+		console.log(await exec('./app-src/node_modules/.bin/electron-builder install-app-deps'));
 
 		console.info('Building')
-		console.log(await exec('./node_modules/.bin/electron-builder -w'), {
+		console.log(await exec('./node_modules/.bin/electron-builder -l'), {
 			env: {
 				SKIP_DOWNLOAD: 'true',
 				...process.env

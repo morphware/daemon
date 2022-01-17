@@ -1,5 +1,5 @@
 {
-  "name": "Morphware-Wallet",
+  "name": "morphware-wallet",
   "version": "0.0.1",
   "description": "",
   "main": "electron.js",
@@ -63,9 +63,5 @@
     "mac": {
       "icon": "build/icon/icon.icns"
     }
-  },
-  "dependencies": {
-    "ethers": "^4.0.46",
-    "moment": "^2.29.1"
   }
 }
