@@ -127,14 +127,23 @@ class JobWorker extends Job {
   /*
 	__process_event in the base Job class deals with listen for events on
 	current job instances. In order for a worker to start the bidding process,
-	we only care about `JobDescriptionPosted` if the client meets cretin run
+	we only care about `JobDescriptionPosted` if the client meets certainn run
 	time states. We override __precess event below to make that happen.
 	*/
   static __process_event(name, instanceId, event) {
     try {
       console.log("Worker");
       console.log("Instance ID: ", instanceId);
-      console.log("jobs: ", Job.jobs);
+      console.log("Job Keys: ", Object.keys(Job.jobs));
+      console.log("Includes: ", Object.keys(Job.jobs).includes(instanceId))
+
+      // If tracking this job and its been approved
+      if (name === "JobApproved" && Object.keys(Job.jobs).includes(instanceId)) {
+        console.log("Passed If Statement");
+        const completedJob = Job.jobs[instanceId];
+        console.log("completed job", completedJob);
+        completedJob.__JobApproved(event)
+      }
 
       // Check to see if job is already tracked by this client
       if (Object.keys(Job.jobs).includes(instanceId)) return;
@@ -169,6 +178,7 @@ class JobWorker extends Job {
         job.transactions.push(event);
         job.__JobDescriptionPosted(event);
       }
+
     } catch (error) {
       this.removeFromJump();
       console.error(`ERROR JobWorker __process_event`, error);
@@ -353,11 +363,7 @@ class JobWorker extends Job {
 				return false;
 			}*/
 
-      // This setTimeout may not be needed.
-      // Calculate start of the reveal window
-      // var now = Math.floor(new Date().getTime());
       var now = new Date().getTime();
-      // var waitTimeInMS = ((parseInt(this.jobData.revealDeadline) * 1000) - now - 180000);
       var revealDeadline = parseInt(this.jobData.revealDeadline);
 
       //Reveal 3 mins before reveal deadline
@@ -490,15 +496,15 @@ class JobWorker extends Job {
     }
   }
 
-  async JobApproved(event) {
+  async __JobApproved() {
     try {
-      //Remove the local model files if approved
-      console.log("WORKER Job Approved");
-      console.log("To Delete");
-      console.log(this.trainedModelPath);
+      console.log("this: ", this)
+      console.log(this.downloadPath);
+      fs.emptyDirSync(this.downloadPath);
+      fs.rmdirSync(this.downloadPath);
     } catch (error) {
       console.error(
-        "ERROR!!! JobWorker UntrainedModelAndTrainingDatasetShared",
+        "ERROR!!! JobWorker __JobApproved",
         this.instanceId,
         error
       );

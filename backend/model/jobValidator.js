@@ -62,7 +62,7 @@ class JobValidator extends Job {
 
   // Check to see if the client is ready and willing to take on jobs
   static canValidate() {
-    return conf.validate && !this.lock;
+    return conf.role === "Validator"  && !this.lock;
   }
 
   /*
@@ -75,6 +75,8 @@ class JobValidator extends Job {
     try {
       console.log("Processing Event: ", name);
       console.log("Event Return Values: ", event.returnValues);
+
+      console.log("My Tracked Jobs: ", Job.jobs)
 
       // Check to see if job is already tracked by this client
       if (Object.keys(Job.jobs).includes(instanceId)) return;
