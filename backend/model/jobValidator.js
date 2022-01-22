@@ -61,8 +61,18 @@ class JobValidator extends Job {
   }
 
   // Check to see if the client is ready and willing to take on jobs
-  static canValidate() {
-    return conf.role === "Validator"  && !this.lock;
+  static canValidate(instanceId) {
+    console.log("Instance ID: ", instanceId);
+
+    const jobNumber = parseInt(instanceId.split(":")[1]);
+    console.log("Job Number: ", jobNumber);
+
+    console.log("ValidatorID: ", conf.validatorId);
+
+    const shouldValidate = jobNumber % 2 === conf.validatorId;
+    console.log("Should Validate: ", shouldValidate);
+
+    return conf.validate && !this.lock && shouldValidate;
   }
 
   /*
@@ -76,7 +86,13 @@ class JobValidator extends Job {
       console.log("Processing Event: ", name);
       console.log("Event Return Values: ", event.returnValues);
 
-      console.log("My Tracked Jobs: ", Job.jobs)
+      console.log("My Tracked Jobs: ", Job.jobs);
+
+      console.log("Instance ID: ", instanceId);
+
+      console.log(
+        `Assessing Job ${instanceId}: ${this.canValidate(instanceId)}`
+      );
 
       // Check to see if job is already tracked by this client
       if (Object.keys(Job.jobs).includes(instanceId)) return;
