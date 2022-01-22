@@ -53,6 +53,8 @@ users on WSL should also use NodeSource. Other Windows can find the correct
 installer on the [NodeJS website](https://nodejs.org). *Insert blurb about
 NodeJS on OSX*
 
+You need to have Python3.x.x and pip3.
+
 You will also need Git to clone and push the code.
 
 Once you have all the required system dependencies, clone this repo and move to
