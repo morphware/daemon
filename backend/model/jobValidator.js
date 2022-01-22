@@ -99,7 +99,7 @@ class JobValidator extends Job {
 
       if (name === "TestingDatasetShared") {
         // Check to see if this client is accepting work
-        if (!this.canValidate()) return;
+        if (!this.canValidate(instanceId)) return;
 
         // Make the job instance
         let job = new this(wallet, event.returnValues);
