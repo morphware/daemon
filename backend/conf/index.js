@@ -145,9 +145,10 @@ var conf = extend(
 	{environment}
 );
 
-console.info('Local path is', runtimeConf.appDataPath);
-console.info('Download path is', conf.appDownloadPath);
-console.info("Command:  ", conf.miningCommand);
-// console.log("Final Conf: ", conf);
+console.log("Base Conf: ", baseConf);
+console.log("Env Conf: ", load(`./${environment}`))
+console.log("Local Conf: ", localConf);
+console.log("Runtime Conf", runtimeConf);
+console.log("Final Conf: ", conf);
 
 module.exports = {conf, localConf, editLocalConf}
