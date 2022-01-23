@@ -72,6 +72,13 @@ class JobValidator extends Job {
     const shouldValidate = jobNumber % 2 === conf.validatorId;
     console.log("Should Validate: ", shouldValidate);
 
+    console.log(" conf.validate: ", conf.validate);
+    console.log("!this.lock: ", !this.lock);
+
+    const final = conf.validate && !this.lock && shouldValidate;
+
+    console.log("Final: ", final);
+
     return conf.validate && !this.lock && shouldValidate;
   }
 
@@ -90,9 +97,7 @@ class JobValidator extends Job {
 
       console.log("Instance ID: ", instanceId);
 
-      console.log(
-        `Assessing Job ${instanceId}: ${this.canValidate(instanceId)}`
-      );
+      this.canValidate(instanceId);
 
       // Check to see if job is already tracked by this client
       if (Object.keys(Job.jobs).includes(instanceId)) return;
