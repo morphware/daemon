@@ -79,7 +79,7 @@ class JobValidator extends Job {
 
     console.log("Final: ", final);
 
-    return conf.validate && !this.lock && shouldValidate;
+    return conf.role === "Validator" && !this.lock && shouldValidate;
   }
 
   /*
