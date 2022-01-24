@@ -77,11 +77,6 @@ class JobValidator extends Job {
   static __process_event(name, instanceId, event) {
     try {
       console.log("Processing Event: ", name);
-      console.log("Event Return Values: ", event.returnValues);
-
-      console.log("My Tracked Jobs: ", Job.jobs);
-
-      console.log("Instance ID: ", instanceId);
 
       this.canValidate(instanceId);
 
