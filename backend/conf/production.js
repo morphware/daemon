@@ -16,4 +16,7 @@ module.exports = {
 
   // Turn on chrome dev tools from electron app.
   electronDev: false,
+
+  // Validation Cluster Nodes
+  validationNodes: 1,
 };
