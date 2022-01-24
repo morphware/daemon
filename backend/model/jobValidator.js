@@ -62,23 +62,9 @@ class JobValidator extends Job {
 
   // Check to see if the client is ready and willing to take on jobs
   static canValidate(instanceId) {
-    console.log("Instance ID: ", instanceId);
-
     const jobNumber = parseInt(instanceId.split(":")[1]);
-    console.log("Job Number: ", jobNumber);
-
-    console.log("ValidatorID: ", conf.validatorId);
-
-    const shouldValidate = jobNumber % 2 === conf.validatorId;
-    console.log("Should Validate: ", shouldValidate);
-
-    console.log(" conf.validate: ", conf.validate);
-    console.log("!this.lock: ", !this.lock);
-
-    const final = conf.validate && !this.lock && shouldValidate;
-
-    console.log("Final: ", final);
-
+    const shouldValidate =
+      jobNumber % conf.validationNodes === conf.validatorId;
     return conf.role === "Validator" && !this.lock && shouldValidate;
   }
 
