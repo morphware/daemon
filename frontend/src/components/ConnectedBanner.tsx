@@ -1,12 +1,31 @@
-import { Grid, Typography } from "@material-ui/core";
+import {
+  createStyles,
+  Grid,
+  makeStyles,
+  Typography,
+  useTheme,
+} from "@material-ui/core";
 import React, { useContext } from "react";
 import { DaemonContext } from "../providers/ServiceProviders";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import CancelIcon from "@material-ui/icons/Cancel";
+import { ThemeProps } from "../providers/MorphwareTheme";
+
+const styles = makeStyles((theme: ThemeProps) =>
+  createStyles({
+    headerText: {
+      color: theme.text?.bold,
+    },
+    contentText: {
+      color: theme.text?.main,
+    },
+  })
+);
 
 const ConnectedBanner = () => {
   const daemonService = useContext(DaemonContext);
-
+  const theme = useTheme();
+  const classes = styles(theme);
   return (
     <Grid
       container
@@ -22,7 +41,9 @@ const ConnectedBanner = () => {
             />
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="h4">Connected to Morphware</Typography>{" "}
+            <Typography variant="h4" className={classes.headerText}>
+              Connected to Morphware
+            </Typography>{" "}
           </Grid>
           <Grid xs={5} />
         </>
@@ -35,13 +56,15 @@ const ConnectedBanner = () => {
             />
           </Grid>
           <Grid item xs={6}>
-            <Typography variant="h4">Not Connected to Morphware</Typography>
+            <Typography variant="h4" className={classes.headerText}>
+              Not Connected to Morphware
+            </Typography>
           </Grid>
           <Grid xs={5} />
         </>
       )}
       <Grid item>
-        <Typography variant="h6">
+        <Typography variant="h6" className={classes.contentText}>
           Welcome to Morphware, you are now an integral part to the future of
           distributed computing.
         </Typography>

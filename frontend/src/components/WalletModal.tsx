@@ -18,8 +18,10 @@ import VerticalAlignBottomIcon from "@material-ui/icons/VerticalAlignBottom";
 import Web3 from "web3";
 import CallMadeIcon from "@material-ui/icons/CallMade";
 import { copyToClipBoard, roundBalance, walletShortener } from "../utils";
+import { ThemeProps } from "../providers/MorphwareTheme";
+import { useTheme } from "@emotion/react";
 
-const useStyles = makeStyles((theme: Theme) =>
+const useStyles = makeStyles((theme: ThemeProps) =>
   createStyles({
     modal: {
       display: "flex",
@@ -27,12 +29,25 @@ const useStyles = makeStyles((theme: Theme) =>
       justifyContent: "center",
     },
     paper: {
-      backgroundColor: "white",
+      backgroundColor: theme.background?.main,
       border: "2px solid #000",
       boxShadow: theme.shadows[5],
       padding: theme.spacing(2, 4, 3),
       width: "350px",
       height: "530px",
+    },
+    viewTransactionButton: {
+      padding: "15px",
+      borderTop: "15px",
+      border: "1px solid black",
+      backgroundColor: theme.text?.bold,
+      color: theme.text?.inverted,
+    },
+    formText: {
+      color: theme.text?.main,
+    },
+    headers: {
+      color: theme.text?.bold,
     },
   })
 );
@@ -73,7 +88,8 @@ const Fade = React.forwardRef<HTMLDivElement, FadeProps>(function Fade(
 });
 
 const WalletModal = () => {
-  const classes = useStyles();
+  const theme = useTheme();
+  const classes = useStyles(theme);
   const [open, setOpen] = useState(false);
   const [toggleModal, setTogalModal] = useState<boolean>(true);
   const daemonService = useContext(DaemonContext);
@@ -89,7 +105,6 @@ const WalletModal = () => {
   };
 
   const sendMWT = async (values: SendMWTRequestProps) => {
-    console.log("sendMWT: ", values);
     const transaction = await daemonService.sendMWT(values);
   };
 
@@ -119,11 +134,15 @@ const WalletModal = () => {
                 style={{ fontSize: 30 }}
               />
             ) : (
-              <CallMadeIcon color="secondary" style={{ fontSize: 30 }} />
+              <CallMadeIcon
+                color="secondary"
+                className={classes.formText}
+                style={{ fontSize: 30 }}
+              />
             )}
           </Box>
           <Box padding={1}>
-            <Typography variant="body2">
+            <Typography variant="body2" className={classes.formText}>
               {Web3.utils.fromWei(
                 historyTransactionItem.returnValues.value,
                 "ether"
@@ -158,13 +177,8 @@ const WalletModal = () => {
         {historyLessThanFive.map((item) => HistoryTransaction(item))}
         {transactions.length >= 4 && (
           <Button
-            style={{
-              padding: "15px",
-              borderTop: "15px",
-              border: "1px solid black",
-            }}
-            color="secondary"
-            variant="outlined"
+            className={classes.viewTransactionButton}
+            variant="contained"
             onClick={viewAllTransactions}
           >
             View All Transactions
@@ -234,7 +248,9 @@ const WalletModal = () => {
                 style={{ marginTop: 16 }}
                 justifyContent="center"
               >
-                <Typography variant="body2">Recipient</Typography>
+                <Typography variant="body2" className={classes.formText}>
+                  Recipient
+                </Typography>
               </Grid>
               <Grid
                 item
@@ -251,7 +267,10 @@ const WalletModal = () => {
                     display: "flex",
                     justifyContent: "center",
                   }}
-                  inputProps={{ style: { textAlign: "center" } }}
+                  inputProps={{
+                    style: { textAlign: "center" },
+                    className: classes.formText,
+                  }}
                 />
               </Grid>
               <Grid
@@ -260,7 +279,9 @@ const WalletModal = () => {
                 style={{ marginTop: 5 }}
                 justifyContent="center"
               >
-                <Typography variant="body2">Amount</Typography>
+                <Typography variant="body2" className={classes.formText}>
+                  Amount
+                </Typography>
               </Grid>
               <Grid
                 item
@@ -278,7 +299,10 @@ const WalletModal = () => {
                     justifyContent: "center",
                   }}
                   placeholder="MWT"
-                  inputProps={{ style: { textAlign: "center" } }}
+                  inputProps={{
+                    style: { textAlign: "center" },
+                    className: classes.formText,
+                  }}
                 />
               </Grid>
               <Grid
@@ -287,7 +311,9 @@ const WalletModal = () => {
                 style={{ marginTop: 5 }}
                 justifyContent="center"
               >
-                <Typography variant="body2">Gas Limit</Typography>
+                <Typography variant="body2" className={classes.formText}>
+                  Gas Limit
+                </Typography>
               </Grid>
               <Grid
                 item
@@ -304,7 +330,10 @@ const WalletModal = () => {
                     justifyContent: "center",
                   }}
                   placeholder="optional (gwei)"
-                  inputProps={{ style: { textAlign: "center" } }}
+                  inputProps={{
+                    style: { textAlign: "center" },
+                    className: classes.formText,
+                  }}
                 />
               </Grid>
               <Grid
@@ -363,21 +392,38 @@ const WalletModal = () => {
               }}
             >
               <Grid item xs={12} style={{ textAlign: "center" }}>
-                <Typography variant="body2">Account1</Typography>
+                <Typography variant="body2" className={classes.headers}>
+                  Account1
+                </Typography>
               </Grid>
               <Box display="flex" alignItems="center">
-                <Typography variant="body2">{shortenedAddress}</Typography>
+                <Typography variant="body2" className={classes.headers}>
+                  {shortenedAddress}
+                </Typography>
               </Box>
               <IconButton
                 onClick={() => copyToClipBoard(daemonService.walletAddress)}
               >
-                <FileCopyIcon fontSize="small" color="secondary" />
+                <FileCopyIcon
+                  fontSize="small"
+                  color="secondary"
+                  className={classes.headers}
+                />
               </IconButton>
-              <Grid item xs={12} style={{ textAlign: "center" }}>
-                <Typography variant="h6"> {roundedBalance}</Typography>
+              <Grid
+                item
+                xs={12}
+                style={{ textAlign: "center" }}
+                className={classes.headers}
+              >
+                <Typography variant="h6" className={classes.headers}>
+                  {roundedBalance}
+                </Typography>
               </Grid>
               <Grid item xs={12} style={{ textAlign: "center" }}>
-                <Typography variant="h6">MWT </Typography>
+                <Typography variant="h6" className={classes.headers}>
+                  MWT{" "}
+                </Typography>
               </Grid>
               <Grid
                 container
@@ -408,10 +454,8 @@ const WalletModal = () => {
                     alignItems: "center",
                   }}
                 >
-                  {/* Toggal modal is False */}
                   <Button
                     type="submit"
-                    // variant={toggleModal ? "outlined" : "contained"}
                     variant="contained"
                     color={toggleModal ? "primary" : "secondary"}
                     style={{ width: "60%" }}

@@ -1,10 +1,15 @@
-import { CircularProgress, createStyles, makeStyles } from "@material-ui/core";
+import {
+  CircularProgress,
+  createStyles,
+  makeStyles,
+  useTheme,
+} from "@material-ui/core";
 import React, { useState } from "react";
 import TrainModelForm from "../components/trainModelForm";
-import { theme } from "../providers/MorphwareTheme";
+import { ThemeProps } from "../providers/MorphwareTheme";
 import TrainModelTopBar from "../components/TrainModelTopBar";
 
-const styles = makeStyles(() =>
+const styles = makeStyles((theme: ThemeProps) =>
   createStyles({
     root: {
       backgroundColor: theme.background?.main,
@@ -25,7 +30,9 @@ const styles = makeStyles(() =>
 );
 
 const TrainModel = () => {
-  const classes = styles();
+  const theme: ThemeProps = useTheme();
+
+  const classes = styles(theme);
   const [sendingRequest, setSendingRequest] = useState(false);
 
   return (

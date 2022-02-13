@@ -12,6 +12,7 @@ import { Box, createStyles, makeStyles } from "@material-ui/core";
 import WalletInfo from "./components/WalletFooterInfo";
 import Auctions from "./screens/Auctions";
 import ScreenViewBox from "./screens/ScreenViewBox";
+import UtilsProvider from "./providers/UtilsProvider";
 
 const styles = makeStyles(() =>
   createStyles({
@@ -28,25 +29,27 @@ const styles = makeStyles(() =>
 const App = () => {
   const classes = styles();
   return (
-    <MorphwareTheme>
-      <div className={classes.root}>
-        <ServiceProviders>
-          <ScreenViewBox>
-            <NavBar />
-            <Box style={{ width: "90vw" }}>
-              <Switch>
-                <Route exact path="/" component={Auctions} />
-                <Route path="/Home" component={Home} />
-                <Route path="/train" component={TrainModel} />
-                <Route path="/torrents" component={Torrents} />
-                <Route path="/settings" component={Settings} />
-              </Switch>
-              <WalletInfo />
-            </Box>
-          </ScreenViewBox>
-        </ServiceProviders>
-      </div>
-    </MorphwareTheme>
+    <UtilsProvider>
+      <MorphwareTheme>
+        <div className={classes.root}>
+          <ServiceProviders>
+            <ScreenViewBox>
+              <NavBar />
+              <Box style={{ width: "90vw" }}>
+                <Switch>
+                  <Route exact path="/" component={Auctions} />
+                  <Route path="/Home" component={Home} />
+                  <Route path="/train" component={TrainModel} />
+                  <Route path="/torrents" component={Torrents} />
+                  <Route path="/settings" component={Settings} />
+                </Switch>
+                <WalletInfo />
+              </Box>
+            </ScreenViewBox>
+          </ServiceProviders>
+        </div>
+      </MorphwareTheme>
+    </UtilsProvider>
   );
 };
 

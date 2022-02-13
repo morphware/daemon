@@ -1,15 +1,23 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Form } from "react-final-form";
-import { Button, Grid, Paper, Typography } from "@material-ui/core";
+import {
+  Button,
+  createStyles,
+  Grid,
+  makeStyles,
+  Paper,
+  Typography,
+  useTheme,
+} from "@material-ui/core";
 import { TextField } from "mui-rff";
 import { Radios } from "./Radios";
 import { DaemonContext } from "../providers/ServiceProviders";
 import { formFieldsMapper } from "../mappers/TrainModelFormMappers";
-import { theme } from "../providers/MorphwareTheme";
 import FileField from "./FileField";
 import { Switches } from "mui-rff";
 import { bountySetter } from "./Util";
 import { FormApi } from "final-form";
+import { ThemeProps } from "../providers/MorphwareTheme";
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 declare const window: any;
@@ -53,16 +61,22 @@ interface ICalculatedBounty {
   setBounty: React.Dispatch<React.SetStateAction<number>>;
 }
 
+const styles = makeStyles((theme: ThemeProps) =>
+  createStyles({
+    formHeaders: {
+      color: theme.text?.bold,
+    },
+  })
+);
+
 const CalculatedBounty = ({ form, bounty, setBounty }: ICalculatedBounty) => {
   const daemonService = useContext(DaemonContext);
-
+  const classes = styles();
   useEffect(() => {
     setBounty(
       bountySetter(daemonService.MWTPrice, form.getState().values.trainingTime)
     );
   }, [form.getState().values.trainingTime]);
-
-  console.log("BOUNTY: ", bounty);
 
   return (
     <Grid item xs={6}>
@@ -78,6 +92,8 @@ const CalculatedBounty = ({ form, bounty, setBounty }: ICalculatedBounty) => {
         }}
         value={bounty}
         focused
+        InputLabelProps={{ className: classes.formHeaders }}
+        inputProps={{ className: classes.formHeaders }}
       />
     </Grid>
   );
@@ -87,6 +103,8 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
   const daemonService = useContext(DaemonContext);
   const [removeFilesSignal, setRemoveFilesSignal] = useState<boolean>(true);
   const [bounty, setBounty] = useState<number>(0);
+  const theme: ThemeProps = useTheme();
+  const classes = styles();
 
   const onSubmit = async (values: formFields) => {
     setSendingRequest(true);
@@ -94,9 +112,7 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
     values.testModel = true;
     values.workerReward = bounty;
     values.stopTrainingAutomatic = "max_num_epochs";
-    console.log("Values Before: ", values);
     const formFields = formFieldsMapper(values);
-    console.log("Values After: ", formFields);
 
     const responseV2 = await daemonService.submitTrainModelRequest(formFields);
 
@@ -121,8 +137,6 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
     <Form
       onSubmit={onSubmit}
       validate={(values: formFields) => {
-        console.log("VALUES: ", values);
-
         const errors = {} as formFieldsErrors;
 
         if (!values.jupyterNotebook) {
@@ -168,7 +182,6 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
               }}
               elevation={0}
             >
-              {console.log("FormValues: ", form.getState().values.trainingTime)}
               <FileField
                 name="jupyterNotebook"
                 buttonText="Upload your Jupyter Notebook"
@@ -198,31 +211,8 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
               elevation={0}
             >
               <Grid container alignItems="flex-start" spacing={2}>
-                {/* <Grid item xs={4} style={{ textAlign: "start" }}>
-                    <Typography variant="h6">
-                      How will your model stop training?
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={8}>
-                    <Radios
-                      name="stopTraining"
-                      required={true}
-                      gridSize={6}
-                      color="primary"
-                      data={[
-                        {
-                          label: "Early stopping (automatic)",
-                          value: "early_stopping",
-                        },
-                        {
-                          label: "Active monitoring (manual)",
-                          value: "active_monitoring",
-                        },
-                      ]}
-                    />
-                  </Grid> */}
                 <Grid item xs={4} style={{ textAlign: "start" }}>
-                  <Typography variant="h6">
+                  <Typography variant="h6" className={classes.formHeaders}>
                     How will it stop training?
                   </Typography>
                 </Grid>
@@ -232,6 +222,11 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
                     required={true}
                     gridSize={6}
                     color="primary"
+                    formControlLabelProps={{
+                      className: classes.formHeaders,
+                      // style: { textDecoration: "red" },
+                    }}
+                    className={classes.formHeaders}
                     data={[
                       {
                         label: "Error rate will reach a threshold value",
@@ -250,10 +245,18 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
                     value="max_num_epochs"
                     defaultValue="max_num_epochs"
                     radioGroupProps={{ defaultValue: "max_num_epochs" }}
+                    // formLabelProps={{ className: classes.formHeaders }}
+                    // fieldProps={{ className: classes.formHeaders }}
+                    // inputProps={{ className: classes.formHeaders }}
+
+                    // formControlProps={{ className: classes.formHeaders }}
+                    // formHelperTextProps={{ className: classes.formHeaders }}
                   />
                 </Grid>
                 <Grid item xs={4} style={{ textAlign: "start" }}>
-                  <Typography variant="h6">Job Specification</Typography>
+                  <Typography variant="h6" className={classes.formHeaders}>
+                    Job Specification
+                  </Typography>
                 </Grid>
                 <Grid container />
                 <Grid container xs={8} spacing={2}>
@@ -268,6 +271,8 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
                         display: "flex",
                         justifyContent: "flex-start",
                       }}
+                      InputLabelProps={{ className: classes.formHeaders }}
+                      inputProps={{ className: classes.formHeaders }}
                     />
                   </Grid>
                   <Grid item xs={6}>
@@ -281,6 +286,8 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
                         display: "flex",
                         justifyContent: "flex-start",
                       }}
+                      InputLabelProps={{ className: classes.formHeaders }}
+                      inputProps={{ className: classes.formHeaders }}
                     />
                   </Grid>
                   <Grid item xs={6}>
@@ -295,6 +302,8 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
                         display: "flex",
                         justifyContent: "flex-start",
                       }}
+                      InputLabelProps={{ className: classes.formHeaders }}
+                      inputProps={{ className: classes.formHeaders }}
                     />
                   </Grid>
                   <CalculatedBounty
@@ -309,6 +318,7 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
                     name="testModel"
                     data={{ label: "", value: true }}
                     checked={true}
+                    formLabelProps={{ style: { color: theme.text?.main } }}
                   />
                 </Grid>
               </Grid>

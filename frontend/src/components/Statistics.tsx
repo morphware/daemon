@@ -4,12 +4,13 @@ import {
   makeStyles,
   Paper,
   Typography,
+  useTheme,
 } from "@material-ui/core";
 import React from "react";
-import { theme } from "../providers/MorphwareTheme";
+import { ThemeProps } from "../providers/MorphwareTheme";
 import ConnectedBanner from "./ConnectedBanner";
 
-const styles = makeStyles(() =>
+const styles = makeStyles((theme: ThemeProps) =>
   createStyles({
     statisticNumber: {
       color: "#1aae9f",
@@ -18,14 +19,21 @@ const styles = makeStyles(() =>
     },
     appRoles: {
       display: "inline",
-      color: "#5B676D",
+      color: theme.text?.bold,
       fontWeight: 700,
+    },
+    headerText: {
+      color: theme.text?.bold,
+    },
+    contentText: {
+      color: theme.text?.main,
     },
   })
 );
 
 const Statistics = () => {
-  const classes = styles();
+  const theme: ThemeProps = useTheme();
+  const classes = styles(theme);
 
   return (
     <React.Fragment>
@@ -71,29 +79,49 @@ const Statistics = () => {
             }}
             elevation={0}
           >
-            <Typography variant="h5">In this app, you can …</Typography>
-            <Typography variant="body2">
+            <Typography variant="h5" className={classes.headerText}>
+              In this app, you can …
+            </Typography>
+            <Typography variant="body2" className={classes.headerText}>
               Assume the role of either a Data Scientist, Worker Node or
               Validator Node
               <ul>
                 <li style={{ textAlign: "left" }}>
-                  <Typography className={classes.appRoles}>End User</Typography>
-                  — Submit machine learning models to be trained by the worker
-                  nodes and tested by the validator nodes.
+                  <Typography
+                    className={classes.appRoles}
+                    style={{ display: "inline" }}
+                  >
+                    End User
+                  </Typography>
+                  <Typography
+                    style={{ display: "inline" }}
+                    className={classes.contentText}
+                  >
+                    — Submit machine learning models to be trained by the worker
+                    nodes and tested by the validator nodes.
+                  </Typography>
                 </li>
-                {/* <br /> */}
                 <li style={{ textAlign: "left" }}>
                   <Typography className={classes.appRoles}>
                     Worker Node
-                  </Typography>{" "}
-                  — Earn tokens by training models submitted by the end users.
+                  </Typography>
+                  <Typography
+                    style={{ display: "inline" }}
+                    className={classes.contentText}
+                  >
+                    — Earn tokens by training models submitted by the end users.{" "}
+                  </Typography>
                 </li>
-                {/* <br /> */}
                 <li style={{ textAlign: "left" }}>
                   <Typography className={classes.appRoles}>
                     Validator Node
-                  </Typography>{" "}
-                  — Earn tokens by testing models trained by the worker nodes.
+                  </Typography>
+                  <Typography
+                    style={{ display: "inline" }}
+                    className={classes.contentText}
+                  >
+                    — Earn tokens by testing models trained by the worker nodes.
+                  </Typography>
                 </li>
               </ul>
             </Typography>
@@ -109,39 +137,45 @@ const Statistics = () => {
             }}
             elevation={0}
           >
-            <Typography variant="h5">What is Morphware?</Typography>
-            <Typography variant="body2" style={{ textAlign: "left" }}>
+            <Typography variant="h5" className={classes.headerText}>
+              What is Morphware?
+            </Typography>
+            <Typography
+              variant="body2"
+              style={{ textAlign: "left" }}
+              className={classes.headerText}
+            >
               <ul>
                 <li>
                   <Typography className={classes.appRoles}>
                     An overlay network
                   </Typography>{" "}
-                  that rides on top of Ethereum and BitTorrent
+                  <Typography
+                    style={{ display: "inline" }}
+                    className={classes.contentText}
+                  >
+                    that rides on top of Ethereum and BitTorrent{" "}
+                  </Typography>
                 </li>
-                {/* <br /> */}
                 <li>
                   <Typography className={classes.appRoles}>
-                    Machine Learning platform
-                  </Typography>{" "}
-                  where data scientists utilise remote compute to train their
-                  machine learning models
-                  {/* where data scientists can pay people who own computers with
-                dedicated graphics cards to train their machine learning models */}
+                    Machine Learning platform where data scientists utilise
+                    remote compute to train their machine learning models
+                  </Typography>
                 </li>
                 <li>
                   <Typography className={classes.appRoles}>
                     A file sharing peer-to-peer network
                   </Typography>{" "}
-                  that allows models, training and testing data to be transfered
-                  in a decentralised architecture
-                  {/* where data scientists can pay people who own computers with
-                dedicated graphics cards to train their machine learning models */}
+                  <Typography
+                    style={{ display: "inline" }}
+                    className={classes.contentText}
+                  >
+                    that allows models, training and testing data to be
+                    transfered in a decentralised architecture
+                  </Typography>
                 </li>
               </ul>
-              {/* An overlay network that rides on top of Ethereum and BitTorrent,
-            where data scientists can pay people who own computers with
-            dedicated graphics cards to train their machine learning models; in
-            a native token called Morphware Token. */}
             </Typography>
           </Paper>
         </Grid>

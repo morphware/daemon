@@ -16,6 +16,9 @@ import {
   Grid,
   GridSize,
   Box,
+  useTheme,
+  makeStyles,
+  Typography,
 } from "@material-ui/core";
 
 import {
@@ -25,6 +28,7 @@ import {
   useFieldForErrors,
 } from "./Util";
 import { Field, FieldProps } from "react-final-form";
+import { ThemeProps } from "../providers/MorphwareTheme";
 
 export interface RadioData {
   label: ReactNode;
@@ -49,6 +53,14 @@ export interface RadiosProps extends Partial<Omit<MuiRadioProps, "onChange">> {
   showError?: ShowErrorFunc;
 }
 
+const styles = makeStyles((theme: ThemeProps) => {
+  return {
+    radioLabel: {
+      color: theme.text?.main,
+    },
+  };
+});
+
 export function Radios(props: RadiosProps) {
   const {
     name,
@@ -69,6 +81,8 @@ export function Radios(props: RadiosProps) {
 
   const field = useFieldForErrors(name);
   const isError = showError(field);
+  const theme = useTheme();
+  const classes = styles(theme);
 
   return (
     <FormControl
@@ -77,7 +91,11 @@ export function Radios(props: RadiosProps) {
       {...formControlProps}
       style={{ display: "block" }}
     >
-      {!!label && <FormLabel {...formLabelProps}>{label}</FormLabel>}
+      {!!label && (
+        <FormLabel {...formLabelProps} style={{ color: "red" }}>
+          {label}
+        </FormLabel>
+      )}
       <RadioGroup {...radioGroupProps} style={{ display: "block" }}>
         <Grid container xs={12}>
           {data.map((item: RadioData, idx: number) => (
@@ -85,7 +103,11 @@ export function Radios(props: RadiosProps) {
               <Box display="flex">
                 <FormControlLabel
                   name={name}
-                  label={item.label}
+                  label={
+                    <Typography className={classes.radioLabel}>
+                      {item.label}
+                    </Typography>
+                  }
                   value={item.value}
                   disabled={item.disabled}
                   control={

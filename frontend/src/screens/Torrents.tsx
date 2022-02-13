@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
-import { theme } from "../providers/MorphwareTheme";
+import { ThemeProps } from "../providers/MorphwareTheme";
 import TorrentsTable from "../components/TorrentsTable";
-import { Grid, Paper, Typography } from "@material-ui/core";
+import { Grid, Paper, Typography, useTheme } from "@material-ui/core";
 import { DaemonContext } from "../providers/ServiceProviders";
 
-const styles = makeStyles(() =>
+const styles = makeStyles((theme: ThemeProps) =>
   createStyles({
     root: {
       backgroundColor: theme.background?.main,
@@ -17,11 +17,15 @@ const styles = makeStyles(() =>
       fontWeight: 700,
       fontSize: "50px",
     },
+    header: {
+      color: theme.text?.bold,
+    },
   })
 );
 
 const Torrents = () => {
-  const classes = styles();
+  const theme: ThemeProps = useTheme();
+  const classes = styles(theme);
   const daemonService = useContext(DaemonContext);
   const torrents = daemonService.torrents;
 
@@ -39,7 +43,11 @@ const Torrents = () => {
             <Typography variant="h4" className={classes.statisticNumber}>
               {torrents?.download}
             </Typography>
-            <Typography variant="h5" style={{ paddingBottom: "20px" }}>
+            <Typography
+              variant="h5"
+              style={{ paddingBottom: "20px" }}
+              className={classes.header}
+            >
               Download
             </Typography>
           </Grid>
@@ -47,7 +55,11 @@ const Torrents = () => {
             <Typography variant="h4" className={classes.statisticNumber}>
               {torrents?.upload}
             </Typography>
-            <Typography variant="h5" style={{ paddingBottom: "20px" }}>
+            <Typography
+              variant="h5"
+              style={{ paddingBottom: "20px" }}
+              className={classes.header}
+            >
               Upload
             </Typography>
           </Grid>
@@ -55,7 +67,11 @@ const Torrents = () => {
             <Typography variant="h4" className={classes.statisticNumber}>
               {torrents?.port}
             </Typography>
-            <Typography variant="h5" style={{ paddingBottom: "20px" }}>
+            <Typography
+              variant="h5"
+              style={{ paddingBottom: "20px" }}
+              className={classes.header}
+            >
               Port
             </Typography>
           </Grid>

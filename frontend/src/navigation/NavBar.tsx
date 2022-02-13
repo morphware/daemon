@@ -1,16 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useContext, useState } from "react";
-import logo from "../assets/logoV3.png";
+import lightLogo from "../assets/logo.png";
+import darkLogo from "../assets/logoDark.png";
 import homeNav from "../assets/train.png";
 import torrentsNav from "../assets/torrents.png";
 import settings from "../assets/settings.png";
-import stats from "../assets/stats.png";
-import auctions from "../assets/auctionsV2.png";
+import auctions from "../assets/auctions.png";
 import { Link } from "react-router-dom";
-import { theme } from "../providers/MorphwareTheme";
-import { Grid, makeStyles, Typography } from "@material-ui/core";
+import { ThemeProps } from "../providers/MorphwareTheme";
+import { Grid, makeStyles, Typography, useTheme } from "@material-ui/core";
 import WalletModal from "../components/WalletModal";
 import { DaemonContext } from "../providers/ServiceProviders";
+import { UtilsContext } from "../providers/UtilsProvider";
 
 enum navOptions {
   Home = "Home",
@@ -28,58 +29,59 @@ interface NavLinkProps {
   selected: boolean;
 }
 
-const styles = makeStyles({
-  root: {
-    flexGrow: 1,
-  },
-  paper: {
-    // padding: theme.spacing(2),
-    textAlign: "center",
-    // color: theme.palette.text.secondary,
-  },
-  navContainer: {
-    backgroundColor: theme.navBar?.main,
-    height: "100vh",
-    width: "10vw",
-    minWidth: "100px",
-    maxWidth: "230px",
-    overflow: "auto",
-  },
-  navText: {
-    fontSize: "19px",
-    color: theme.navBar?.text,
-  },
-  navItemContainer: {
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    padding: "20px 0px",
-    userSelect: "none",
-    borderRight: "6px solid transparent",
-    "&:hover": {
-      background: theme.navBar?.selected,
-      curser: "pointer",
+const styles = makeStyles((theme: ThemeProps) => {
+  return {
+    root: {
+      flexGrow: 1,
     },
-  },
-  selected: {
-    backgroundColor: theme.navBar?.selected,
-    borderRight: `6px solid ${theme.navBar?.innerBorder}`,
-  },
-  itemLink: {
-    textDecoration: "none",
-  },
-  logoContainer: {
-    paddingTop: "20px",
-    paddingBottom: "20px",
-    width: "100%",
-    "&:hover": {
-      curser: "pointer",
+    paper: {
+      textAlign: "center",
     },
-  },
+    navContainer: {
+      backgroundColor: theme.navBar?.main,
+      height: "100vh",
+      width: "10vw",
+      minWidth: "100px",
+      maxWidth: "230px",
+      overflow: "auto",
+    },
+    navText: {
+      fontSize: "19px",
+      color: theme.navBar?.text,
+    },
+    navItemContainer: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      padding: "20px 0px",
+      userSelect: "none",
+      borderRight: "6px solid transparent",
+      "&:hover": {
+        background: theme.navBar?.selected,
+        curser: "pointer",
+      },
+    },
+    selected: {
+      backgroundColor: theme.navBar?.selected,
+      borderRight: `6px solid ${theme.navBar?.innerBorder}`,
+    },
+    itemLink: {
+      textDecoration: "none",
+    },
+    logoContainer: {
+      paddingTop: "20px",
+      paddingBottom: "20px",
+      width: "100%",
+      "&:hover": {
+        curser: "pointer",
+      },
+    },
+  };
 });
 
 const NavLink = ({ to, icon, title, setSelected, selected }: NavLinkProps) => {
-  const classes = styles();
+  const theme: ThemeProps = useTheme();
+  const classes = styles(theme);
   var className = classes.navItemContainer;
 
   if (selected) {
@@ -97,8 +99,10 @@ const NavLink = ({ to, icon, title, setSelected, selected }: NavLinkProps) => {
             height="35%"
           />
         </div>
-        <div className={classes.navText}>
-          <Typography variant="h6">{title}</Typography>
+        <div>
+          <Typography className={classes.navText} variant="h6">
+            {title}
+          </Typography>
         </div>
       </div>
     </Link>
@@ -107,6 +111,7 @@ const NavLink = ({ to, icon, title, setSelected, selected }: NavLinkProps) => {
 
 const NavBar = () => {
   const { clientVersion } = useContext(DaemonContext);
+  const { darkTheme } = useContext(UtilsContext);
   const [selectedNavItem, setSelectedNavItem] = useState<navOptions>(
     navOptions.Auctions
   );
@@ -121,7 +126,11 @@ const NavBar = () => {
         onClick={() => setSelectedNavItem(navOptions.Home)}
       >
         <Link className={classes.itemLink} to={"/home"}>
-          <img src={logo} alt="Morphware Logo" width="85%" />
+          <img
+            src={darkTheme ? darkLogo : lightLogo}
+            alt="Morphware Logo"
+            width="85%"
+          />
         </Link>
       </Grid>
       <Grid item className="navbar-content">
@@ -165,7 +174,9 @@ const NavBar = () => {
         }}
       >
         <WalletModal />
-        <Typography variant="body2">V{clientVersion}</Typography>
+        <Typography className={classes.navText} variant="body2">
+          V{clientVersion}
+        </Typography>
       </Grid>
     </Grid>
   );
