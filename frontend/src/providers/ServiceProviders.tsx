@@ -143,6 +143,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     let response = await daemonService.updateSettings(request);
     if (!response.error) {
       response = settingsDaemonResponseToSettingsResponseProps(response);
+      console.log("RESPONSE SETTOMGS CAT: ", response);
       setCurrentConfigs(response);
     }
     return response;
@@ -150,6 +151,7 @@ const ServiceProviders: React.FC = ({ children }) => {
 
   const getSettings = async () => {
     const response = await daemonService.getSettings();
+    console.log("Recieved Settings: ", response);
     setConfigParams(response);
     const version = response.conf.version;
     setClientVersion(version);
@@ -159,6 +161,7 @@ const ServiceProviders: React.FC = ({ children }) => {
     let response = await daemonService.getCurrentSettings();
     response = settingsDaemonResponseToSettingsResponseProps(response);
     if (!response.jupyterLabPort) response.jupyterLabPort = 3020; //The default port
+    console.log("RECIEVED RESPONSE CAT: ", response);
     setCurrentConfigs(response);
   };
 

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Button,
   Grid,
@@ -25,6 +26,7 @@ interface SettingsRequestPropsErrors {
   privateKey?: string;
   torrentListenPort?: string;
   appDownloadPath?: string;
+  darkMode?: string;
 }
 declare global {
   interface Window {
@@ -102,8 +104,11 @@ const AddAppDownloadPath = ({
 const SettingsForm = () => {
   const theme: ThemeProps = useTheme();
   const daemonService = useContext(DaemonContext);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { darkTheme, setDarkTheme } = useContext(UtilsContext);
   const currentSettings = daemonService.currentConfigs;
+  console.log("CurrentSettings FORM: ", currentSettings);
+  console.log("DarkTheme provider: ", darkTheme);
   const currentAppDownloadPath = currentSettings?.appDownloadPath
     ? currentSettings.appDownloadPath
     : "";
@@ -113,8 +118,8 @@ const SettingsForm = () => {
   );
 
   const updateConfigurations = async (values: SettingsRequestProps) => {
+    console.log("Value: ", values);
     const response = await daemonService.updateSettings(values);
-
     if (response.error) {
       daemonService.updateSnackbarProps({
         text: response.error,
@@ -552,10 +557,11 @@ const SettingsForm = () => {
                       style={{ display: "flex", justifyContent: "flex-end" }}
                     >
                       <Switches
-                        name="testModel"
+                        name="darkMode"
                         data={{ label: "", value: darkTheme }}
                         checked={darkTheme}
                         onClick={() => {
+                          console.log("clicking ", !darkTheme);
                           setDarkTheme(!darkTheme);
                         }}
                       />

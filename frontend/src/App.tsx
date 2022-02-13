@@ -29,10 +29,10 @@ const styles = makeStyles(() =>
 const App = () => {
   const classes = styles();
   return (
-    <UtilsProvider>
-      <MorphwareTheme>
-        <div className={classes.root}>
-          <ServiceProviders>
+    <ServiceProviders>
+      <UtilsProvider>
+        <MorphwareTheme>
+          <div className={classes.root}>
             <ScreenViewBox>
               <NavBar />
               <Box style={{ width: "90vw" }}>
@@ -46,10 +46,10 @@ const App = () => {
                 <WalletInfo />
               </Box>
             </ScreenViewBox>
-          </ServiceProviders>
-        </div>
-      </MorphwareTheme>
-    </UtilsProvider>
+          </div>
+        </MorphwareTheme>
+      </UtilsProvider>
+    </ServiceProviders>
   );
 };
 

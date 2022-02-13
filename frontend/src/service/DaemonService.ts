@@ -138,6 +138,7 @@ export interface SettingsRequestProps {
   miningCommand?: string;
   workerGPU?: string;
   role?: string;
+  darkMode?: boolean;
 }
 
 interface trainModelPostDataResponse {

@@ -26,5 +26,8 @@ export const settingsDaemonResponseToSettingsResponseProps = (
   if (Object.keys(daemonResponse).includes("role")) {
     response.role = daemonResponse.role;
   }
+  if (Object.keys(daemonResponse).includes("darkMode")) {
+    response.darkMode = daemonResponse.darkMode;
+  }
   return response;
 };
