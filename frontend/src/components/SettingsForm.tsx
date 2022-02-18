@@ -104,11 +104,8 @@ const AddAppDownloadPath = ({
 const SettingsForm = () => {
   const theme: ThemeProps = useTheme();
   const daemonService = useContext(DaemonContext);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { darkTheme, setDarkTheme } = useContext(UtilsContext);
   const currentSettings = daemonService.currentConfigs;
-  console.log("CurrentSettings FORM: ", currentSettings);
-  console.log("DarkTheme provider: ", darkTheme);
   const currentAppDownloadPath = currentSettings?.appDownloadPath
     ? currentSettings.appDownloadPath
     : "";
@@ -118,7 +115,6 @@ const SettingsForm = () => {
   );
 
   const updateConfigurations = async (values: SettingsRequestProps) => {
-    console.log("Value: ", values);
     const response = await daemonService.updateSettings(values);
     if (response.error) {
       daemonService.updateSnackbarProps({
@@ -561,7 +557,6 @@ const SettingsForm = () => {
                         data={{ label: "", value: darkTheme }}
                         checked={darkTheme}
                         onClick={() => {
-                          console.log("clicking ", !darkTheme);
                           setDarkTheme(!darkTheme);
                         }}
                       />
