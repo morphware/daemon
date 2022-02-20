@@ -432,7 +432,6 @@ const WalletModal = () => {
               >
                 <Grid item xs={6}>
                   <Button
-                    // variant={toggleModal ? "contained" : "outlined"}
                     variant="contained"
                     color={toggleModal ? "secondary" : "primary"}
                     style={{ width: "60%" }}

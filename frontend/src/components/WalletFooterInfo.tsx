@@ -26,7 +26,6 @@ const styles = makeStyles((theme: ThemeProps) =>
     footerText: {
       color: theme.WalletFooterInfo?.text,
       fontWeight: 700,
-      // fontSize: "50px",
     },
   })
 );
@@ -100,11 +99,7 @@ const WalletInfo = () => {
         <IconButton
           onClick={() => copyToClipBoard(daemonService.walletAddress)}
         >
-          <FileCopyIcon
-            fontSize="small"
-            // color="secondary"
-            color="secondary"
-          />
+          <FileCopyIcon fontSize="small" color="secondary" />
         </IconButton>
       </Grid>
       <Grid

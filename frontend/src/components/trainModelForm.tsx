@@ -224,7 +224,6 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
                     color="primary"
                     formControlLabelProps={{
                       className: classes.formHeaders,
-                      // style: { textDecoration: "red" },
                     }}
                     className={classes.formHeaders}
                     data={[
@@ -245,12 +244,6 @@ const TrainModelForm = ({ setSendingRequest }: ITrainModelForm) => {
                     value="max_num_epochs"
                     defaultValue="max_num_epochs"
                     radioGroupProps={{ defaultValue: "max_num_epochs" }}
-                    // formLabelProps={{ className: classes.formHeaders }}
-                    // fieldProps={{ className: classes.formHeaders }}
-                    // inputProps={{ className: classes.formHeaders }}
-
-                    // formControlProps={{ className: classes.formHeaders }}
-                    // formHelperTextProps={{ className: classes.formHeaders }}
                   />
                 </Grid>
                 <Grid item xs={4} style={{ textAlign: "start" }}>

@@ -160,21 +160,18 @@ const AuctionsTable = () => {
                 cellRenderer={trainingDatasetSizeRenderer}
                 dataKey="trainingDataSize"
                 width={width * 0.4}
-                // className="f6 charcoal truncate pl2"
               />
               <Column
                 label="Worker Reward (MWT)"
                 cellRenderer={mwtRenderer}
                 dataKey="workerReward"
                 width={width * 0.45}
-                // className="f6 charcoal truncate pl2"
               />
               <Column
                 label="Status"
                 cellRenderer={statusRenderer}
                 dataKey="status"
                 width={width}
-                // className="f6 charcoal truncate pl2"
               />
             </Table>
           )}

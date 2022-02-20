@@ -190,8 +190,6 @@ const FileField = ({
                 }}
               >
                 <input
-                  // webkitdirectory={webkitdirectory ? "" : false}
-                  // directory={directory ? "" : false}
                   {...input}
                   type="file"
                   style={{ display: "none" }}
@@ -213,7 +211,6 @@ const FileField = ({
                     style={{ width: "100%", display: "flex", height: "50px" }}
                     component="span"
                     variant="contained"
-                    // variant="outlined"
                     color="primary"
                   >
                     {buttonText}
