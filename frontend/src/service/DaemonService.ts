@@ -138,6 +138,7 @@ export interface SettingsRequestProps {
   miningCommand?: string;
   workerGPU?: string;
   role?: string;
+  darkMode?: boolean;
 }
 
 interface trainModelPostDataResponse {
@@ -288,8 +289,6 @@ export class DaemonService implements IDaemonService {
   ): Promise<any> => {
     const url = `${this.baseUrl}/api/V0/wallet/send`;
 
-    console.log("sendMWT: ", sendMWTRequest);
-
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -334,8 +333,6 @@ export class DaemonService implements IDaemonService {
   ): Promise<SubmitTrainingModelResponse> => {
     const url = `${this.baseUrl}/api/v0/contract`;
 
-    console.log("submitTrainModelRequest: ", trainModelRequest);
-
     const requestOptions = {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -356,7 +353,6 @@ export class DaemonService implements IDaemonService {
     };
 
     const response = await fetch(url, requestOptions);
-    console.log("Response: ", response);
     const torrentData: ActiveTorrents = await response.json();
 
     return torrentData;
@@ -373,8 +369,6 @@ export class DaemonService implements IDaemonService {
     const response = await fetch(url, requestOptions);
     const settingsConfig: SettingsParamsResponseProps = await response.json();
 
-    console.log("Settings First: ", settingsConfig);
-
     return settingsConfig;
   };
 
@@ -388,8 +382,6 @@ export class DaemonService implements IDaemonService {
 
     const response = await fetch(url, requestOptions);
     const currentSettings: SettingsResponseProps = await response.json();
-
-    console.log("Current Settings HERE: ", currentSettings);
 
     return currentSettings;
   };
@@ -405,13 +397,9 @@ export class DaemonService implements IDaemonService {
       body: JSON.stringify(requestValues),
     };
 
-    console.log("updateSettings: ", requestValues);
-
     const response = await fetch(url, requestOptions);
     const updatedSettingsResponse: SettingsResponseProps =
       await response.json();
-
-    console.log("Response: ", updatedSettingsResponse);
 
     return updatedSettingsResponse;
   };

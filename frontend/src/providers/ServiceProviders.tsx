@@ -79,12 +79,10 @@ const ServiceProviders: React.FC = ({ children }) => {
     if (roleResponse.role === "poster") setRole(Role.Poster);
     if (roleResponse.role === "worker") setRole(Role.Worker);
     if (roleResponse.role === "validator") setRole(Role.Validator);
-    console.log("Role is: ", roleResponse.role);
   };
 
   const getMWTPrice = async () => {
     const MWTPrice = await daemonService.getMWTPrice();
-    console.log("MWT PRICE: ", MWTPrice);
     setMWTPrice(MWTPrice);
   };
 
@@ -121,7 +119,6 @@ const ServiceProviders: React.FC = ({ children }) => {
     if (request.gas) {
       newRequest.gas = Web3.utils.toWei(request.gas, "gwei");
     }
-    console.log("sendMWT : ", newRequest);
     const transaction = await daemonService.sendMWT(newRequest);
     return transaction;
   };
@@ -153,7 +150,6 @@ const ServiceProviders: React.FC = ({ children }) => {
 
   const getSettings = async () => {
     const response = await daemonService.getSettings();
-    console.log("SETTINGS", response);
     setConfigParams(response);
     const version = response.conf.version;
     setClientVersion(version);
@@ -162,25 +158,21 @@ const ServiceProviders: React.FC = ({ children }) => {
   const getCurrentSettings = async () => {
     let response = await daemonService.getCurrentSettings();
     response = settingsDaemonResponseToSettingsResponseProps(response);
-    console.log("getCurrentSettings: ", response);
     if (!response.jupyterLabPort) response.jupyterLabPort = 3020; //The default port
     setCurrentConfigs(response);
   };
 
   const startJupyterLab = async () => {
     let response = await daemonService.startJupyterLab();
-    console.log("Response: ", response);
   };
 
   const startMiner = async () => {
     let response = await daemonService.startMiner();
-    console.log("Response: ", response);
     return response;
   };
 
   const stopMiner = async () => {
     let response = await daemonService.stopMiner();
-    console.log("Response: ", response);
     return response;
   };
 

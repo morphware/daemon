@@ -1,9 +1,9 @@
 import React from "react";
-import { createStyles, makeStyles } from "@material-ui/core/styles";
-import { theme } from "../providers/MorphwareTheme";
+import { createStyles, makeStyles, useTheme } from "@material-ui/core/styles";
+import { ThemeProps } from "../providers/MorphwareTheme";
 import Statistics from "../components/Statistics";
 
-const styles = makeStyles(() =>
+const styles = makeStyles((theme: ThemeProps) =>
   createStyles({
     root: {
       backgroundColor: theme.background?.main,
@@ -14,7 +14,8 @@ const styles = makeStyles(() =>
 );
 
 const Home = () => {
-  const classes = styles();
+  const theme: ThemeProps = useTheme();
+  const classes = styles(theme);
 
   return (
     <div className={classes.root}>

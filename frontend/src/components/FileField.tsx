@@ -7,11 +7,12 @@ import {
   IconButton,
   makeStyles,
   Typography,
+  useTheme,
 } from "@material-ui/core";
 import React, { InputHTMLAttributes, useEffect, useRef, useState } from "react";
 import { Field, useForm } from "react-final-form";
 import HighlightOffIcon from "@material-ui/icons/HighlightOff";
-import { theme } from "../providers/MorphwareTheme";
+import { ThemeProps } from "../providers/MorphwareTheme";
 import { formatFileSize } from "../utils";
 
 interface FileFieldProps extends InputHTMLAttributes<HTMLInputElement> {
@@ -23,17 +24,22 @@ interface FileFieldProps extends InputHTMLAttributes<HTMLInputElement> {
   directory?: boolean;
 }
 
-const styles = makeStyles({
-  removeFileIcon: {
-    "&:hover": {
-      curser: "pointer",
+const styles = makeStyles((theme: ThemeProps) => {
+  return {
+    removeFileIcon: {
+      "&:hover": {
+        curser: "pointer",
+      },
     },
-  },
-  metaDataContainer: {
-    width: "100%",
-    height: "80%",
-    border: `1px solid ${theme.metaDataContainer?.main}`,
-  },
+    metaDataContainer: {
+      width: "100%",
+      height: "80%",
+      border: `1px solid ${theme.metaDataContainer?.main}`,
+    },
+    metaDataText: {
+      color: theme.text?.main,
+    },
+  };
 });
 
 const FileField = ({
@@ -47,11 +53,10 @@ const FileField = ({
 }: FileFieldProps) => {
   const inputRef = useRef<HTMLInputElement>(null);
   const [fileUploaded, setFileUploaded] = useState<boolean>(false);
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const accept = acceptedValues ? acceptedValues.join(",") : "*";
-
   const form = useForm();
+  const theme = useTheme();
+  const classes = styles(theme);
 
   const fileName = (files?: FileList | null) => {
     const fileName = fileUploaded && files?.length === 1 ? files[0].name : "";
@@ -88,7 +93,8 @@ const FileField = ({
 
   const FileMetaData = () => {
     if (fileUploaded && inputRef.current?.files?.length === 1) {
-      const classes = styles();
+      const theme: ThemeProps = useTheme();
+      const classes = styles(theme);
 
       return (
         <>
@@ -103,7 +109,7 @@ const FileField = ({
                   alignItems: "center",
                 }}
               >
-                <Typography variant="body2">
+                <Typography variant="body2" className={classes.metaDataText}>
                   {fileName(inputRef.current?.files)}
                 </Typography>
               </Grid>
@@ -116,7 +122,7 @@ const FileField = ({
                   alignItems: "center",
                 }}
               >
-                <Typography variant="body2">
+                <Typography variant="body2" className={classes.metaDataText}>
                   {fileSize(inputRef.current?.files)}
                 </Typography>
               </Grid>
@@ -129,7 +135,7 @@ const FileField = ({
                   alignItems: "center",
                 }}
               >
-                <Typography variant="body2">
+                <Typography variant="body2" className={classes.metaDataText}>
                   {lastModified(inputRef.current?.files)}
                 </Typography>
               </Grid>
@@ -148,7 +154,11 @@ const FileField = ({
                 aria-label="delete"
                 onClick={removeUploadedFile}
               >
-                <HighlightOffIcon fontSize="large" color="secondary" />
+                <HighlightOffIcon
+                  fontSize="large"
+                  color="secondary"
+                  className={classes.metaDataText}
+                />
               </IconButton>
             </Box>
           </Grid>
@@ -180,8 +190,6 @@ const FileField = ({
                 }}
               >
                 <input
-                  // webkitdirectory={webkitdirectory ? "" : false}
-                  // directory={directory ? "" : false}
                   {...input}
                   type="file"
                   style={{ display: "none" }}
@@ -203,7 +211,6 @@ const FileField = ({
                     style={{ width: "100%", display: "flex", height: "50px" }}
                     component="span"
                     variant="contained"
-                    // variant="outlined"
                     color="primary"
                   >
                     {buttonText}

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import {
   Button,
   Grid,
@@ -5,22 +6,27 @@ import {
   Paper,
   Typography,
   MenuItem,
+  useTheme,
+  makeStyles,
+  createStyles,
 } from "@material-ui/core";
 import React, { useContext, useState } from "react";
-import { theme } from "../providers/MorphwareTheme";
-import { TextField, Select } from "mui-rff";
+import { TextField, Select, Switches } from "mui-rff";
 import { Form, useForm } from "react-final-form";
 import { DaemonContext } from "../providers/ServiceProviders";
 import { SettingsRequestProps } from "../service/DaemonService";
 import { ethers } from "ethers";
 import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
 import { IpcRenderer } from "electron";
+import { ThemeProps } from "../providers/MorphwareTheme";
+import { UtilsContext } from "../providers/UtilsProvider";
 interface SettingsRequestPropsErrors {
   httpBindAddress?: string;
   httpPort?: string;
   privateKey?: string;
   torrentListenPort?: string;
   appDownloadPath?: string;
+  darkMode?: string;
 }
 declare global {
   interface Window {
@@ -33,12 +39,34 @@ interface AddAppDownloadPathProps {
   setAppDownloadPath: React.Dispatch<React.SetStateAction<string>>;
 }
 
+const styles = makeStyles((theme: ThemeProps) =>
+  createStyles({
+    formHeaders: {
+      ...theme.typography.h6,
+    },
+    options: {
+      color: theme.text?.main,
+    },
+    selectBackground: {
+      backgroundColor: theme.dropdown?.main,
+      color: theme.text?.main,
+      "&:hover": {
+        background: theme.dropdown?.selected,
+      },
+    },
+    active: {
+      color: theme.text?.dropdown,
+    },
+  })
+);
+
 const AddAppDownloadPath = ({
   appDownloadPath,
   setAppDownloadPath,
 }: AddAppDownloadPathProps) => {
+  const theme: ThemeProps = useTheme();
   const form = useForm();
-
+  const classes = styles();
   const getFolder = () => {
     const appDownloadPath = window.renderer.sendSync("selectFolder");
     setAppDownloadPath(appDownloadPath);
@@ -60,18 +88,24 @@ const AddAppDownloadPath = ({
           display: "flex",
           justifyContent: "flex-start",
         }}
+        inputProps={{ className: classes.options }}
+        InputLabelProps={{ className: classes.formHeaders }}
       />
       <IconButton style={{ width: "10%" }} onClick={getFolder}>
-        <DriveFileRenameOutlineIcon fontSize="large" />
+        <DriveFileRenameOutlineIcon
+          fontSize="large"
+          style={{ color: theme.text?.main }}
+        />
       </IconButton>
     </>
   );
 };
 
 const SettingsForm = () => {
+  const theme: ThemeProps = useTheme();
   const daemonService = useContext(DaemonContext);
+  const { darkTheme, setDarkTheme } = useContext(UtilsContext);
   const currentSettings = daemonService.currentConfigs;
-  console.log("Current Settings: ", currentSettings);
   const currentAppDownloadPath = currentSettings?.appDownloadPath
     ? currentSettings.appDownloadPath
     : "";
@@ -81,9 +115,7 @@ const SettingsForm = () => {
   );
 
   const updateConfigurations = async (values: SettingsRequestProps) => {
-    console.log("values: ", values);
     const response = await daemonService.updateSettings(values);
-
     if (response.error) {
       daemonService.updateSnackbarProps({
         text: response.error,
@@ -97,6 +129,7 @@ const SettingsForm = () => {
     }
   };
 
+  const classes = styles();
   return (
     <div>
       <Form
@@ -155,7 +188,11 @@ const SettingsForm = () => {
                     <Grid xs={4}>
                       <Typography
                         variant="h6"
-                        style={{ textAlign: "start", padding: "15px" }}
+                        style={{
+                          textAlign: "start",
+                          padding: "15px",
+                        }}
+                        className={classes.formHeaders}
                       >
                         Private Key
                       </Typography>
@@ -175,12 +212,18 @@ const SettingsForm = () => {
                           display: "flex",
                           justifyContent: "flex-start",
                         }}
+                        inputProps={{ className: classes.formHeaders }}
+                        InputLabelProps={{ className: classes.formHeaders }}
                       />
                     </Grid>
                     <Grid xs={4}>
                       <Typography
                         variant="h6"
-                        style={{ textAlign: "start", padding: "15px" }}
+                        style={{
+                          textAlign: "start",
+                          padding: "15px",
+                        }}
+                        className={classes.formHeaders}
                       >
                         Data Path
                       </Typography>
@@ -199,6 +242,7 @@ const SettingsForm = () => {
                       <Typography
                         variant="h6"
                         style={{ textAlign: "start", padding: "15px" }}
+                        className={classes.formHeaders}
                       >
                         Global Mining Command
                       </Typography>
@@ -218,12 +262,15 @@ const SettingsForm = () => {
                           display: "flex",
                           justifyContent: "flex-start",
                         }}
+                        inputProps={{ className: classes.options }}
+                        InputLabelProps={{ className: classes.formHeaders }}
                       />
                     </Grid>
                     <Grid xs={4}>
                       <Typography
                         variant="h6"
                         style={{ textAlign: "start", padding: "15px" }}
+                        className={classes.formHeaders}
                       >
                         Torrent Listening Port
                       </Typography>
@@ -243,12 +290,15 @@ const SettingsForm = () => {
                           display: "flex",
                           justifyContent: "flex-start",
                         }}
+                        inputProps={{ className: classes.options }}
+                        InputLabelProps={{ className: classes.formHeaders }}
                       />
                     </Grid>
                     <Grid xs={4}>
                       <Typography
                         variant="h6"
                         style={{ textAlign: "start", padding: "15px" }}
+                        className={classes.formHeaders}
                       >
                         Jupyter Lab Port
                       </Typography>
@@ -268,12 +318,15 @@ const SettingsForm = () => {
                           display: "flex",
                           justifyContent: "flex-start",
                         }}
+                        inputProps={{ className: classes.options }}
+                        InputLabelProps={{ className: classes.formHeaders }}
                       />
                     </Grid>
                     <Grid xs={4}>
                       <Typography
                         variant="h6"
                         style={{ textAlign: "start", padding: "15px" }}
+                        className={classes.formHeaders}
                       >
                         Select your GPU
                       </Typography>
@@ -293,27 +346,147 @@ const SettingsForm = () => {
                         label="Select your GPU"
                         formControlProps={{ margin: "normal" }}
                         required={true}
+                        inputProps={{
+                          className: classes.options,
+                          style: { backgroundColor: theme.dropdown?.main },
+                        }}
+                        inputLabelProps={{
+                          className: classes.options,
+                        }}
                       >
-                        <MenuItem value="3090">3090</MenuItem>
-                        <MenuItem value="3080Ti">3080 Ti</MenuItem>
-                        <MenuItem value="3080">3080</MenuItem>
-                        <MenuItem value="3070Ti">3070 Ti</MenuItem>
-                        <MenuItem value="3070">3070</MenuItem>
-                        <MenuItem value="3060Ti">3060 Ti</MenuItem>
-                        <MenuItem value="3060">3060</MenuItem>
-                        <MenuItem value="2080Ti">2080 Ti</MenuItem>
-                        <MenuItem value="2080s">2080 Super</MenuItem>
-                        <MenuItem value="2080">2080</MenuItem>
-                        <MenuItem value="2070s">2070 Super</MenuItem>
-                        <MenuItem value="2070">2070</MenuItem>
-                        <MenuItem value="2060s">2060 Super</MenuItem>
-                        <MenuItem value="2060">2060</MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="3090"
+                        >
+                          3090
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="3080Ti"
+                        >
+                          3080 Ti
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="3080"
+                        >
+                          3080
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="3070Ti"
+                        >
+                          3070 Ti
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="3070"
+                        >
+                          3070
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="3060Ti"
+                        >
+                          3060 Ti
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="3060"
+                        >
+                          3060
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="2080Ti"
+                        >
+                          2080 Ti
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="2080s"
+                        >
+                          2080 Super
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="2080"
+                        >
+                          2080
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="2070s"
+                        >
+                          2070 Super
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="2070"
+                        >
+                          2070
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="2060s"
+                        >
+                          2060 Super
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="2060"
+                        >
+                          2060
+                        </MenuItem>
                       </Select>
                     </Grid>
                     <Grid xs={4}>
                       <Typography
                         variant="h6"
                         style={{ textAlign: "start", padding: "15px" }}
+                        className={classes.formHeaders}
                       >
                         Select your Role
                       </Typography>
@@ -333,11 +506,60 @@ const SettingsForm = () => {
                         label="Select your role"
                         formControlProps={{ margin: "normal" }}
                         required={true}
+                        inputProps={{ className: classes.options }}
+                        inputLabelProps={{ className: classes.options }}
                       >
-                        <MenuItem value="Poster">Poster</MenuItem>
-                        <MenuItem value="Worker">Worker</MenuItem>
-                        <MenuItem value="Validator">Validator</MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="Poster"
+                        >
+                          Poster
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="Worker"
+                        >
+                          Worker
+                        </MenuItem>
+                        <MenuItem
+                          classes={{
+                            root: classes.selectBackground,
+                            selected: classes.active,
+                          }}
+                          value="Validator"
+                        >
+                          Validator
+                        </MenuItem>
                       </Select>
+                    </Grid>
+                    <Grid xs={4}>
+                      <Typography
+                        variant="h6"
+                        style={{ textAlign: "start", padding: "15px" }}
+                        className={classes.formHeaders}
+                      >
+                        Dark Mode
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={8}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                      <Switches
+                        name="darkMode"
+                        data={{ label: "", value: darkTheme }}
+                        checked={darkTheme}
+                        onClick={() => {
+                          setDarkTheme(!darkTheme);
+                        }}
+                      />
                     </Grid>
                   </Grid>
                 </Grid>

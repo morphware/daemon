@@ -12,14 +12,16 @@ import React, { useContext, useState } from "react";
 import Web3 from "web3";
 import { auctionStatusMapper, formatFileSize } from "../utils";
 import { DaemonContext } from "../providers/ServiceProviders";
-import { makeStyles, Typography } from "@material-ui/core";
-import { theme } from "../providers/MorphwareTheme";
+import { makeStyles, Typography, useTheme } from "@material-ui/core";
+import { ThemeProps } from "../providers/MorphwareTheme";
 
-const styles = makeStyles({
-  tableHeader: {
-    color: theme.metaDataContainer?.main,
-    fontWeight: 600,
-  },
+const styles = makeStyles((theme: ThemeProps) => {
+  return {
+    tableHeader: {
+      color: theme.metaDataContainer?.main,
+      fontWeight: 600,
+    },
+  };
 });
 
 const AuctionsTable = () => {
@@ -28,7 +30,8 @@ const AuctionsTable = () => {
   const [sortDirection, setSortDirection] = useState<SortDirectionType>(
     SortDirection.ASC
   );
-  const classes = styles();
+  const theme: ThemeProps = useTheme();
+  const classes = styles(theme);
 
   const activeJobsResponse = daemonService.activeJobs;
   const activeJobs = activeJobsResponse
@@ -157,21 +160,18 @@ const AuctionsTable = () => {
                 cellRenderer={trainingDatasetSizeRenderer}
                 dataKey="trainingDataSize"
                 width={width * 0.4}
-                className="f6 charcoal truncate pl2"
               />
               <Column
                 label="Worker Reward (MWT)"
                 cellRenderer={mwtRenderer}
                 dataKey="workerReward"
                 width={width * 0.45}
-                className="f6 charcoal truncate pl2"
               />
               <Column
                 label="Status"
                 cellRenderer={statusRenderer}
                 dataKey="status"
                 width={width}
-                className="f6 charcoal truncate pl2"
               />
             </Table>
           )}

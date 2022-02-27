@@ -75,10 +75,6 @@ export const bountySetter = (
 
   const estimatedBountyUSD =
     CUDACorePerHour * CUDACores * estimatedTrainingTime;
-
-  console.log("estimatedBountyUSD: ", estimatedBountyUSD);
-  console.log("MWTPrice: ", MWTPrice);
-
   const estimatedBountyMWT = estimatedBountyUSD / parseFloat(MWTPrice);
 
   return Math.round(estimatedBountyMWT);

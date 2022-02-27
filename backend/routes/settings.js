@@ -13,6 +13,7 @@ const editKeys = {
 	'miningCommand': {type: 'string'},
 	'workerGPU': {type: 'string'},
 	'role': {type: 'string'},
+	'darkMode': {type: 'string'},
 };
 
 router.get('/', async function(req, res, next){

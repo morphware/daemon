@@ -9,17 +9,24 @@ import {
   SortDirectionType,
 } from "react-virtualized";
 import "react-virtualized/styles.css";
-import { IconButton, makeStyles, Typography } from "@material-ui/core";
-import { theme } from "../providers/MorphwareTheme";
+import {
+  IconButton,
+  makeStyles,
+  Typography,
+  useTheme,
+} from "@material-ui/core";
 import { copyToClipBoard } from "../utils";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import "./AuctionsTable.css";
+import { ThemeProps } from "../providers/MorphwareTheme";
 
-const styles = makeStyles({
-  tableHeader: {
-    color: theme.metaDataContainer?.main,
-    fontWeight: 600,
-  },
+const styles = makeStyles((theme: ThemeProps) => {
+  return {
+    tableHeader: {
+      color: theme.metaDataContainer?.main,
+      fontWeight: 600,
+    },
+  };
 });
 
 const TorrentsTable = () => {
@@ -28,7 +35,8 @@ const TorrentsTable = () => {
   const [sortDirection, setSortDirection] = useState<SortDirectionType>(
     SortDirection.ASC
   );
-  const classes = styles();
+  const theme: ThemeProps = useTheme();
+  const classes = styles(theme);
 
   const torrents = daemonService.torrents?.torrents
     ? daemonService.torrents?.torrents
@@ -87,16 +95,12 @@ const TorrentsTable = () => {
     setSortDirection(sortDirection);
   };
 
-  console.log("sortedTorrents: ", sortedTorrents);
-  //              rowClassName="react_virtualised_row_custom"
-
   return (
     <div style={{ maxWidth: 1800, width: "100%" }}>
       <Typography variant="body1">
         <AutoSizer disableHeight style={{ width: "100%" }}>
           {({ width }) => (
             <Table
-              // rowClassName="react_virtualised_row_custom"
               width={width}
               height={400}
               headerHeight={20}
@@ -107,7 +111,6 @@ const TorrentsTable = () => {
               sortDirection={sortDirection}
               sort={sort}
               headerClassName={classes.tableHeader}
-              // rowClassName={classes.tableHeader}
               rowStyle={{ width: "100%" }}
             >
               <Column

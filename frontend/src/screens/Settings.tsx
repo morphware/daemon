@@ -1,9 +1,9 @@
-import { createStyles, makeStyles } from "@material-ui/core";
+import { createStyles, makeStyles, useTheme } from "@material-ui/core";
 import React from "react";
 import SettingsForm from "../components/SettingsForm";
-import { theme } from "../providers/MorphwareTheme";
+import { ThemeProps } from "../providers/MorphwareTheme";
 
-const styles = makeStyles(() =>
+const styles = makeStyles((theme: ThemeProps) =>
   createStyles({
     root: {
       backgroundColor: theme.background?.main,
@@ -14,7 +14,8 @@ const styles = makeStyles(() =>
 );
 
 const Settings = () => {
-  const classes = styles();
+  const theme: ThemeProps = useTheme();
+  const classes = styles(theme);
   return (
     <div className={classes.root}>
       <SettingsForm />

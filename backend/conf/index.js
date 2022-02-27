@@ -28,6 +28,7 @@ function load(filePath, required) {
 // Apply changes to local conf
 function editLocalConf(args) {
   localConf = { ...localConf, ...args };
+  console.log("Backend updated conf: ", localConf);
   fs.writeJsonSync(runtimeConf.appDataLocal, localConf);
   switch (process.platform) {
     case "linux":

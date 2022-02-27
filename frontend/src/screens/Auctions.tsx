@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
 import { createStyles, makeStyles } from "@material-ui/core/styles";
-import { theme } from "../providers/MorphwareTheme";
+import { ThemeProps } from "../providers/MorphwareTheme";
 import AuctionsTable from "../components/AuctionsTable";
-import { Grid, Paper, Typography } from "@material-ui/core";
+import { Grid, Paper, Typography, useTheme } from "@material-ui/core";
 import { DaemonContext } from "../providers/ServiceProviders";
 
-const styles = makeStyles(() =>
+const styles = makeStyles((theme: ThemeProps) =>
   createStyles({
     root: {
       backgroundColor: theme.background?.main,
@@ -17,6 +17,9 @@ const styles = makeStyles(() =>
       fontWeight: 700,
       fontSize: "50px",
     },
+    header: {
+      color: theme.text?.bold,
+    },
   })
 );
 
@@ -26,7 +29,8 @@ const Auctions = () => {
     ? Object.values(daemonService.activeJobs.jobs).length
     : 0;
 
-  const classes = styles();
+  const theme: ThemeProps = useTheme();
+  const classes = styles(theme);
 
   return (
     <div className={classes.root}>
@@ -44,7 +48,11 @@ const Auctions = () => {
             </Typography>
           </Grid>
           <Grid item xs={12}>
-            <Typography variant="h5" style={{ paddingBottom: "20px" }}>
+            <Typography
+              variant="h5"
+              style={{ paddingBottom: "20px" }}
+              className={classes.header}
+            >
               Live Morphware Auctions
             </Typography>
           </Grid>

@@ -6,23 +6,26 @@ import {
   IconButton,
   makeStyles,
   Typography,
+  useTheme,
 } from "@material-ui/core";
 import React, { useContext } from "react";
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { theme } from "../providers/MorphwareTheme";
 import { DaemonContext } from "../providers/ServiceProviders";
 import CheckCircleIcon from "@material-ui/icons/CheckCircle";
 import CancelIcon from "@material-ui/icons/Cancel";
 import { copyToClipBoard, roundBalance, walletShortener } from "../utils";
 import FileCopyIcon from "@material-ui/icons/FileCopy";
 import Identicon from "./Identicon";
+import { ThemeProps } from "../providers/MorphwareTheme";
 
-const styles = makeStyles(() =>
+const styles = makeStyles((theme: ThemeProps) =>
   createStyles({
     root: {
-      //   backgroundColor: theme.background?.main,
       height: "70px",
-      //   padding: "50px 50px 0px",
+      backgroundColor: theme.WalletFooterInfo?.main,
+    },
+    footerText: {
+      color: theme.WalletFooterInfo?.text,
+      fontWeight: 700,
     },
   })
 );
@@ -38,9 +41,11 @@ export const ConnectionStatus = ({
   connected,
   network,
 }: ConnectionStatusProps) => {
+  const theme: ThemeProps = useTheme();
+  const classes = styles(theme);
   return connected ? (
     <Box display="flex">
-      <Typography variant="body2">
+      <Typography variant="body2" className={classes.footerText}>
         {text}:&nbsp;&nbsp;&nbsp;{network}&nbsp;
       </Typography>
       <CheckCircleIcon
@@ -50,7 +55,9 @@ export const ConnectionStatus = ({
     </Box>
   ) : (
     <Box display="flex">
-      <Typography variant="body2">{text}:&nbsp;&nbsp;&nbsp;</Typography>
+      <Typography variant="body2" className={classes.footerText}>
+        {text}:&nbsp;&nbsp;&nbsp;
+      </Typography>
       <CancelIcon
         style={{ fontSize: 25, color: "#FF6666" }}
         color="secondary"
@@ -60,10 +67,10 @@ export const ConnectionStatus = ({
 };
 
 const WalletInfo = () => {
-  const classes = styles();
+  const theme: ThemeProps = useTheme();
+  const classes = styles(theme);
   const daemonService = useContext(DaemonContext);
   const roundedBalance = roundBalance(daemonService.walletBalance);
-  const shortenedAddress = walletShortener(daemonService.walletAddress, 5);
 
   return (
     <Grid container className={classes.root}>
@@ -77,7 +84,7 @@ const WalletInfo = () => {
         }}
       >
         <span>
-          <Typography variant="body2">
+          <Typography variant="body2" className={classes.footerText}>
             Address:&nbsp;&nbsp;&nbsp;
             <Identicon
               address={
@@ -87,7 +94,7 @@ const WalletInfo = () => {
             />
             &nbsp;&nbsp;
             {walletShortener(daemonService.walletAddress, 4, 4)}
-          </Typography>{" "}
+          </Typography>
         </span>
         <IconButton
           onClick={() => copyToClipBoard(daemonService.walletAddress)}
@@ -104,7 +111,7 @@ const WalletInfo = () => {
           justifyContent: "center",
         }}
       >
-        <Typography variant="body2">
+        <Typography variant="body2" className={classes.footerText}>
           {roundedBalance}&nbsp;&nbsp;&nbsp;MWT
         </Typography>
       </Grid>
