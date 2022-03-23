@@ -59,21 +59,10 @@ class JobPoster extends Job {
     try {
       // Start a new instance
       let job = new this(wallet, postData);
-
-      console.log("POST DATA");
-      console.log(postData);
-
-      console.log("Constructor: ");
-      console.log(this.preConfirmedJobs);
       this.preConfirmedJobs.push(job);
 
       // Post the job
       await job.post();
-
-      console.log("Finished Posting");
-
-      // Hold the this job in the jump table
-      job.addToJump();
 
       return job;
     } catch (error) {
@@ -135,8 +124,12 @@ class JobPoster extends Job {
 	time states. We override __precess event below to make that happen.
 	*/
   static __process_event(name, instanceId, event) {
+    console.log("poster tryCatch ");
     try {
       //Getting confirmation of a job that this wallet just posted
+      console.log("Heard event in posted");
+      console.log("name:", name);
+      console.log("preConfirmedLenght: ", this.preConfirmedJobs.length);
       if (
         name === "JobDescriptionPosted" &&
         event.returnValues.jobPoster === wallet.address &&
@@ -152,6 +145,9 @@ class JobPoster extends Job {
 
         // Gather data about the job
         job.jobData = event.returnValues;
+
+        // Hold the this job in the jump table
+        job.addToJump();
 
         let now = new Date().getTime();
         let biddingDeadline = event.returnValues.biddingDeadline * 1000;
@@ -235,32 +231,6 @@ class JobPoster extends Job {
       await action.send({
         gas: await action.estimateGas(),
       });
-
-      // this.transactions.push({ ...receipt, event: "postJobDescription" });
-
-      // Gather data about the job
-      // this.jobData = receipt.events.JobDescriptionPosted.returnValues;
-
-      // console.info(
-      //   "Started auction",
-      //   this.instanceId,
-      //   new Date().toLocaleString()
-      // );
-      // console.info(
-      //   "Started auction biddingDeadline",
-      //   this.instanceId,
-      //   new Date(biddingDeadline).toLocaleString()
-      // );
-      // console.info(
-      //   "Started auction revealDeadline",
-      //   this.instanceId,
-      //   new Date(revealDeadline).toLocaleString()
-      // );
-
-      // // End the auction when the reveal deadline has passed
-      // this.auctionEnd(parseInt(this.postData.biddingTime) + revealTime);
-
-      // return receipt.events.JobDescriptionPosted;
     } catch (error) {
       console.error("posting job error", error);
       throw error;
@@ -476,7 +446,7 @@ class JobPoster extends Job {
 Listen for `JobPostedDescription` events. This runs in addition to `Job.events`
 */
 if (conf.role === "Poster") {
-  console.log("Listening as Poster");
+  console.log("Listening as poster");
   JobPoster.events();
 }
 
