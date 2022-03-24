@@ -124,7 +124,6 @@ class JobPoster extends Job {
 	time states. We override __precess event below to make that happen.
 	*/
   static __process_event(name, instanceId, event) {
-    console.log("poster tryCatch ");
     try {
       //Getting confirmation of a job that this wallet just posted
       if (
@@ -134,38 +133,7 @@ class JobPoster extends Job {
       ) {
         //Find the job from preConfirmed
         let job = this.preConfirmedJobs.shift();
-
-        job.transactions.push({ event: "postJobDescription" });
-
-        // Gather data about the job
-        job.jobData = event.returnValues;
-
-        // Hold the this job in the jump table
-        job.addToJump();
-
-        let now = new Date().getTime();
-        let biddingDeadline = event.returnValues.biddingDeadline * 1000;
-        let revealDeadline = event.returnValues.revealDeadline * 1000;
-        let auctionEnd = revealDeadline - now;
-
-        console.info(
-          "Started auction",
-          job.instanceId,
-          new Date().toLocaleString()
-        );
-        console.info(
-          "Started auction biddingDeadline",
-          job.instanceId,
-          new Date(biddingDeadline).toLocaleString()
-        );
-        console.info(
-          "Started auction revealDeadline",
-          job.instanceId,
-          new Date(revealDeadline).toLocaleString()
-        );
-
-        // End the auction when the reveal deadline has passed
-        job.auctionEnd(parseInt(auctionEnd) / 1000);
+        job.validateJob(event);
       }
     } catch (error) {
       console.error(`ERROR JobPoster __process_event`, error);
@@ -229,6 +197,41 @@ class JobPoster extends Job {
       console.error("posting job error", error);
       throw error;
     }
+  }
+
+  // Validate a posted job
+  validateJob(event) {
+    this.transactions.push({ event: "postJobDescription" });
+
+    // Gather data about the job
+    this.jobData = event.returnValues;
+
+    // Hold the this job in the jump table
+    this.addToJump();
+
+    let now = new Date().getTime();
+    let biddingDeadline = event.returnValues.biddingDeadline * 1000;
+    let revealDeadline = event.returnValues.revealDeadline * 1000;
+    let auctionEnd = revealDeadline - now;
+
+    console.info(
+      "Started auction",
+      this.instanceId,
+      new Date().toLocaleString()
+    );
+    console.info(
+      "Started auction biddingDeadline",
+      this.instanceId,
+      new Date(biddingDeadline).toLocaleString()
+    );
+    console.info(
+      "Started auction revealDeadline",
+      this.instanceId,
+      new Date(revealDeadline).toLocaleString()
+    );
+
+    // End the auction when the reveal deadline has passed
+    this.auctionEnd(parseInt(auctionEnd) / 1000);
   }
 
   // The job posted will emit an event to end the auction, this will trigger
