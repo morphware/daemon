@@ -127,17 +127,11 @@ class JobPoster extends Job {
     console.log("poster tryCatch ");
     try {
       //Getting confirmation of a job that this wallet just posted
-      console.log("Heard event in posted");
-      console.log("name:", name);
-      console.log("preConfirmedLenght: ", this.preConfirmedJobs.length);
       if (
         name === "JobDescriptionPosted" &&
         event.returnValues.jobPoster === wallet.address &&
         this.preConfirmedJobs.length > 0
       ) {
-        console.log("Recieved event for job descrption I posted");
-        console.log(event);
-
         //Find the job from preConfirmed
         let job = this.preConfirmedJobs.shift();
 
