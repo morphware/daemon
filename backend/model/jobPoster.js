@@ -48,6 +48,12 @@ class JobPoster extends Job {
     return "poster";
   }
 
+  /**
+   * An 'in-transit' array which stores all jobs which have been posted but
+   * have not yet had an event transmitted from the smart contract, signifiying the
+   * job post has completed. Once that event is emmited, the job is moved from
+   * preConfirmedJobs into Job.jobs using addToJump()
+   */
   static preConfirmedJobs = [];
 
   /*
