@@ -9,6 +9,7 @@ const {
   runJupyterLabServer,
   stopJupyterLabServer,
 } = require("../model/notebook");
+const { wallet } = require("../model/morphware");
 
 /*
 JobPoster extends the common functions of Job class and is responsible for
@@ -47,6 +48,14 @@ class JobPoster extends Job {
     return "poster";
   }
 
+  /**
+   * An 'in-transit' array which stores all jobs which have been posted but
+   * have not yet had an event transmitted from the smart contract, signifiying the
+   * job post has completed. Once that event is emmited, the job is moved from
+   * preConfirmedJobs into Job.jobs using addToJump()
+   */
+  static preConfirmedJobs = [];
+
   /*
 	Wrapper for creating a new job
 	This only exists because a proper constructor can not be async and we
@@ -56,12 +65,10 @@ class JobPoster extends Job {
     try {
       // Start a new instance
       let job = new this(wallet, postData);
+      this.preConfirmedJobs.push(job);
 
       // Post the job
       await job.post();
-
-      // Hold the this job in the jump table
-      job.addToJump();
 
       return job;
     } catch (error) {
@@ -117,6 +124,61 @@ class JobPoster extends Job {
   }
 
   /*
+	__process_event in the base Job class deals with listen for events on
+	current job instances. In order for a worker to start the bidding process,
+	we only care about `JobDescriptionPosted` if the client meets certainn run
+	time states. We override __precess event below to make that happen.
+	*/
+  static __process_event(name, instanceId, event) {
+    console.log("poster tryCatch ");
+    try {
+      //Getting confirmation of a job that this wallet just posted
+      if (
+        name === "JobDescriptionPosted" &&
+        event.returnValues.jobPoster === wallet.address &&
+        this.preConfirmedJobs.length > 0
+      ) {
+        //Find the job from preConfirmed
+        let job = this.preConfirmedJobs.shift();
+
+        job.transactions.push({ event: "postJobDescription" });
+
+        // Gather data about the job
+        job.jobData = event.returnValues;
+
+        // Hold the this job in the jump table
+        job.addToJump();
+
+        let now = new Date().getTime();
+        let biddingDeadline = event.returnValues.biddingDeadline * 1000;
+        let revealDeadline = event.returnValues.revealDeadline * 1000;
+        let auctionEnd = revealDeadline - now;
+
+        console.info(
+          "Started auction",
+          job.instanceId,
+          new Date().toLocaleString()
+        );
+        console.info(
+          "Started auction biddingDeadline",
+          job.instanceId,
+          new Date(biddingDeadline).toLocaleString()
+        );
+        console.info(
+          "Started auction revealDeadline",
+          job.instanceId,
+          new Date(revealDeadline).toLocaleString()
+        );
+
+        // End the auction when the reveal deadline has passed
+        job.auctionEnd(parseInt(auctionEnd) / 1000);
+      }
+    } catch (error) {
+      console.error(`ERROR JobPoster __process_event`, error);
+    }
+  }
+
+  /*
 	Actions
 
 	The client can initiate actions against the contract as a poster. Most of
@@ -145,8 +207,6 @@ class JobPoster extends Job {
       let buffer = 180;
       let revealTime = 120 + buffer + buffer;
 
-      console.log("postData: ", this.postData);
-
       var now = new Date().getTime();
       let biddingDeadline =
         now + parseInt(parseInt(this.postData.biddingTime) + buffer) * 1000;
@@ -156,16 +216,6 @@ class JobPoster extends Job {
       let trainingDatasetSize = await this.__getFileSize(
         this.postData.trainingData
       );
-      console.log("Total Size: ", trainingDatasetSize);
-
-      console.log("Time: ", this.postData.trainingTime);
-      console.log("GPU: ", conf.workerGPU);
-
-      console.log(
-        "Minimum Payout: ",
-        percentHelper(this.postData.workerReward, 10)
-      );
-      console.log("Worker Reward: ", this.postData.workerReward.toString());
 
       // Post the new job
       let action = this.jobContract.methods.postJobDescription(
@@ -178,35 +228,9 @@ class JobPoster extends Job {
         this.postData.workerReward.toString()
       );
 
-      let receipt = await action.send({
+      await action.send({
         gas: await action.estimateGas(),
       });
-
-      this.transactions.push({ ...receipt, event: "postJobDescription" });
-
-      // Gather data about the job
-      this.jobData = receipt.events.JobDescriptionPosted.returnValues;
-
-      console.info(
-        "Started auction",
-        this.instanceId,
-        new Date().toLocaleString()
-      );
-      console.info(
-        "Started auction biddingDeadline",
-        this.instanceId,
-        new Date(biddingDeadline).toLocaleString()
-      );
-      console.info(
-        "Started auction revealDeadline",
-        this.instanceId,
-        new Date(revealDeadline).toLocaleString()
-      );
-
-      // End the auction when the reveal deadline has passed
-      this.auctionEnd(parseInt(this.postData.biddingTime) + revealTime);
-
-      return receipt.events.JobDescriptionPosted;
     } catch (error) {
       console.error("posting job error", error);
       throw error;
@@ -416,6 +440,14 @@ class JobPoster extends Job {
       console.error("ERROR!!! `JobApproved`", error);
     }
   }
+}
+
+/*
+Listen for `JobPostedDescription` events. This runs in addition to `Job.events`
+*/
+if (conf.role === "Poster") {
+  console.log("Listening as poster");
+  JobPoster.events();
 }
 
 module.exports = { JobPoster };

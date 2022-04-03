@@ -17,5 +17,5 @@ module.exports = {
   electronDev: true,
 
   // Validation Cluster Nodes
-  validationNodes: 2,
+  validationNodes: 1,
 };

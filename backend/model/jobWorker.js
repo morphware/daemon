@@ -132,17 +132,13 @@ class JobWorker extends Job {
 	*/
   static __process_event(name, instanceId, event) {
     try {
-      console.log("Worker");
-      console.log("Instance ID: ", instanceId);
-      console.log("Job Keys: ", Object.keys(Job.jobs));
-      console.log("Includes: ", Object.keys(Job.jobs).includes(instanceId))
-
       // If tracking this job and its been approved
-      if (name === "JobApproved" && Object.keys(Job.jobs).includes(instanceId)) {
-        console.log("Passed If Statement");
+      if (
+        name === "JobApproved" &&
+        Object.keys(Job.jobs).includes(instanceId)
+      ) {
         const completedJob = Job.jobs[instanceId];
-        console.log("completed job", completedJob);
-        completedJob.__JobApproved(event)
+        completedJob.__JobApproved(event);
       }
 
       // Check to see if job is already tracked by this client
@@ -178,7 +174,6 @@ class JobWorker extends Job {
         job.transactions.push(event);
         job.__JobDescriptionPosted(event);
       }
-
     } catch (error) {
       this.removeFromJump();
       console.error(`ERROR JobWorker __process_event`, error);
@@ -498,16 +493,12 @@ class JobWorker extends Job {
 
   async __JobApproved() {
     try {
-      console.log("this: ", this)
+      console.log("this: ", this);
       console.log(this.downloadPath);
       fs.emptyDirSync(this.downloadPath);
       fs.rmdirSync(this.downloadPath);
     } catch (error) {
-      console.error(
-        "ERROR!!! JobWorker __JobApproved",
-        this.instanceId,
-        error
-      );
+      console.error("ERROR!!! JobWorker __JobApproved", this.instanceId, error);
     }
   }
 }
