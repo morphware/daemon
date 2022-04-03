@@ -284,11 +284,11 @@ class JobWorker extends Job {
 
     console.log("TRAINED MODEL PATH: ", this.trainedModelPath);
 
-    let { magnetURI } = await webtorrent().findOrSeed(this.trainedModelPath);
-
+    let torrent = await webtorrent().findOrSeed(this.trainedModelPath);
+    let magnetURI = torrent.magnetURI;
+    this.currentJobTorrent = torrent;
     console.log("Magnet Link to trained mode: ", magnetURI);
 
-    // let action = this.jobFactoryContract.methods.shareTrainedModel(
     let action = this.jobContract.methods.shareTrainedModel(
       this.jobData.jobPoster,
       parseInt(this.id),
@@ -306,8 +306,6 @@ class JobWorker extends Job {
     console.log("Reciept: ", receipt);
 
     this.transactions.push({ ...receipt, event: "shareTrainedModel" });
-    // this.transactions.push({...receipt, event:'postJobDescription'});
-
     return receipt;
   }
 
@@ -497,6 +495,13 @@ class JobWorker extends Job {
       console.log(this.downloadPath);
       fs.emptyDirSync(this.downloadPath);
       fs.rmdirSync(this.downloadPath);
+
+      console.log("Deleting Torrent");
+
+      if (this.currentJobTorrent) {
+        await webtorrent().removeTorrent(this.currentJobTorrent);
+        this.currentJobTorrent = null;
+      }
     } catch (error) {
       console.error("ERROR!!! JobWorker __JobApproved", this.instanceId, error);
     }

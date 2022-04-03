@@ -43,6 +43,8 @@ class Job {
 
     this.auctionContract = auctionFactoryContract.clone();
     this.auctionContract.options.from = this.wallet.address;
+
+    this.currentJobTorrent = null;
   }
 
   // Build a hashable object to represent a current instance state.
