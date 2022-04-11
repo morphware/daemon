@@ -5,11 +5,12 @@
     - [Data Specification](#data-specificiation)
       - [Interface](#interface)
       - [Example](#response-example)
+      - [Data Retrieval Endpoints](#endpoints)
     - [Requesting this Data from a Tellor Data Registry](#requesting-this-data-from-a-tellor-data-registry)
-    - [Providing this Data as a Tellor Miner](#providing-this-data-as-a-tellor-miner)
+    - [Providing this Data as a Tellor Reporter](#providing-this-data-as-a-tellor-reporter)
       - [Query Version](#query-version)
       - [Disputes](#disputes)
-      - [Submit final reference value](#submit-final-reference-value)
+
 
 
 
@@ -18,7 +19,7 @@ This document provides the data specification for calling, validating and provid
 Oracles hosted by the Tellor protocol. It will initially outline the neccesity for this data for Morphware. <br>
 Then for Morphware and other entities who will use this data, we will discuess how to request this data once stored in Tellor data registry contracts (with a example). 
 <br>
-Finally, for Tellor miners, we'll go through how to perform a job request for this Oracle, the response interface (with an example), how to validate the response, and how to submit the response.
+Finally, for Tellor reporters, we'll go through how to perform a job request for this Oracle, the response interface (with an example), how to validate the response, and how to submit the response.
 
 ## Cloud Instance Spot Price Oracle
 
@@ -111,22 +112,24 @@ This is a subset of the entire response. The entire response has 21 objects retu
 
 - TODO (Should be able to complete this once the Oracle is live)
 
-### Providing this data as a Tellor Miner
+### Providing this data as a Tellor Reporter
 
 #### Serving this Job using Telliot Core
 - Refer to Tellors Official Documentation on [Telliot Core](https://github.com/tellor-io/telliot-core)
 
 #### Query Version
-- TODO (Since this is the first iteration of this Oracle job, would it be query version 1?)
+|Query Version| Oracle Job         |
+|-------------|--------------------|
+| 1           |AWS Ec2 Spot Pricing| 
 
 #### Disputes
-Ec2MetaData being an object, there are 5 validation checks Tellor miners will perform prior to submitting the value to a Tellor data registry.
+Ec2MetaData being an object, there are 5 validation checks Tellor reporters will perform prior to submitting the value to a Tellor data registry.
 For each Ec2MetaData object in the returned Array of Ec2MetaData. We must valdiate:
 - The instance's names does not change
 - The instance's number of CUDA Cores  does not change
 - The instance's number of CPU's does not change
 - The instance's RAM does not change
-- The on-demand price per hour does not change greater than 10% when compared to the last reported price per hour value given of the instance
+- The on-demand price per hour must be the value reported from the [endpoint](#endpoints)
 
 ### Endpoints
 We will add more endpoints for redundancy to ensure data integrity in the future.
