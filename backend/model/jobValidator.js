@@ -41,10 +41,10 @@ class JobValidator extends Job {
   }
 
   /*
-	this.lock will determine if this client is currently occupied with another
-	another job. We will over ride `addTOJump` and `removeFromJump` to set
-	locking at the correct times.
-	*/
+  this.lock will determine if this client is currently occupied with another
+  another job. We will over ride `addTOJump` and `removeFromJump` to set
+  locking at the correct times.
+  */
 
   static lock = false;
 
@@ -57,7 +57,7 @@ class JobValidator extends Job {
     try {
       super.removeFromJump();
       this.constructor.lock = false;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   // Check to see if the client is ready and willing to take on jobs
@@ -69,11 +69,11 @@ class JobValidator extends Job {
   }
 
   /*
-	__process_event in the base Job class deals with listen for events on
-	current job instances. In order for a validator to start the bidding process,
-	we only care about `JobDescriptionPosted` if the client meets cretin run
-	time states. We override __precess event below to make that happen.
-	*/
+  __process_event in the base Job class deals with listen for events on
+  current job instances. In order for a validator to start the bidding process,
+  we only care about `JobDescriptionPosted` if the client meets cretin run
+  time states. We override __precess event below to make that happen.
+  */
   static __process_event(name, instanceId, event) {
     try {
       console.log("Processing Event: ", name);
@@ -118,31 +118,31 @@ class JobValidator extends Job {
   // Helpers
   async __checkDisk(size, target) {
     /*
-		This does not account for size on disk(blocks used) vs file size, for
-		larger files this may be an issue.
+    This does not account for size on disk(blocks used) vs file size, for
+    larger files this may be an issue.
 
-		This also not not account for space needed to extract or decrypt
-		operations.
-		*/
+    This also not not account for space needed to extract or decrypt
+    operations.
+    */
 
     return (await checkDiskSpace(target)).free > size;
   }
 
   /*
-	Actions
+  Actions
 
-	The client can initiate actions against the contract as a validator. Most of
-	these result in a action being emitted to the smart contract. 
-	*/
+  The client can initiate actions against the contract as a validator. Most of
+  these result in a action being emitted to the smart contract.
+  */
 
   /*
-	Events
+  Events
 
-	This sections maps events the clients listens for to actionable events.
-	All of the following methods are intended to be called by the
-	`Job.__processEvent` in the `Job` class. See the Events sections in the Job
-	class for more information.
-	*/
+  This sections maps events the clients listens for to actionable events.
+  All of the following methods are intended to be called by the
+  `Job.__processEvent` in the `Job` class. See the Events sections in the Job
+  class for more information.
+  */
 
   async __TestingDatasetShared(event) {
     try {
@@ -164,7 +164,7 @@ class JobValidator extends Job {
 
       //Test the modal and get loss
       const std = await exec(
-        "python3 unsorted/validator_node.py 2> /dev/null | tail -n 1"
+        `python3 unsorted/validator_node.py ${this.downloadPath} 2> /dev/null | tail -n 1`
       );
       //TODO: Check if std returns correct array
       console.log("Python STDOUT: ", std);

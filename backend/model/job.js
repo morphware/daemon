@@ -63,12 +63,12 @@ class Job {
   }
 
   /*
-	Helpers
+  Helpers
 
-	A job/auction ID is not globally unique. Each poster address gets an
-	incremented id, starting at zero. Because of this, we need to track both
-	the job/auction ID and make out own globally unique ID, instanceID 
-	*/
+  A job/auction ID is not globally unique. Each poster address gets an
+  incremented id, starting at zero. Because of this, we need to track both
+  the job/auction ID and make out own globally unique ID, instanceID
+  */
 
   // Id of the auction
   get id() {
@@ -81,11 +81,11 @@ class Job {
   }
 
   /*
-	The job jump table, `Jobs.jobs` holds instances this client is current
-	working with. It allows matching of incoming events to instances. Once the
-	client is done with a job, for any reason, its removed from the jump table.
-	Mapping is `instanceID` => Job instance
-	*/
+  The job jump table, `Jobs.jobs` holds instances this client is current
+  working with. It allows matching of incoming events to instances. Once the
+  client is done with a job, for any reason, its removed from the jump table.
+  Mapping is `instanceID` => Job instance
+  */
 
   static jobs = {};
 
@@ -99,11 +99,11 @@ class Job {
   }
 
   /*
-	Jobs stream
+  Jobs stream
 
-	Hold `streamMaxLength` amount of job events to report to the user so they
-	can see whats going on in the network.
-	*/
+  Hold `streamMaxLength` amount of job events to report to the user so they
+  can see whats going on in the network.
+  */
 
   static streamMaxLength = 50;
 
@@ -116,19 +116,20 @@ class Job {
   }
 
   /*
-	Events
+  Events
 
-	We will listen for all incoming requests for the job and auction contract. 
-	Parse the instanceID, event name and events returnValues out. Using the
-	instanceID we will check the jump table to see if this client is working
-	with the job associated with the incoming event. If we have a match, we grab
-	the correct instance from the jump table call the instanced method for the
-	incoming event
-	*/
+  We will listen for all incoming requests for the job and auction contract.
+  Parse the instanceID, event name and events returnValues out. Using the
+  instanceID we will check the jump table to see if this client is working
+  with the job associated with the incoming event. If we have a match, we grab
+  the correct instance from the jump table call the instanced method for the
+  incoming event
+  */
 
   static events() {
     console.log("Listening for all contract events", this.name);
 
+    // Setting up listeners
     auctionFactoryContract.events.allEvents((error, event) => {
       try {
         return this.__parse_event(event);
@@ -137,6 +138,7 @@ class Job {
       }
     });
 
+    // Setting up listeners
     jobFactoryContract.events.allEvents((error, event) => {
       try {
         return this.__parse_event(event);
@@ -151,16 +153,16 @@ class Job {
     let name = event.event;
 
     /*
-		we want to get to the object that holds `returnValues`. Sometime its in the
-		event, and sometimes there is returnValue in a `events` object.
-		*/
+    we want to get to the object that holds `returnValues`. Sometime its in the
+    event, and sometimes there is returnValue in a `events` object.
+    */
     if (event.events && event.events[name]) {
       event = event.events[name];
     }
 
     /*
-		Some times its .id and sometimes its .auctionId...
-		*/
+    Some times its .id and sometimes its .auctionId...
+    */
     let id = event.returnValues.id || event.returnValues.auctionId;
 
     // Now that we have the ID, we can figure out the instanceID

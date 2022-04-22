@@ -48,17 +48,18 @@ class JobWorker extends Job {
   }
 
   /*
-	this.lock will determine if this client is currently occupied with another
-	another job. We will over ride `addTOJump` and `removeFromJump` to set
-	locking at the correct times.
-	*/
+  this.lock will determine if this client is currently occupied with another
+  another job. We will over ride `addTOJump` and `removeFromJump` to set
+  locking at the correct times.
+  */
 
+  // only one job is allowed to be worked on at a given time. This set to true when a job is being worked on.
   static lock = false;
 
   /*
-		A worker can choose to mine if they are not currently working on a job. 
-		this.childMiner holds the child process if the worker is currently mining  
-	*/
+    A worker can choose to mine if they are not currently working on a job.
+    this.childMiner holds the child process if the worker is currently mining
+  */
 
   static childMiner;
 
@@ -71,7 +72,7 @@ class JobWorker extends Job {
     try {
       super.removeFromJump();
       this.constructor.lock = false;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   // Check to see if the client is ready and willing to take on jobs
@@ -79,6 +80,7 @@ class JobWorker extends Job {
     return conf.role === "Worker" && !this.lock;
   }
 
+  // when there is no modeling running, utilize the global mining command to mine other coins.
   //Create a new process group that starts mining
   static startMining() {
     try {
@@ -125,11 +127,11 @@ class JobWorker extends Job {
   }
 
   /*
-	__process_event in the base Job class deals with listen for events on
-	current job instances. In order for a worker to start the bidding process,
-	we only care about `JobDescriptionPosted` if the client meets certainn run
-	time states. We override __precess event below to make that happen.
-	*/
+  __process_event in the base Job class deals with listen for events on
+  current job instances. In order for a worker to start the bidding process,
+  we only care about `JobDescriptionPosted` if the client meets certainn run
+  time states. We override __precess event below to make that happen.
+  */
   static __process_event(name, instanceId, event) {
     try {
       // If tracking this job and its been approved
@@ -183,22 +185,22 @@ class JobWorker extends Job {
   // Helpers
   async __checkDisk(size, target) {
     /*
-		This does not account for size on disk(blocks used) vs file size, for
-		larger files this may be an issue.
+    This does not account for size on disk(blocks used) vs file size, for
+    larger files this may be an issue.
 
-		This also not not account for space needed to extract or decrypt
-		operations.
-		*/
+    This also not not account for space needed to extract or decrypt
+    operations.
+    */
 
     return (await checkDiskSpace(target)).free > size;
   }
 
   /*
-	Actions
+  Actions
 
-	The client can initiate actions against the contract as a worker. Most of
-	these result in a action being emitted to the smart contract. 
-	*/
+  The client can initiate actions against the contract as a worker. Most of
+  these result in a action being emitted to the smart contract.
+  */
 
   async bid() {
     try {
@@ -335,13 +337,13 @@ class JobWorker extends Job {
   }
 
   /*
-	Events
+  Events
 
-	This sections maps events the clients listens for to actionable events.
-	All of the following methods are intended to be called by the
-	`Job.__processEvent` in the `Job` class. See the Events sections in the Job
-	class for more information.
-	*/
+  This sections maps events the clients listens for to actionable events.
+  All of the following methods are intended to be called by the
+  `Job.__processEvent` in the `Job` class. See the Events sections in the Job
+  class for more information.
+  */
 
   async __JobDescriptionPosted(event) {
     // This is prefixed with '__' so its not auto called by Job.events and
@@ -350,13 +352,13 @@ class JobWorker extends Job {
     try {
       // Confirm we have enough free space to perform the job
       /*			if(!await this.__checkDisk(this.trainingDatasetSize, conf.appDownloadPath)){
-				console.info('Not enough free disk space, passing');
+        console.info('Not enough free disk space, passing');
 
-				// Drop this instance instance from the jump table
-				this.removeFromJump();
+        // Drop this instance instance from the jump table
+        this.removeFromJump();
 
-				return false;
-			}*/
+        return false;
+      }*/
 
       var now = new Date().getTime();
       var revealDeadline = parseInt(this.jobData.revealDeadline);

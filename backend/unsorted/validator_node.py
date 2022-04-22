@@ -3,8 +3,15 @@
 
 # In[1]:
 
-import tensorflow as     tf
-from   tensorflow import keras
+import tensorflow as tf
+from tensorflow import keras
+import sys
+import glob
+
+
+download_path = str(sys.argv[1])
+print(download_path)
+print(glob.glob(download_path))
 
 
 # In[2]:
@@ -16,23 +23,26 @@ fashion_mnist = keras.datasets.fashion_mnist
 # In[3]:
 
 
-validation_set_size     = 5000
+validation_set_size = 5000
 maximum_pixel_intensity = 255.0
 
 
 # In[4]:
 
 
-X_valid, X_train = X_train_full[:validation_set_size] / maximum_pixel_intensity, X_train_full[validation_set_size:] / maximum_pixel_intensity
+X_valid, X_train = (
+    X_train_full[:validation_set_size] / maximum_pixel_intensity,
+    X_train_full[validation_set_size:] / maximum_pixel_intensity,
+)
 y_valid, y_train = y_train_full[:validation_set_size], y_train_full[validation_set_size:]
-X_test           = X_test / maximum_pixel_intensity
+X_test = X_test / maximum_pixel_intensity
 
 
 # In[5]:
 
-
+# this.downloadPath = `${conf.appDownloadPath}${this.jobData.jobPoster}/${this.id}`;
 # TODO Prepend the downloads directory and the broader path to this filename.
-infile_pathname  = 'unsorted/uploads/trainedModels/trained_model.h5'
+infile_pathname = "unsorted/uploads/trainedModels/trained_model.h5"
 model = keras.models.load_model(infile_pathname)
 
 
@@ -52,17 +62,7 @@ print(fn())
 # In[ ]:
 
 
-
-
-
 # In[ ]:
 
 
-
-
-
 # In[ ]:
-
-
-
-

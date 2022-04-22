@@ -18,7 +18,7 @@ Windows installers, DEB and RPM packages.
 
 This is a *mono repo* containing the front end React project for the UI, the
 back end express.js project for the business logic and the electron project we
-use mostly as a multi platform build system. Here is a general overview of the 
+use mostly as a multi platform build system. Here is a general overview of the
 files and folders:
 
 * daemon - *project root*
@@ -106,11 +106,11 @@ would like to allow all conf options to be set via the CLI.
 > node devRun.js "--help"
 
   Usage: devRun.js [options] [command]
-  
+
   Commands:
     help     Display help
     version  Display version
-  
+
   Options:
     -A, --appDataPath  Path where local data is held
     -e, --electronDev  Load chrome dev tools
@@ -123,3 +123,40 @@ would like to allow all conf options to be set via the CLI.
 
 ```
 
+## Examples:
+
+To start as a poster
+```bash
+npm run dev -- -r Poster -h 3050 -p 5a9d1c7444c0548431e68d83d5a2e4818cf940322a419bc490a3de05650fc9ff
+```
+
+To start as a worker
+```bash
+npm run dev -- -r Worker -h 3008 -p 82835eb03485554b79a0b3888b82a95a529019c66c2067b8ebf355c436988958
+```
+
+To start as a validator
+```bash
+npm run dev -- -r Validator -t 3034 -h 3010 -p cc5fb6d661b791851ad5cbbd9ca1611fd131acc03f1a66e03076d32c315cae72 -v 0
+```
+
+Running headlessly:
+poster
+```
+npm run dev -- -r "Poster" -p 5a9d1c7444c0548431e68d83d5a2e4818cf940322a419bc490a3de05650fc9ff
+```
+worker
+```
+npm run dev -- -r "Worker" -t 3034 -h 3008 -p cc5fb6d661b791851ad5cbbd9ca1611fd131acc03f1a66e03076d32c315cae72
+```
+validator0
+```
+npm run dev -- -r "Validator" -v 0 -t 3035 -h 3010 -p 82835eb03485554b79a0b3888b82a95a529019c66c2067b8ebf355c436988958
+```
+validator1
+```
+npm run dev -- -r "Validator" -v 1 -t 3036 -h 3010 -p 0b8ac89108a351036e5786dcdad47f78ce70d74a4bba48587df41d8967d05712
+```
+
+
+When a job is being worked on by the worker node or validated by the validator node, a new virtual env is created. We read the import statements in the ipython notebook and install the packages on the fly.
