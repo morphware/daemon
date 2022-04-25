@@ -37,6 +37,7 @@ const AuctionsTable = () => {
   const activeJobs = activeJobsResponse
     ? Object.values(activeJobsResponse.jobs)
     : [];
+
   const activeJobsFiltered = activeJobs.map((job) => {
     return {
       jobID: job.id,
@@ -47,6 +48,7 @@ const AuctionsTable = () => {
       wallet: job.wallet,
     };
   });
+
   const sortedJobs = activeJobsFiltered.sort(
     sortByProperty(sortBy, sortDirection === SortDirection.ASC ? 1 : -1)
   );
@@ -81,7 +83,7 @@ const AuctionsTable = () => {
   };
 
   const mwtRenderer = ({ cellData }: any) => {
-    const convertedMWT = Web3.utils.fromWei(cellData, "ether");
+    const convertedMWT = Web3.utils.fromWei(cellData.toString(), "ether");
     if (cellData == null)
       return (
         <span className="dib o-40 no-select" style={{ width: "100%" }}>
