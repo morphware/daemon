@@ -212,15 +212,16 @@ class JobWorker extends Job {
       console.log("BiddingAmount: ", biddingAmount);
 
       let approveReceipt = await this.wallet.approve(
+        conf.auctionFactoryContractAddress,
         percentHelper(this.jobData.workerReward, 100)
       );
 
       this.bidData = {
-        // bidAmount: percentHelper(this.jobData.workerReward, 25), // How do we figure out the correct bid?
-        bidAmount: biddingAmount, // How do we figure out the correct bid?
-        fakeBid: false, // How do we know when to fake bid?
+        bidAmount: biddingAmount,
+        fakeBid: false,
         secret: `0x${crypto.randomBytes(32).toString("hex")}`,
       };
+
       console.log("bidding data", this.bidData, this.instanceId);
 
       let action = this.auctionContract.methods.bid(
