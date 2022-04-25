@@ -71,12 +71,17 @@ class MorphwareWallet {
     }
   }
 
-  async approve(amount, gas) {
+  async approve(address, amount, gas) {
     try {
-      let action = this.contract.methods.approve(
-        conf.auctionFactoryContractAddress,
-        amount
-      );
+      if (!web3.utils.isAddress(address)) {
+        throw "Invalid address provided";
+      }
+
+      if (Number.isNaN(Number(amount))) {
+        throw "Invalid amount provided";
+      }
+
+      let action = this.contract.methods.approve(address, amount);
 
       let receipt = await action.send({
         gas: gas || (await action.estimateGas()),
