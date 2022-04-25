@@ -212,15 +212,16 @@ class JobWorker extends Job {
       console.log("BiddingAmount: ", biddingAmount);
 
       let approveReceipt = await this.wallet.approve(
+        conf.auctionFactoryContractAddress,
         percentHelper(this.jobData.workerReward, 100)
       );
 
       this.bidData = {
-        // bidAmount: percentHelper(this.jobData.workerReward, 25), // How do we figure out the correct bid?
-        bidAmount: biddingAmount, // How do we figure out the correct bid?
-        fakeBid: false, // How do we know when to fake bid?
+        bidAmount: biddingAmount,
+        fakeBid: false,
         secret: `0x${crypto.randomBytes(32).toString("hex")}`,
       };
+
       console.log("bidding data", this.bidData, this.instanceId);
 
       let action = this.auctionContract.methods.bid(
@@ -261,9 +262,9 @@ class JobWorker extends Job {
       let action = this.auctionContract.methods.reveal(
         this.jobData.jobPoster,
         parseInt(this.id),
-        [this.bidData.bidAmount],
-        [this.bidData.fakeBid],
-        [this.bidData.secret]
+        this.bidData.bidAmount,
+        this.bidData.fakeBid,
+        this.bidData.secret
       );
 
       let receipt = await action.send({
@@ -361,8 +362,8 @@ class JobWorker extends Job {
       var now = new Date().getTime();
       var revealDeadline = parseInt(this.jobData.revealDeadline);
 
-      //Reveal 3 mins before reveal deadline
-      var revealTime = revealDeadline * 1000 - 3 * 60 * 1000;
+      //Reveal 80 seconds before reveal deadline
+      var revealTime = revealDeadline * 1000 - 80 * 1000;
       var revealInMS = revealTime - now;
 
       var revealDeadline = new Date(revealTime).toLocaleTimeString();

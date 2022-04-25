@@ -188,44 +188,31 @@ class JobPoster extends Job {
   // Create a new job
   async post() {
     try {
-      // Transfer funds for the contract to hold in escrow
-      let transfer = await this.wallet.send(
+      // Approve funds for the contract to hold in escrow
+      let approve = await this.wallet.approve(
         conf.auctionFactoryContractAddress,
         this.postData.workerReward
       );
 
       // Hold the transaction for history
-      this.transactions.push({ ...transfer, event: "transfer" });
+      this.transactions.push({ ...approve, event: "approve" });
 
       // Seed files
       this.__parsePostFile(this.postData);
-
-      // Calculate the auction timing
-      // This is a hack to deal with block timing. All timing will be
-      // reworked soon and this is the last we will speak of it...
-
-      let buffer = 180;
-      let revealTime = 120 + buffer + buffer;
-
-      var now = new Date().getTime();
-      let biddingDeadline =
-        now + parseInt(parseInt(this.postData.biddingTime) + buffer) * 1000;
-      let revealDeadline =
-        now + parseInt(parseInt(this.postData.biddingTime) + revealTime) * 1000;
 
       let trainingDatasetSize = await this.__getFileSize(
         this.postData.trainingData
       );
 
+      console.log("Posting Job");
       // Post the new job
       let action = this.jobContract.methods.postJobDescription(
         parseInt(this.postData.trainingTime),
         parseInt(trainingDatasetSize),
         parseInt(this.postData.errorRate),
         percentHelper(this.postData.workerReward, 10),
-        parseInt(biddingDeadline / 1000),
-        parseInt(revealDeadline / 1000),
-        this.postData.workerReward.toString()
+        this.postData.workerReward.toString(),
+        1
       );
 
       await action.send({
@@ -316,7 +303,8 @@ class JobPoster extends Job {
       let action = this.jobContract.methods.shareTestingDataset(
         this.id,
         this.files.trainedModel.magnetURI,
-        this.postData.files.testingData.magnetURI
+        this.postData.files.testingData.magnetURI,
+        this.postData.files.jupyterNotebook.magnetURI
       );
 
       let receipt = await action.send({
@@ -399,10 +387,6 @@ class JobPoster extends Job {
   async TrainedModelShared(event) {
     try {
       console.log("TrainedModelShared Event: ", event);
-
-      console.log("Return Values --------");
-
-      console.log(event.returnValues);
 
       this.files.trainedModel = {
         magnetURI: event.returnValues.trainedModelMagnetLink,

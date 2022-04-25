@@ -8,7 +8,7 @@
       },
       {
         "internalType": "address",
-        "name": "auctionAddress",
+        "name": "_auctionAddress",
         "type": "address"
       }
     ],
@@ -23,12 +23,6 @@
         "internalType": "address",
         "name": "jobPoster",
         "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
       },
       {
         "indexed": true,
@@ -47,6 +41,12 @@
         "internalType": "string",
         "name": "trainedModelMagnetLink",
         "type": "string"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
       }
     ],
     "name": "JobApproved",
@@ -63,9 +63,15 @@
       },
       {
         "indexed": false,
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
+        "internalType": "uint16",
+        "name": "estimatedTrainingTime",
+        "type": "uint16"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "trainingDatasetSize",
+        "type": "uint64"
       },
       {
         "indexed": false,
@@ -75,15 +81,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint16",
-        "name": "estimatedTrainingTime",
-        "type": "uint16"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint32",
-        "name": "trainingDatasetSize",
-        "type": "uint32"
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -102,6 +102,12 @@
         "internalType": "uint256",
         "name": "revealDeadline",
         "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "clientVersion",
+        "type": "uint64"
       }
     ],
     "name": "JobDescriptionPosted",
@@ -115,6 +121,12 @@
         "internalType": "address",
         "name": "jobPoster",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "targetErrorRate",
+        "type": "uint64"
       },
       {
         "indexed": true,
@@ -136,9 +148,9 @@
       },
       {
         "indexed": false,
-        "internalType": "uint64",
-        "name": "targetErrorRate",
-        "type": "uint64"
+        "internalType": "string",
+        "name": "untrainedModelMagnetLink",
+        "type": "string"
       }
     ],
     "name": "TestingDatasetShared",
@@ -154,10 +166,10 @@
         "type": "address"
       },
       {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "trainingErrorRate",
+        "type": "uint64"
       },
       {
         "indexed": true,
@@ -166,16 +178,16 @@
         "type": "address"
       },
       {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
         "indexed": false,
         "internalType": "string",
         "name": "trainedModelMagnetLink",
         "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint64",
-        "name": "trainingErrorRate",
-        "type": "uint64"
       }
     ],
     "name": "TrainedModelShared",
@@ -191,16 +203,22 @@
         "type": "address"
       },
       {
-        "indexed": true,
-        "internalType": "uint256",
-        "name": "id",
-        "type": "uint256"
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "targetErrorRate",
+        "type": "uint64"
       },
       {
         "indexed": true,
         "internalType": "address",
         "name": "workerNode",
         "type": "address"
+      },
+      {
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
       },
       {
         "indexed": false,
@@ -213,12 +231,6 @@
         "internalType": "string",
         "name": "trainingDatasetMagnetLink",
         "type": "string"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint64",
-        "name": "targetErrorRate",
-        "type": "uint64"
       }
     ],
     "name": "UntrainedModelAndTrainingDatasetShared",
@@ -268,9 +280,9 @@
         "type": "uint256"
       },
       {
-        "internalType": "enum JobFactory.Status",
-        "name": "status",
-        "type": "uint8"
+        "internalType": "address",
+        "name": "workerNode",
+        "type": "address"
       },
       {
         "internalType": "uint64",
@@ -278,9 +290,14 @@
         "type": "uint64"
       },
       {
-        "internalType": "address",
-        "name": "workerNode",
-        "type": "address"
+        "internalType": "enum JobFactory.Status",
+        "name": "status",
+        "type": "uint8"
+      },
+      {
+        "internalType": "uint64",
+        "name": "clientVersion",
+        "type": "uint64"
       }
     ],
     "stateMutability": "view",
@@ -294,9 +311,9 @@
         "type": "uint16"
       },
       {
-        "internalType": "uint32",
+        "internalType": "uint64",
         "name": "_trainingDatasetSize",
-        "type": "uint32"
+        "type": "uint64"
       },
       {
         "internalType": "uint64",
@@ -310,18 +327,13 @@
       },
       {
         "internalType": "uint256",
-        "name": "_biddingDeadline",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_revealDeadline",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
         "name": "_workerReward",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint64",
+        "name": "_clientVersion",
+        "type": "uint64"
       }
     ],
     "name": "postJobDescription",
@@ -344,6 +356,11 @@
       {
         "internalType": "string",
         "name": "_testingDatasetMagnetLink",
+        "type": "string"
+      },
+      {
+        "internalType": "string",
+        "name": "_untrainedModelMagnetLink",
         "type": "string"
       }
     ],
