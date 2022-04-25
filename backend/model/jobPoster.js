@@ -193,9 +193,6 @@ class JobPoster extends Job {
         conf.auctionFactoryContractAddress,
         this.postData.workerReward
       );
-      // let reciept = await approve.wait();
-      // console.log("Approved the allowance");
-      // console.log(reciept);
 
       // Hold the transaction for history
       this.transactions.push({ ...approve, event: "approve" });
@@ -306,7 +303,8 @@ class JobPoster extends Job {
       let action = this.jobContract.methods.shareTestingDataset(
         this.id,
         this.files.trainedModel.magnetURI,
-        this.postData.files.testingData.magnetURI
+        this.postData.files.testingData.magnetURI,
+        this.postData.files.jupyterNotebook.magnetURI
       );
 
       let receipt = await action.send({
@@ -389,10 +387,6 @@ class JobPoster extends Job {
   async TrainedModelShared(event) {
     try {
       console.log("TrainedModelShared Event: ", event);
-
-      console.log("Return Values --------");
-
-      console.log(event.returnValues);
 
       this.files.trainedModel = {
         magnetURI: event.returnValues.trainedModelMagnetLink,

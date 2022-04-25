@@ -158,7 +158,8 @@ class JobValidator extends Job {
       let downloads = await webtorrent().downloadAll(
         this.downloadPath,
         event.returnValues.trainedModelMagnetLink,
-        event.returnValues.testingDatasetMagnetLink
+        event.returnValues.testingDatasetMagnetLink,
+        event.returnValues.untrainedModelMagnetLink
       );
       console.log("Downloads", downloads);
 
