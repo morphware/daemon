@@ -1,17 +1,18 @@
 module.exports = {
-  morphwareTokenABIPath: "MorphwareToken-RopstenABI",
-  morphwareTokenContractAddress: "0xbc40e97e6d665ce77e784349293d716b030711bc",
+  // https://mumbai.polygonscan.com/address/0xf82Ee83CC92b35873Ea5859BD7b5b7D4aFCad279#code
+  morphwareTokenABIPath: "MorphwareToken-PolygonMumbaiABI",
+  morphwareTokenContractAddress: "0xf82Ee83CC92b35873Ea5859BD7b5b7D4aFCad279",
 
-  // https://ropsten.etherscan.io/address/0x78e211873D367D0810F85D817a28f989cB44E168#code
-  auctionFactoryABIPath: "VickreyAuction-RopstenABI",
-  auctionFactoryContractAddress: "0x78e211873D367D0810F85D817a28f989cB44E168",
+  // https://mumbai.polygonscan.com/address/0xa32f1A4379972CDeBEfc554Dd045C13b4f377233#code
+  auctionFactoryABIPath: "VickreyAuction-PolygonMumbaiABI",
+  auctionFactoryContractAddress: "0xa32f1A4379972CDeBEfc554Dd045C13b4f377233",
 
-  // https://ropsten.etherscan.io/address/0xb0f1F97720790788CD3da27651d2939d55104533#code
-  jobFactoryAbiPath: "JobFactory-RopstenABI",
-  jobFactoryContractAddress: "0xb0f1F97720790788CD3da27651d2939d55104533",
+  // https://mumbai.polygonscan.com/address/0x044C2d8D3AaAc920cdC68344017ddc1fa031900f#code
+  jobFactoryAbiPath: "JobFactory-PolygonMumbaiABI",
+  jobFactoryContractAddress: "0x044C2d8D3AaAc920cdC68344017ddc1fa031900f",
 
-  ethAddress: "wss://ropsten.infura.io/ws/v3/dc53ba9a23564600bfbe5f8c2f345d1d",
-  // ethAddress: 'wss://geth.vm42.us',
+  ethAddress:
+    "wss://polygon-mumbai.g.alchemy.com/v2/NKFS1ombIWCMj0c91yL2XBUQwbBm3dRr",
 
   // Turn on chrome dev tools from electron app.
   electronDev: true,
