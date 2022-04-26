@@ -254,7 +254,7 @@ class JobWorker extends Job {
   async reveal() {
     try {
       console.info(
-        "Revealing on",
+        "Revealing now on",
         this.instanceId,
         new Date().toLocaleString()
       );
@@ -362,8 +362,8 @@ class JobWorker extends Job {
       var now = new Date().getTime();
       var revealDeadline = parseInt(this.jobData.revealDeadline);
 
-      //Reveal 80 seconds before reveal deadline
-      var revealTime = revealDeadline * 1000 - 80 * 1000;
+      //Reveal 4 minutes before reveal deadline
+      var revealTime = revealDeadline * 1000 - 4 * 60 * 1000;
       var revealInMS = revealTime - now;
 
       var revealDeadline = new Date(revealTime).toLocaleTimeString();
