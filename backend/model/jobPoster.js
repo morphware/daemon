@@ -130,7 +130,6 @@ class JobPoster extends Job {
 	time states. We override __precess event below to make that happen.
 	*/
   static __process_event(name, instanceId, event) {
-    console.log("poster tryCatch ");
     try {
       //Getting confirmation of a job that this wallet just posted
       if (
@@ -138,6 +137,7 @@ class JobPoster extends Job {
         event.returnValues.jobPoster === wallet.address &&
         this.preConfirmedJobs.length > 0
       ) {
+        //TODO Move this to a function
         //Find the job from preConfirmed
         let job = this.preConfirmedJobs.shift();
 
@@ -204,7 +204,6 @@ class JobPoster extends Job {
         this.postData.trainingData
       );
 
-      console.log("Posting Job");
       // Post the new job
       let action = this.jobContract.methods.postJobDescription(
         parseInt(this.postData.trainingTime),
@@ -250,7 +249,6 @@ class JobPoster extends Job {
           );
 
           let receipt = await action.send({
-            // gas: await action.estimateGas()
             gas: parseInt(parseInt(await action.estimateGas()) * 2),
           });
 
@@ -278,7 +276,6 @@ class JobPoster extends Job {
         );
 
       let receipt = await action.send({
-        // gas: await action.estimateGas()
         gas: parseInt(parseInt(await action.estimateGas()) * 2),
       });
 

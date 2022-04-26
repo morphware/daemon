@@ -76,13 +76,12 @@ class JobValidator extends Job {
 	*/
   static __process_event(name, instanceId, event) {
     try {
-      console.log("Processing Event: ", name);
-
       this.canValidate(instanceId);
 
       // Check to see if job is already tracked by this client
       if (Object.keys(Job.jobs).includes(instanceId)) return;
 
+      //TODO Move into its own function
       if (name === "TestingDatasetShared") {
         // Check to see if this client is accepting work
         if (!this.canValidate(instanceId)) return;
@@ -161,7 +160,6 @@ class JobValidator extends Job {
         event.returnValues.testingDatasetMagnetLink,
         event.returnValues.untrainedModelMagnetLink
       );
-      console.log("Downloads", downloads);
 
       //Test the modal and get loss
       const std = await exec(
@@ -201,8 +199,6 @@ class JobValidator extends Job {
         let receipt = await action.send({
           gas: await action.estimateGas(),
         });
-
-        console.log("receipt: ", receipt);
       } else {
         throw `This model isn't accurate enough. Error is ${error} Maximum Allowable Error is ${maximumAllowableError}`;
       }

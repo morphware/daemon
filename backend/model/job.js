@@ -91,7 +91,6 @@ class Job {
 
   addToJump() {
     this.constructor.jobs[this.instanceId] = this;
-    console.log("THE JUMP TABLE: ", this.constructor.jobs);
   }
 
   removeFromJump() {
@@ -127,8 +126,6 @@ class Job {
 	*/
 
   static events() {
-    console.log("Listening for all contract events", this.name);
-
     auctionFactoryContract.events.allEvents((error, event) => {
       try {
         return this.__parse_event(event);
@@ -174,10 +171,6 @@ class Job {
   // when an event is required to kick off the creation of a new local
   // instance.
   static __process_event(name, instanceId, event) {
-    console.info(
-      `Event ${name}, ${instanceId} on ${new Date().toLocaleString()}`
-    );
-
     // Check to see if we are tracking the job tied to this event
     if (Object.keys(this.jobs).includes(instanceId)) {
       // Get the correct job instance from the job jump table
