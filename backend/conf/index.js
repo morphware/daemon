@@ -92,8 +92,6 @@ var runtimeConf = args.parse(process.argv, {
   },
 });
 
-console.log("Runtime Conf: ", runtimeConf);
-
 // Include the current version
 runtimeConf.version = packageJSON.version;
 
@@ -103,13 +101,11 @@ const environment =
 
 // Grab the base conf, we will need it for the rest of the file
 var baseConf = load("./base", true);
-console.log("BaseConf: ", baseConf);
 
 // Set the correct local data path based platform
 if (!runtimeConf.appDataPath) {
   switch (process.platform) {
     case "linux":
-      console.log("");
       runtimeConf.appDataPath = `${process.env.HOME}/.local/share/`;
       break;
     case "darwin":
@@ -126,8 +122,6 @@ runtimeConf.appDataPath += `${baseConf.appName}${
   environment === "production" ? "" : "-" + environment
 }/`;
 runtimeConf.appDataLocal = `${runtimeConf.appDataPath}local.json`;
-
-console.log("runtimeConf: ", runtimeConf);
 
 // Create the `appDataPath` if it doesnt exist
 fs.ensureDirSync(runtimeConf.appDataPath);
@@ -158,11 +152,5 @@ var conf = extend(
   runtimeConf, // Settings applied at runtime trump all!
   { environment }
 );
-
-console.log("Base Conf: ", baseConf);
-console.log("Env Conf: ", load(`./${environment}`));
-console.log("Local Conf: ", localConf);
-console.log("Runtime Conf", runtimeConf);
-console.log("Final Conf: ", conf);
 
 module.exports = { conf, localConf, editLocalConf };

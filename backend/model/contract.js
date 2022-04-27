@@ -18,7 +18,7 @@ function percentHelper(input, percent) {
 }
 
 web3.currentProvider.on("connect", function (...args) {
-  console.log("connect", args, arguments);
+  console.log("Connected to Websocket Provider");
 });
 web3.currentProvider.on("disconnect", function () {
   console.log("disconnect", arguments);
