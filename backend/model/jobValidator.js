@@ -65,12 +65,6 @@ class JobValidator extends Job {
     const jobNumber = parseInt(instanceId.split(":")[1]);
     const shouldValidate =
       jobNumber % conf.validationNodes === conf.validatorId;
-    console.log(shouldValidate);
-    console.log(conf.role === "Validator");
-    console.log(!this.lock);
-    console.log(name === "TestingDatasetShared");
-    console.log(jobNumber);
-    console.log(name);
     return (
       name === "TestingDatasetShared" &&
       conf.role === "Validator" &&
@@ -122,7 +116,6 @@ class JobValidator extends Job {
   async downloadAndTestModel(event) {
     try {
       let job = event.returnValues;
-      console.log("Job: ", job);
 
       this.downloadPath = `${conf.appDownloadPath}${this.jobData.jobPoster}/${this.id}`;
 
@@ -197,18 +190,6 @@ class JobValidator extends Job {
     try {
       // Display for auction times
       console.log("New Validation job found", new Date().toLocaleString());
-
-      console.log("JobData: ", this.jobData);
-
-      console.info("Error Rate", event.returnValues.targetErrorRate);
-      console.info(
-        "Trained Model Magnet URI",
-        event.returnValues.trainedModelMagnetLink
-      );
-      console.info(
-        "Testing Dataset Magnet URI",
-        event.returnValues.testingDatasetMagnetLink
-      );
 
       this.addToJump();
       this.transactions.push(event);
