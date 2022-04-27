@@ -61,11 +61,16 @@ class JobValidator extends Job {
   }
 
   // Check to see if the client is ready and willing to take on jobs
-  static canValidate(instanceId) {
+  static canValidate(name, instanceId) {
     const jobNumber = parseInt(instanceId.split(":")[1]);
     const shouldValidate =
       jobNumber % conf.validationNodes === conf.validatorId;
-    return conf.role === "Validator" && !this.lock && shouldValidate;
+    return (
+      name === "TestingDatasetShared" &&
+      conf.role === "Validator" &&
+      !this.lock &&
+      shouldValidate
+    );
   }
 
   /*
@@ -76,36 +81,11 @@ class JobValidator extends Job {
 	*/
   static __process_event(name, instanceId, event) {
     try {
-      this.canValidate(instanceId);
-
       // Check to see if job is already tracked by this client
       if (Object.keys(Job.jobs).includes(instanceId)) return;
 
-      //TODO Move into its own function
-      if (name === "TestingDatasetShared") {
-        // Check to see if this client is accepting work
-        if (!this.canValidate(instanceId)) return;
-
-        // Make the job instance
+      if (canValidate(name, instanceId)) {
         let job = new this(wallet, event.returnValues);
-
-        // Display for auction times
-        console.log("New Validation job found", new Date().toLocaleString());
-
-        console.log("JobData: ", this.jobData);
-
-        console.info("Error Rate", event.returnValues.targetErrorRate);
-        console.info(
-          "Trained Model Magnet URI",
-          event.returnValues.trainedModelMagnetLink
-        );
-        console.info(
-          "Testing Dataset Magnet URI",
-          event.returnValues.testingDatasetMagnetLink
-        );
-
-        job.addToJump();
-        job.transactions.push(event);
         job.__TestingDatasetShared(event);
       }
     } catch (error) {
@@ -134,16 +114,7 @@ class JobValidator extends Job {
 	these result in a action being emitted to the smart contract. 
 	*/
 
-  /*
-	Events
-
-	This sections maps events the clients listens for to actionable events.
-	All of the following methods are intended to be called by the
-	`Job.__processEvent` in the `Job` class. See the Events sections in the Job
-	class for more information.
-	*/
-
-  async __TestingDatasetShared(event) {
+  async downloadAndTrainModel(event) {
     try {
       let job = event.returnValues;
       console.log("Job: ", job);
@@ -154,7 +125,7 @@ class JobValidator extends Job {
       fs.ensureDirSync(this.downloadPath);
 
       // Download the shared files
-      let downloads = await webtorrent().downloadAll(
+      await webtorrent().downloadAll(
         this.downloadPath,
         event.returnValues.trainedModelMagnetLink,
         event.returnValues.testingDatasetMagnetLink,
@@ -165,7 +136,7 @@ class JobValidator extends Job {
       const std = await exec(
         "python3 unsorted/validator_node.py 2> /dev/null | tail -n 1"
       );
-      //TODO: Check if std returns correct array
+
       console.log("Python STDOUT: ", std);
 
       let retVal = std.out[0].slice(0, -1);
@@ -202,6 +173,41 @@ class JobValidator extends Job {
       } else {
         throw `This model isn't accurate enough. Error is ${error} Maximum Allowable Error is ${maximumAllowableError}`;
       }
+    } catch (error) {
+      // this.removeFromJump();
+      console.error(`ERROR!!! JobValidator __JobDescriptionPosted`, error);
+    }
+  }
+
+  /*
+	Events
+
+	This sections maps events the clients listens for to actionable events.
+	All of the following methods are intended to be called by the
+	`Job.__processEvent` in the `Job` class. See the Events sections in the Job
+	class for more information.
+	*/
+
+  async __TestingDatasetShared(event) {
+    try {
+      // Display for auction times
+      console.log("New Validation job found", new Date().toLocaleString());
+
+      console.log("JobData: ", this.jobData);
+
+      console.info("Error Rate", event.returnValues.targetErrorRate);
+      console.info(
+        "Trained Model Magnet URI",
+        event.returnValues.trainedModelMagnetLink
+      );
+      console.info(
+        "Testing Dataset Magnet URI",
+        event.returnValues.testingDatasetMagnetLink
+      );
+
+      this.addToJump();
+      this.transactions.push(event);
+      this.downloadAndTrainModel(event);
     } catch (error) {
       // this.removeFromJump();
       console.error(`ERROR!!! JobValidator __JobDescriptionPosted`, error);
