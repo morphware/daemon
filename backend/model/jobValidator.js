@@ -65,6 +65,12 @@ class JobValidator extends Job {
     const jobNumber = parseInt(instanceId.split(":")[1]);
     const shouldValidate =
       jobNumber % conf.validationNodes === conf.validatorId;
+    console.log(shouldValidate);
+    console.log(conf.role === "Validator");
+    console.log(!this.lock);
+    console.log(name === "TestingDatasetShared");
+    console.log(jobNumber);
+    console.log(name);
     return (
       name === "TestingDatasetShared" &&
       conf.role === "Validator" &&
@@ -84,12 +90,11 @@ class JobValidator extends Job {
       // Check to see if job is already tracked by this client
       if (Object.keys(Job.jobs).includes(instanceId)) return;
 
-      if (canValidate(name, instanceId)) {
+      if (JobValidator.canValidate(name, instanceId)) {
         let job = new this(wallet, event.returnValues);
         job.__TestingDatasetShared(event);
       }
     } catch (error) {
-      this.removeFromJump();
       console.error(`ERROR JobValidator __process_event`, error);
     }
   }
@@ -114,7 +119,7 @@ class JobValidator extends Job {
 	these result in a action being emitted to the smart contract. 
 	*/
 
-  async downloadAndTrainModel(event) {
+  async downloadAndTestModel(event) {
     try {
       let job = event.returnValues;
       console.log("Job: ", job);
@@ -207,7 +212,7 @@ class JobValidator extends Job {
 
       this.addToJump();
       this.transactions.push(event);
-      this.downloadAndTrainModel(event);
+      this.downloadAndTestModel(event);
     } catch (error) {
       // this.removeFromJump();
       console.error(`ERROR!!! JobValidator __JobDescriptionPosted`, error);
