@@ -16,14 +16,6 @@ const {
 } = require("./notebook");
 const { calculateBid } = require("../pricingUtils");
 
-(async function () {
-  try {
-    console.log("pwd");
-  } catch (error) {
-    console.error("here error", error);
-  }
-})();
-
 /*
 JobWorker extends the common functions of Job class and is responsible for
 handling functionality a worker node needs.
