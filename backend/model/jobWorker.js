@@ -63,7 +63,7 @@ class JobWorker extends Job {
     try {
       super.removeFromJump();
       this.constructor.lock = false;
-    } catch (error) { }
+    } catch (error) {}
   }
 
   // Check to see if the client is ready and willing to take on jobs
@@ -440,10 +440,10 @@ class JobWorker extends Job {
       let pythonPathname;
 
       for (let download of downloads) {
-        if (download.dn.slice(-5) == "ipynb") {
+        if (download.dn.slice(-6) == ".ipynb") {
           jupyterNotebookPathname = download.path + "/" + download.dn;
           pythonPathname = jupyterNotebookPathname.slice(0, -5).concat("py");
-        } else if (download.dn.slice(-2) == "py") {
+        } else if (download.dn.slice(-3) == ".py") {
           pythonPathname = download.path + "/" + download.dn;
         } else {
           //TODO: Unzip if needed
@@ -458,18 +458,16 @@ class JobWorker extends Job {
         await exec("jupyter nbconvert --to script", jupyterNotebookPathname);
       }
 
-      await installNotebookDependencies(
-        pythonPathname
-      );
+      await installNotebookDependencies(pythonPathname);
 
       await updateNotebookMorphwareTerms(
         pythonPathname,
         this.downloadPath + "/"
       );
 
-      await exec("python3", pythonPathname, 'morphware_train');
+      await exec("python3", pythonPathname, "morphware_train");
 
-      this.trainedModelPath = this.downloadPath + "/" + 'trained_model.pkl';
+      this.trainedModelPath = this.downloadPath + "/" + "trained_model.pkl";
 
       this.shareTrainedModel();
 
