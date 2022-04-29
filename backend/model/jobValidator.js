@@ -1,5 +1,5 @@
 "use strict";
-
+const { fileExtensionExtractor, filenameExtractor } = require("./../utils/files")
 const fs = require("fs-extra");
 const checkDiskSpace = require("check-disk-space").default;
 
@@ -8,6 +8,10 @@ const webtorrent = require("../controller/torrent");
 const { wallet } = require("./morphware");
 const { Job } = require("./job");
 const { exec } = require("./python");
+const {
+  installNotebookDependencies,
+  updateNotebookMorphwareTerms,
+} = require("./notebook");
 
 /*
 JobValidator extends the common functions of Job class and is responsible for
