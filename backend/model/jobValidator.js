@@ -9,14 +9,6 @@ const { wallet } = require("./morphware");
 const { Job } = require("./job");
 const { exec } = require("./python");
 
-(async function () {
-  try {
-    console.log(await exec("python3"));
-  } catch (error) {
-    console.error("here error", error);
-  }
-})();
-
 /*
 JobValidator extends the common functions of Job class and is responsible for
 handling functionality a validator node needs.
@@ -41,10 +33,10 @@ class JobValidator extends Job {
   }
 
   /*
-	this.lock will determine if this client is currently occupied with another
-	another job. We will over ride `addTOJump` and `removeFromJump` to set
-	locking at the correct times.
-	*/
+  this.lock will determine if this client is currently occupied with another
+  another job. We will over ride `addTOJump` and `removeFromJump` to set
+  locking at the correct times.
+  */
 
   static lock = false;
 
@@ -57,7 +49,7 @@ class JobValidator extends Job {
     try {
       super.removeFromJump();
       this.constructor.lock = false;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   // Check to see if the client is ready and willing to take on jobs
@@ -74,11 +66,11 @@ class JobValidator extends Job {
   }
 
   /*
-	__process_event in the base Job class deals with listen for events on
-	current job instances. In order for a validator to start the bidding process,
-	we only care about `JobDescriptionPosted` if the client meets cretin run
-	time states. We override __precess event below to make that happen.
-	*/
+  __process_event in the base Job class deals with listen for events on
+  current job instances. In order for a validator to start the bidding process,
+  we only care about `JobDescriptionPosted` if the client meets cretin run
+  time states. We override __precess event below to make that happen.
+  */
   static __process_event(name, instanceId, event) {
     try {
       // Check to see if job is already tracked by this client
@@ -96,57 +88,45 @@ class JobValidator extends Job {
   // Helpers
   async __checkDisk(size, target) {
     /*
-		This does not account for size on disk(blocks used) vs file size, for
-		larger files this may be an issue.
+    This does not account for size on disk(blocks used) vs file size, for
+    larger files this may be an issue.
 
-		This also not not account for space needed to extract or decrypt
-		operations.
-		*/
+    This also not not account for space needed to extract or decrypt
+    operations.
+    */
 
     return (await checkDiskSpace(target)).free > size;
   }
 
   /*
-	Actions
+  Actions
 
-	The client can initiate actions against the contract as a validator. Most of
-	these result in a action being emitted to the smart contract. 
-	*/
+  The client can initiate actions against the contract as a validator. Most of
+  these result in a action being emitted to the smart contract.
+  */
 
   async downloadAndTestModel(event) {
+
     try {
       let job = event.returnValues;
 
       this.downloadPath = `${conf.appDownloadPath}${this.jobData.jobPoster}/${this.id}`;
 
+      console.log('download path:')
+      console.log(this.downloadPath);
+
       // Make sure download spot exists
       fs.ensureDirSync(this.downloadPath);
 
       // Download the shared files
-      await webtorrent().downloadAll(
+      let downloads = await webtorrent().downloadAll(
         this.downloadPath,
         event.returnValues.trainedModelMagnetLink,
         event.returnValues.testingDatasetMagnetLink,
         event.returnValues.untrainedModelMagnetLink
       );
 
-      //Test the modal and get loss
-      const std = await exec(
-        "python3 unsorted/validator_node.py 2> /dev/null | tail -n 1"
-      );
-
-      console.log("Python STDOUT: ", std);
-
-      let retVal = std.out[0].slice(0, -1);
-      console.log("retVal", retVal);
-      console.log("retVal type:", typeof retVal);
-
-      let error = parseInt(retVal * 100);
-      error = 100 - error;
-
-      const maximumAllowableError = parseInt(
-        event.returnValues.targetErrorRate
-      );
+      console.log("Downloads", downloads);
 
       console.info(
         "Download done!",
@@ -154,10 +134,48 @@ class JobValidator extends Job {
         new Date().toLocaleString()
       );
 
-      console.log("Training Error: ", error);
-      console.log("Required Max Error: ", maximumAllowableError);
+      let jupyterNotebookPathname;
+      let testingDataPathname;
+      let pythonPathname;
 
-      if (error <= maximumAllowableError) {
+      for (let download of downloads) {
+        if (fileExtensionExtractor(download.dn) == "ipynb") {
+          jupyterNotebookPathname = download.path + "/" + download.dn;
+          //Convert .ipynb => .py
+          await exec("jupyter nbconvert --to script", jupyterNotebookPathname);
+          pythonPathname = download.path + "/" + filenameExtractor(download.dn) + '.py';
+        } else if (fileExtensionExtractor(download.dn) == "py") {
+          pythonPathname = download.path + "/" + download.dn;
+        } else {
+          //TODO: Unzip if needed
+          testingDataPathname = download.path + "/" + download.dn;
+        }
+      }
+
+      console.log("pythonPathname:", pythonPathname);
+
+      await installNotebookDependencies(pythonPathname);
+
+      await updateNotebookMorphwareTerms(
+        pythonPathname,
+        this.downloadPath + "/"
+      );
+
+      const std = await exec("python3", pythonPathname, "morphware_validate");
+
+      console.log("Python STD: ", std);
+      console.log("Python STDOUT: ", std.out);
+
+      const accuracy = parseInt(parseFloat(std.out[0]) * 100)
+
+      const minAllowableAccuracyRate = parseInt(
+        event.returnValues.targetErrorRate // TODO change to targetAccuracyRate
+      );
+
+      console.log("Training Accuracy: ", accuracy);
+      console.log("Required Min Accuracy: ", minAllowableAccuracyRate);
+
+      if (accuracy >= minAllowableAccuracyRate) {
         //Approve the job if loss is less than target loss
         let action = this.jobContract.methods.approveJob(
           job.jobPoster,
@@ -169,7 +187,7 @@ class JobValidator extends Job {
           gas: await action.estimateGas(),
         });
       } else {
-        throw `This model isn't accurate enough. Error is ${error} Maximum Allowable Error is ${maximumAllowableError}`;
+        throw `This model isn't accurate enough. Accuracy is ${accuracy} minAllowableAccuracyRate is ${minAllowableAccuracyRate}`;
       }
     } catch (error) {
       // this.removeFromJump();
@@ -178,13 +196,13 @@ class JobValidator extends Job {
   }
 
   /*
-	Events
+  Events
 
-	This sections maps events the clients listens for to actionable events.
-	All of the following methods are intended to be called by the
-	`Job.__processEvent` in the `Job` class. See the Events sections in the Job
-	class for more information.
-	*/
+  This sections maps events the clients listens for to actionable events.
+  All of the following methods are intended to be called by the
+  `Job.__processEvent` in the `Job` class. See the Events sections in the Job
+  class for more information.
+  */
 
   async __TestingDatasetShared(event) {
     try {

@@ -1,5 +1,6 @@
 "use strict";
 
+const { fileExtensionExtractor, filenameExtractor } = require("./../utils/files")
 const fs = require("fs-extra");
 const crypto = require("crypto");
 const checkDiskSpace = require("check-disk-space").default;
@@ -63,7 +64,7 @@ class JobWorker extends Job {
     try {
       super.removeFromJump();
       this.constructor.lock = false;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   // Check to see if the client is ready and willing to take on jobs
@@ -440,10 +441,12 @@ class JobWorker extends Job {
       let pythonPathname;
 
       for (let download of downloads) {
-        if (download.dn.slice(-6) == ".ipynb") {
+        if (fileExtensionExtractor(download.dn) == "ipynb") {
           jupyterNotebookPathname = download.path + "/" + download.dn;
-          pythonPathname = jupyterNotebookPathname.slice(0, -5).concat("py");
-        } else if (download.dn.slice(-3) == ".py") {
+          //Convert .ipynb => .py
+          await exec("jupyter nbconvert --to script", jupyterNotebookPathname);
+          pythonPathname = download.path + "/" + filenameExtractor(download.dn) + '.py';
+        } else if (fileExtensionExtractor(download.dn) == "py") {
           pythonPathname = download.path + "/" + download.dn;
         } else {
           //TODO: Unzip if needed
@@ -452,11 +455,6 @@ class JobWorker extends Job {
       }
 
       console.log("pythonPathname:", pythonPathname);
-
-      //Convert .ipynb => .py
-      if (jupyterNotebookPathname) {
-        await exec("jupyter nbconvert --to script", jupyterNotebookPathname);
-      }
 
       await installNotebookDependencies(pythonPathname);
 
