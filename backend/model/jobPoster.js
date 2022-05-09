@@ -15,7 +15,7 @@ const { wallet } = require("../model/morphware");
 JobPoster extends the common functions of Job class and is responsible for
 handling functionality a poster node needs.
 
-With out intimate knowledge of how this class functions, users should use 
+With out intimate knowledge of how this class functions, users should use
 `JobPoster.new()` instead of `new JobPoster()` when making a new instance.
 
 It is recommend you understand the Job class before editing the JobPoster class
@@ -57,10 +57,10 @@ class JobPoster extends Job {
   static preConfirmedJobs = [];
 
   /*
-	Wrapper for creating a new job
-	This only exists because a proper constructor can not be async and we
-	have to wait for the job instanceId
-	*/
+  Wrapper for creating a new job
+  This only exists because a proper constructor can not be async and we
+  have to wait for the job instanceId
+  */
   static async new(wallet, postData) {
     try {
       // Start a new instance
@@ -134,11 +134,11 @@ class JobPoster extends Job {
   }
 
   /*
-	__process_event in the base Job class deals with listen for events on
-	current job instances. In order for a worker to start the bidding process,
-	we only care about `JobDescriptionPosted` if the client meets certainn run
-	time states. We override __precess event below to make that happen.
-	*/
+  __process_event in the base Job class deals with listen for events on
+  current job instances. In order for a worker to start the bidding process,
+  we only care about `JobDescriptionPosted` if the client meets certainn run
+  time states. We override __precess event below to make that happen.
+  */
   static __process_event(name, instanceId, event) {
     try {
       //If JobDescriptionPosted for my job
@@ -152,11 +152,11 @@ class JobPoster extends Job {
   }
 
   /*
-	Actions
+  Actions
 
-	The client can initiate actions against the contract as a poster. Most of
-	these result in a action being emitted to the smart contract. 
-	*/
+  The client can initiate actions against the contract as a poster. Most of
+  these result in a action being emitted to the smart contract.
+  */
 
   // Create a new job
   async post() {
@@ -269,6 +269,7 @@ class JobPoster extends Job {
   // Once the winner worker is done processing the data, we will share the
   // testing data.
   async shareTesting() {
+    console.log('🔥 poster sharing testing data')
     try {
       let action = this.jobContract.methods.shareTestingDataset(
         this.id,
@@ -312,13 +313,13 @@ class JobPoster extends Job {
   }
 
   /*
-	Events
+  Events
 
-	This sections maps events the clients listens for to actionable events.
-	All of the following methods are intended to be called by the
-	`Job.__processEvent` in the `Job` class. See the Events sections in the Job
-	class for more information.
-	*/
+  This sections maps events the clients listens for to actionable events.
+  All of the following methods are intended to be called by the
+  `Job.__processEvent` in the `Job` class. See the Events sections in the Job
+  class for more information.
+  */
 
   async BidPlaced(event) {
     console.info(
