@@ -1,5 +1,5 @@
 # This is a Debian 10 (buster) image
-FROM node:16.9
+FROM node:gallium-buster
 
 RUN echo "deb http://deb.pascalroeleven.nl/python3.8 buster-backports main" >> /etc/apt/sources.list
 RUN wget https://pascalroeleven.nl/deb-pascalroeleven.gpg && \
