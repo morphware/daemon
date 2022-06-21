@@ -234,7 +234,7 @@ class JobWorker extends Job {
             this.bidData.secret
           )
         ),
-        this.bidData.bidAmount
+        biddingAmount
       );
 
       let receipt = await action.send({
