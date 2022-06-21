@@ -10,6 +10,7 @@ const {
   stopJupyterLabServer,
 } = require("../model/notebook");
 const { wallet } = require("../model/morphware");
+const { wait } = require("../helpers");
 
 /*
 JobPoster extends the common functions of Job class and is responsible for
