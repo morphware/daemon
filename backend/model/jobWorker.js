@@ -209,7 +209,7 @@ class JobWorker extends Job {
 
       let reciept = await this.wallet.approve(
         conf.auctionFactoryContractAddress,
-        percentHelper(this.jobData.workerReward, 100)
+        biddingAmount
       );
 
       await web3.eth.getTransactionReceiptMined(web3, reciept.transactionHash);

@@ -161,15 +161,17 @@ class JobPoster extends Job {
   // Create a new job
   async post() {
     try {
+      console.log("Sending approve TX");
       // Approve funds for the contract to hold in escrow
       let reciept = await this.wallet.approve(
         conf.auctionFactoryContractAddress,
         this.postData.workerReward
       );
+      console.log("Sent approve TX");
 
       await web3.eth.getTransactionReceiptMined(web3, reciept.transactionHash);
 
-      console.log("Confirmed pre-post MWT approval");
+      console.log("Confirmed approve TX");
 
       // Hold the transaction for history
       this.transactions.push({ ...reciept, event: "approve" });
@@ -177,10 +179,14 @@ class JobPoster extends Job {
       // Seed files
       this.__parsePostFile(this.postData);
 
+      console.log("Generated Magnet URI's");
+
       // Get Training Dataset file size
       let trainingDatasetSize = await this.__getFileSize(
         this.postData.trainingData
       );
+
+      console.log("File size of training dataset: ", trainingDatasetSize);
 
       // Post the new job
       let action = this.jobContract.methods.postJobDescription(
@@ -195,6 +201,8 @@ class JobPoster extends Job {
       await action.send({
         gas: await action.estimateGas(),
       });
+
+      console.log("Sent postJobDescription TX");
     } catch (error) {
       console.error("posting job error", error);
       throw error;
