@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "args": "^5.0.1",
+    "bluebird": "^3.7.2",
     "check-disk-space": "^3.0.1",
     "cors": "^2.8.5",
     "csv-parser": "^3.0.0",

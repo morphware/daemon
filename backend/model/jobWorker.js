@@ -1,6 +1,9 @@
 "use strict";
 
-const { fileExtensionExtractor, filenameExtractor } = require("./../utils/files")
+const {
+  fileExtensionExtractor,
+  filenameExtractor,
+} = require("./../utils/files");
 const fs = require("fs-extra");
 const crypto = require("crypto");
 const checkDiskSpace = require("check-disk-space").default;
@@ -64,7 +67,7 @@ class JobWorker extends Job {
     try {
       super.removeFromJump();
       this.constructor.lock = false;
-    } catch (error) { }
+    } catch (error) {}
   }
 
   // Check to see if the client is ready and willing to take on jobs
@@ -204,10 +207,14 @@ class JobWorker extends Job {
 
       console.log("BiddingAmount: ", biddingAmount);
 
-      let approveReceipt = await this.wallet.approve(
+      let reciept = await this.wallet.approve(
         conf.auctionFactoryContractAddress,
         percentHelper(this.jobData.workerReward, 100)
       );
+
+      await web3.eth.getTransactionReceiptMined(web3, reciept.transactionHash);
+
+      console.log("Confirmed pre-post MWT approval");
 
       this.bidData = {
         bidAmount: biddingAmount,
@@ -445,7 +452,8 @@ class JobWorker extends Job {
           jupyterNotebookPathname = download.path + "/" + download.dn;
           //Convert .ipynb => .py
           await exec("jupyter nbconvert --to script", jupyterNotebookPathname);
-          pythonPathname = download.path + "/" + filenameExtractor(download.dn) + '.py';
+          pythonPathname =
+            download.path + "/" + filenameExtractor(download.dn) + ".py";
         } else if (fileExtensionExtractor(download.dn) == "py") {
           pythonPathname = download.path + "/" + download.dn;
         } else {

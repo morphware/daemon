@@ -162,17 +162,22 @@ class JobPoster extends Job {
   async post() {
     try {
       // Approve funds for the contract to hold in escrow
-      let approve = await this.wallet.approve(
+      let reciept = await this.wallet.approve(
         conf.auctionFactoryContractAddress,
         this.postData.workerReward
       );
 
+      await web3.eth.getTransactionReceiptMined(web3, reciept.transactionHash);
+
+      console.log("Confirmed pre-post MWT approval");
+
       // Hold the transaction for history
-      this.transactions.push({ ...approve, event: "approve" });
+      this.transactions.push({ ...reciept, event: "approve" });
 
       // Seed files
       this.__parsePostFile(this.postData);
 
+      // Get Training Dataset file size
       let trainingDatasetSize = await this.__getFileSize(
         this.postData.trainingData
       );
@@ -257,9 +262,6 @@ class JobPoster extends Job {
         event: "shareUntrainedModelAndTrainingDataset",
       });
 
-      //Calling payout when approve job has been emmited
-      //this.payout();
-
       return receipt;
     } catch (error) {
       throw error;
@@ -269,7 +271,7 @@ class JobPoster extends Job {
   // Once the winner worker is done processing the data, we will share the
   // testing data.
   async shareTesting() {
-    console.log('🔥 poster sharing testing data')
+    console.log("🔥 poster sharing testing data");
     try {
       let action = this.jobContract.methods.shareTestingDataset(
         this.id,
