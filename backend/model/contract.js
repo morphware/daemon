@@ -12,7 +12,8 @@ const provider = new Web3.providers.WebsocketProvider(conf.ethAddress, {
 });
 
 const web3 = new Web3(provider);
-web3.eth.getTransactionReceiptMined = require("../helpers");
+const { getTransactionReceiptMined } = require("../helpers");
+web3.eth.getTransactionReceiptMined = getTransactionReceiptMined;
 
 function percentHelper(input, percent) {
   return new BN(input).mul(new BN(percent)).div(new BN(100)).toString();

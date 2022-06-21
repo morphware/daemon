@@ -19,7 +19,7 @@ const {
   updateNotebookMorphwareTerms,
 } = require("./notebook");
 const { calculateBid } = require("../pricingUtils");
-
+const { wait } = require("../helpers");
 /*
 JobWorker extends the common functions of Job class and is responsible for
 handling functionality a worker node needs.
@@ -215,6 +215,8 @@ class JobWorker extends Job {
       await web3.eth.getTransactionReceiptMined(web3, reciept.transactionHash);
 
       console.log("Confirmed pre-post MWT approval");
+
+      await wait();
 
       this.bidData = {
         bidAmount: biddingAmount,

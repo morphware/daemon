@@ -188,6 +188,8 @@ class JobPoster extends Job {
 
       console.log("File size of training dataset: ", trainingDatasetSize);
 
+      await wait();
+
       // Post the new job
       let action = this.jobContract.methods.postJobDescription(
         parseInt(this.postData.trainingTime),

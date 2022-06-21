@@ -53,4 +53,12 @@ const sequentialPromise = async (promiseArray) => {
   return result.chain.then(() => result.results);
 };
 
-module.exports = getTransactionReceiptMined;
+const wait = (ms = 10000) => {
+  return new Promise((res) => {
+    setTimeout(() => {
+      res();
+    }, ms);
+  });
+};
+
+module.exports = { getTransactionReceiptMined, wait };
