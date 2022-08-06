@@ -19,6 +19,7 @@ enum navOptions {
   Torrents = "Torrents",
   Settings = "Settings",
   Auctions = "Auctions",
+  WorkerNode = "Worker Node",
 }
 
 interface NavLinkProps {
@@ -39,11 +40,9 @@ const styles = makeStyles((theme: ThemeProps) => {
     },
     navContainer: {
       backgroundColor: theme.navBar?.main,
-      height: "100vh",
       width: "10vw",
       minWidth: "100px",
       maxWidth: "230px",
-      overflow: "auto",
     },
     navText: {
       fontSize: "19px",
@@ -119,7 +118,12 @@ const NavBar = () => {
   const classes = styles();
 
   return (
-    <Grid container direction="column" className={classes.navContainer}>
+    <Grid
+      container
+      direction="column"
+      justifyContent="space-around"
+      className={classes.navContainer}
+    >
       <Grid
         item
         className={classes.logoContainer}
@@ -149,11 +153,11 @@ const NavBar = () => {
           selected={navOptions.Train === selectedNavItem}
         ></NavLink>
         <NavLink
-          title={navOptions.Torrents}
+          title={navOptions.WorkerNode}
           icon={torrentsNav}
-          to="/torrents"
+          to="/workerNode"
           setSelected={setSelectedNavItem}
-          selected={navOptions.Torrents === selectedNavItem}
+          selected={navOptions.WorkerNode === selectedNavItem}
         ></NavLink>
         <NavLink
           title={navOptions.Settings}
@@ -163,16 +167,7 @@ const NavBar = () => {
           selected={navOptions.Settings === selectedNavItem}
         ></NavLink>
       </Grid>
-      <Grid
-        container
-        style={{
-          flexGrow: 1,
-          flexDirection: "column",
-          justifyContent: "flex-end",
-          alignContent: "center",
-          padding: "20px",
-        }}
-      >
+      <Grid>
         <WalletModal />
         <Typography className={classes.navText} variant="body2">
           V{clientVersion}

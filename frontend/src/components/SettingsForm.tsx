@@ -20,6 +20,7 @@ import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutli
 import { IpcRenderer } from "electron";
 import { ThemeProps } from "../providers/MorphwareTheme";
 import { UtilsContext } from "../providers/UtilsProvider";
+import EnableMLAlertModal from "./EnableMLAlertModal";
 interface SettingsRequestPropsErrors {
   httpBindAddress?: string;
   httpPort?: string;
@@ -109,12 +110,19 @@ const SettingsForm = () => {
   const currentAppDownloadPath = currentSettings?.appDownloadPath
     ? currentSettings.appDownloadPath
     : "";
+  const enableML = currentSettings?.trainModels
+    ? currentSettings?.trainModels
+    : false;
+
+  // console.log("current Settings");
+  // console.log(currentSettings);
 
   const [appDownloadPath, setAppDownloadPath] = useState<string>(
     currentAppDownloadPath
   );
 
   const updateConfigurations = async (values: SettingsRequestProps) => {
+    console.log(values);
     const response = await daemonService.updateSettings(values);
     if (response.error) {
       daemonService.updateSnackbarProps({
@@ -128,6 +136,10 @@ const SettingsForm = () => {
       });
     }
   };
+
+  const [enableMachineLearning, setEnableMachineLearning] = useState(enableML);
+  const [openEnableMachineLearning, setOpenEnableMachineLearning] =
+    useState(false);
 
   const classes = styles();
   return (
@@ -236,34 +248,6 @@ const SettingsForm = () => {
                       <AddAppDownloadPath
                         appDownloadPath={appDownloadPath}
                         setAppDownloadPath={setAppDownloadPath}
-                      />
-                    </Grid>
-                    <Grid xs={4}>
-                      <Typography
-                        variant="h6"
-                        style={{ textAlign: "start", padding: "15px" }}
-                        className={classes.formHeaders}
-                      >
-                        Global Mining Command
-                      </Typography>
-                    </Grid>
-                    <Grid
-                      item
-                      xs={8}
-                      style={{ display: "flex", justifyContent: "flex-end" }}
-                    >
-                      <TextField
-                        label="Global Mining Command"
-                        name="miningCommand"
-                        required={true}
-                        type="text"
-                        style={{
-                          width: "80%",
-                          display: "flex",
-                          justifyContent: "flex-start",
-                        }}
-                        inputProps={{ className: classes.options }}
-                        InputLabelProps={{ className: classes.formHeaders }}
                       />
                     </Grid>
                     <Grid xs={4}>
@@ -560,6 +544,39 @@ const SettingsForm = () => {
                           setDarkTheme(!darkTheme);
                         }}
                       />
+                    </Grid>
+                    <Grid xs={4}>
+                      <Typography
+                        variant="h6"
+                        style={{ textAlign: "start", padding: "15px" }}
+                        className={classes.formHeaders}
+                      >
+                        Enable Machine Learning
+                      </Typography>
+                    </Grid>
+                    <Grid
+                      item
+                      xs={8}
+                      style={{ display: "flex", justifyContent: "flex-end" }}
+                    >
+                      <Switches
+                        name="trainModels"
+                        data={{ label: "", value: darkTheme }}
+                        checked={enableMachineLearning}
+                        onClick={() => {
+                          if (!enableMachineLearning) {
+                            setOpenEnableMachineLearning(true);
+                          } else {
+                            setEnableMachineLearning(false);
+                          }
+                        }}
+                      />
+                      {openEnableMachineLearning && (
+                        <EnableMLAlertModal
+                          enableML={() => setEnableMachineLearning(true)}
+                          closeModal={() => setOpenEnableMachineLearning(false)}
+                        />
+                      )}
                     </Grid>
                   </Grid>
                 </Grid>

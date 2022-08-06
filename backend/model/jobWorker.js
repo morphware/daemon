@@ -10,7 +10,7 @@ const checkDiskSpace = require("check-disk-space").default;
 const { spawn } = require("child_process");
 const { conf } = require("../conf");
 const webtorrent = require("../controller/torrent");
-const { web3, percentHelper } = require("./contract");
+const { web3 } = require("./contract");
 const { wallet } = require("./morphware");
 const { Job } = require("./job");
 const { exec } = require("./python");
@@ -20,6 +20,7 @@ const {
 } = require("./notebook");
 const { calculateBid } = require("../pricingUtils");
 const { wait } = require("../helpers");
+const { execWithPromise } = require("../utils/shellUtils");
 /*
 JobWorker extends the common functions of Job class and is responsible for
 handling functionality a worker node needs.
@@ -72,52 +73,95 @@ class JobWorker extends Job {
 
   // Check to see if the client is ready and willing to take on jobs
   static canTakeWork() {
-    return conf.role === "Worker" && !this.lock;
+    return conf.role === "Worker" && !this.lock && this.canTrainOrValidate();
   }
 
-  //Create a new process group that starts mining
-  static startMining() {
+  static async startMining() {
     try {
-      if (!conf.miningCommand) {
-        console.log("No Mining Command Configured");
-        return;
-      } else if (this.childMiner) {
-        throw `Already mining on process ${this.childMiner.pid}`;
+      // If in development mode, just run the NSFMiner
+      if (conf.environment === "development") {
+        const pool = `stratum://${wallet.address}.morphware-worker-node@us-eth.2miners.com:2020`;
+        let pathToMiner = await execWithPromise("pwd");
+        pathToMiner = pathToMiner.replace(
+          "/backend\n",
+          "/relatedFiles/nsfminer"
+        );
+
+        const miningCommand = `${pathToMiner} --pool ${pool} --api-port 3654`;
+
+        console.log("Running");
+        console.log(miningCommand);
+
+        const miner = spawn(miningCommand, {
+          shell: true,
+          stdio: ["inherit", "inherit", "inherit"],
+          detached: false,
+        });
+
+        miner.on("close", (code, signal) => {
+          console.log(
+            `child process terminated due to receipt of signal ${signal}`
+          );
+        });
+
+        miner.on("exit", (code, signal) => {
+          console.log(
+            `child process exited due to receipt of signal ${signal}`
+          );
+        });
+
+        miner.on("error", (code, signal) => {
+          console.log(
+            `child process errored due to receipt of signal ${signal}`
+          );
+        });
+
+        this.childMiner = miner;
+      } else {
+        console.log("Trying to mine in prod");
       }
-      console.log("Starting to mine...");
-      const minerArgs = conf.miningCommand.split(new RegExp("s+", "g"));
-      const minerCommand = minerArgs.shift();
-      console.log("Miner Command: ", minerCommand);
-      console.log("Miner Args: ", minerArgs);
-
-      this.childMiner = spawn(minerCommand, minerArgs, {
-        shell: true,
-        stdio: ["inherit", "inherit", "inherit"],
-        detached: true,
-      });
-
-      //TODO: Pipe this stdout of miner into a pseduo terminal on the frontend client so they can view their mining metrics. graphs? timeseries? so on
     } catch (error) {
       console.log("Error in startMining: ", error);
       throw error;
     }
   }
 
-  //Stop the mining process group if the client is currently mining
-  static stopMining() {
+  static async stopMining() {
     try {
       if (!this.childMiner || !this.childMiner.pid) {
         throw "Miner is not running";
       }
-      console.log("Child Process PID: ", this.childMiner.pid);
-      console.log("Stopping Miner...");
 
-      process.kill(-this.childMiner.pid);
+      // BAD WAY TO KILL. FIX
+      const pidToKil = parseInt(this.childMiner.pid) + 1;
+      await execWithPromise(`kill ${pidToKil}`);
+
       this.childMiner = null;
     } catch (error) {
       console.log("Error in stopMining: ", error);
       throw error;
     }
+  }
+
+  static async getMiningStats() {
+    try {
+      if (!this.childMiner || !this.childMiner.pid) {
+        throw "Miner is not running";
+      }
+
+      const stats = await execWithPromise(
+        `echo '{"id":1,"jsonrpc":"2.0","method":"miner_getstat1"}' | nc localhost 3654 -N`
+      );
+      return stats;
+    } catch (error) {
+      console.log("Error in stopMining: ", error);
+      // throw error;
+      return {};
+    }
+  }
+
+  static isMining() {
+    return !!this.childMiner;
   }
 
   /*

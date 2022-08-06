@@ -102,7 +102,7 @@ const TorrentsTable = () => {
           {({ width }) => (
             <Table
               width={width}
-              height={400}
+              height={250}
               headerHeight={20}
               rowHeight={30}
               rowCount={sortedTorrents.length}

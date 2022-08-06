@@ -43,7 +43,6 @@ on.
 * `electronDev` *BOOL* Bring up the chrome dev tools in electron.
 * `appDownloadPath` *STRING* Absolute path where downloads are kept.
 * `torrentListenPort` *STRING* TCP port for the torrent client to listen on
-* `miningCommand` *STRING* A global mining command the worker can run
 * `workerGPU` *STRING* Name of GPU worker is using
 
 ## Dev fields

@@ -66,6 +66,7 @@ class JobPoster extends Job {
     try {
       // Start a new instance
       let job = new this(wallet, postData);
+      console.log("Posting jobs");
       this.preConfirmedJobs.push(job);
 
       // Post the job
@@ -169,6 +170,8 @@ class JobPoster extends Job {
         this.postData.workerReward
       );
       console.log("Sent approve TX");
+
+      console.log(reciept);
 
       await web3.eth.getTransactionReceiptMined(web3, reciept.transactionHash);
 

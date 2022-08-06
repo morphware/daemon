@@ -63,6 +63,9 @@ class Job {
     return this.transactions.map((event) => event.event).slice(-1)[0];
   }
 
+  static canTrainOrValidate() {
+    return conf["trainModels"] ? conf["trainModels"] : false;
+  }
   /*
 	Helpers
 

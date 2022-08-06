@@ -10,10 +10,10 @@ const editKeys = {
 	'torrentListenPort':{ type: 'number'},
 	'appDownloadPath': {type: 'string'},
 	'jupyterLabPort': {type: 'number'},
-	'miningCommand': {type: 'string'},
 	'workerGPU': {type: 'string'},
 	'role': {type: 'string'},
 	'darkMode': {type: 'string'},
+	'trainModels': {type: 'string'}
 };
 
 router.get('/', async function(req, res, next){

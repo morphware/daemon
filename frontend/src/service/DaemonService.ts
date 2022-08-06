@@ -1,3 +1,4 @@
+import JsonRpcMinerStatsToIMinerStats from "../mappers/MiningStats";
 import { ITrainingModelValuesV2 } from "../mappers/TrainModelFormMappers";
 
 interface TorrentData {
@@ -124,7 +125,6 @@ export interface SettingsParamsResponseProps {
     privateKey: string;
     torrentListenPort: string;
     appDownloadPath: string;
-    miningCommand: string;
   };
 }
 
@@ -135,10 +135,10 @@ export interface SettingsRequestProps {
   torrentListenPort?: number;
   appDownloadPath?: string;
   jupyterLabPort?: number;
-  miningCommand?: string;
   workerGPU?: string;
   role?: string;
   darkMode?: boolean;
+  trainModels?: boolean;
 }
 
 interface trainModelPostDataResponse {
@@ -228,6 +228,9 @@ export interface IDaemonService {
 export class DaemonService implements IDaemonService {
   private readonly baseUrl: string =
     "http://" + (window.localStorage.getItem("url") || "127.0.0.1:3001");
+
+    private readonly baseUrlNsfMiner: string =
+    "http://127.0.0.1:3654";
 
   constructor() {}
 
@@ -442,4 +445,38 @@ export class DaemonService implements IDaemonService {
     const stopLocalMinerResponse = await response.json();
     return stopLocalMinerResponse;
   }
+ 
+  public getMinerStats = async () => {
+    const url = `${this.baseUrl}/api/v0/miner/stats`;
+
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    };
+    try {
+      const response = await fetch(url, requestOptions);
+      let stopLocalMinerResponse = await response.json();
+      stopLocalMinerResponse = JsonRpcMinerStatsToIMinerStats(JSON.parse(stopLocalMinerResponse));
+      return stopLocalMinerResponse;
+
+    } catch (error) {
+      return  null;
+    }
+    
+
+  };
+
+  public isMining = async () => {
+    const url = `${this.baseUrl}/api/v0/miner/isMining`;
+
+    const requestOptions = {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    };
+
+    const response = await fetch(url, requestOptions);
+    const resp = await response.json();
+    return resp.isMining;
+  }
 }
+
