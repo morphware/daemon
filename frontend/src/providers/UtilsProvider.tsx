@@ -81,7 +81,7 @@ const UtilsProvider: React.FC = ({ children }) => {
       await getMiningStatus();
     }, 20000);
     return () => clearInterval(interval);
-  }, []);
+  }, [currentlyMining]);
 
   return (
     <UtilsContext.Provider value={utilsContext}>

@@ -84,7 +84,7 @@ class JobWorker extends Job {
         let pathToMiner = await execWithPromise("pwd");
         pathToMiner = pathToMiner.replace(
           "/backend\n",
-          "/relatedFiles/nsfminer"
+          "/extraResources/nsfminer"
         );
 
         const miningCommand = `${pathToMiner} --pool ${pool} --api-port 3654`;
