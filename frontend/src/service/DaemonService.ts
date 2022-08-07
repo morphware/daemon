@@ -429,8 +429,11 @@ export class DaemonService implements IDaemonService {
     };
 
     const response = await fetch(url, requestOptions);
-    const startLocalMinerResponse = await response.json();
-    return startLocalMinerResponse;
+    console.log("PROCESS RESPONSE");
+    console.log(response);
+    return {};
+    // const startLocalMinerResponse = await response.json();
+    // return startLocalMinerResponse;/
   }
   
   public stopMiner = async () => {

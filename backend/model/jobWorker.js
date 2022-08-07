@@ -21,6 +21,8 @@ const {
 const { calculateBid } = require("../pricingUtils");
 const { wait } = require("../helpers");
 const { execWithPromise } = require("../utils/shellUtils");
+const path = require("path");
+
 /*
 JobWorker extends the common functions of Job class and is responsible for
 handling functionality a worker node needs.
@@ -79,47 +81,50 @@ class JobWorker extends Job {
   static async startMining() {
     try {
       // If in development mode, just run the NSFMiner
+      const pool = `stratum://${wallet.address}.morphware-worker-node@us-eth.2miners.com:2020`;
+      let pathToMiner;
       if (conf.environment === "development") {
-        const pool = `stratum://${wallet.address}.morphware-worker-node@us-eth.2miners.com:2020`;
-        let pathToMiner = await execWithPromise("pwd");
+        pathToMiner = await execWithPromise("pwd");
         pathToMiner = pathToMiner.replace(
           "/backend\n",
           "/extraResources/nsfminer"
         );
-
-        const miningCommand = `${pathToMiner} --pool ${pool} --api-port 3654`;
-
-        console.log("Running");
-        console.log(miningCommand);
-
-        const miner = spawn(miningCommand, {
-          shell: true,
-          stdio: ["inherit", "inherit", "inherit"],
-          detached: false,
-        });
-
-        miner.on("close", (code, signal) => {
-          console.log(
-            `child process terminated due to receipt of signal ${signal}`
-          );
-        });
-
-        miner.on("exit", (code, signal) => {
-          console.log(
-            `child process exited due to receipt of signal ${signal}`
-          );
-        });
-
-        miner.on("error", (code, signal) => {
-          console.log(
-            `child process errored due to receipt of signal ${signal}`
-          );
-        });
-
-        this.childMiner = miner;
       } else {
-        console.log("Trying to mine in prod");
+        pathToMiner = path.join(
+          process.resourcesPath,
+          "extraResources",
+          "nsfminer"
+        );
       }
+
+      const miningCommand = `${pathToMiner} --pool ${pool} --api-port 3654`;
+
+      console.log("Running");
+      console.log(miningCommand);
+
+      const miner = spawn(miningCommand, {
+        shell: true,
+        stdio: ["inherit", "inherit", "inherit"],
+        detached: false,
+      });
+
+      miner.on("close", (code, signal) => {
+        console.log(
+          `child process terminated due to receipt of signal ${signal}`
+        );
+      });
+
+      miner.on("exit", (code, signal) => {
+        console.log(`child process exited due to receipt of signal ${signal}`);
+      });
+
+      miner.on("error", (code, signal) => {
+        console.log(`child process errored due to receipt of signal ${signal}`);
+      });
+
+      this.childMiner = miner;
+
+      return miningCommand;
     } catch (error) {
       console.log("Error in startMining: ", error);
       throw error;

@@ -46,9 +46,9 @@ function createWindow() {
   );
 
   // Open the DevTools.
-  if (conf.electronDev) {
-    win.webContents.openDevTools({ mode: "detach" });
-  }
+  // if (conf.electronDev) {
+  win.webContents.openDevTools({ mode: "detach" });
+  // }
 
   ipcMain.on("selectFolder", async (event, args) => {
     const response = await dialog.showOpenDialog(win, {
@@ -113,9 +113,10 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
-    // app.quit();
-  }
+  // if (process.platform !== "darwin") {
+  //   app.quit();
+  // }
+  app.quit();
 });
 
 app.on("activate", () => {

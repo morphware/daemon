@@ -41,7 +41,15 @@
     "productName": "MorphwareWallet",
     "copyright": "Copyright © 2021 Morphware, LLC",
     "icon": "resources/icon/logo-light.png",
-    "extraResources": ["./extraResources/**"],
+    "extraResources": [
+      {
+        "from": "./extraResources/",
+        "to": "extraResources",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ],
     "directories": {
       "buildResources": "resources",
       "app": "app-src",

@@ -1,7 +1,7 @@
 {
   "name": "morphware-wallet",
-  "version": "0.0.14",
-  "description": "Morphware desktop daemon",
+  "version": "0.0.13",
+  "description": "Morphware Desktop Daemon",
   "main": "express.js",
   "scripts": {
     "start": "nodemon express.js --",

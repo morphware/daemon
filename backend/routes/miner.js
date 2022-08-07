@@ -5,8 +5,8 @@ const { JobWorker } = require("../model/jobWorker");
 
 router.post("/start", async function (req, res, next) {
   try {
-    await JobWorker.startMining();
-    return res.json({ status: "success" });
+    const commandRun = await JobWorker.startMining();
+    return res.json({ status: `success ${commandRun}` });
   } catch (error) {
     next(error);
   }
