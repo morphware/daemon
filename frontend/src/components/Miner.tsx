@@ -21,7 +21,6 @@ const Miner = () => {
     const resp = await daemonService.startMiner();
     await mining.getMiningStatus();
     console.log(resp);
-    // setCurrentlyMining(!currentlyMining);
   };
 
   const stopMining = async () => {
@@ -29,7 +28,6 @@ const Miner = () => {
     await mining.getMiningStatus();
     mining.setMiningStats(defaultMiningStats);
     console.log(resp);
-    // setCurrentlyMining(!currentlyMining);
   };
 
   return (
