@@ -79,7 +79,6 @@ args
     'The role your client will assume.  Provide "Poster" (Post model training jobs), "Worker" (Accept model training jobs) or "Validator" (Accept model training jobs)'
   )
   .option("torrentListenPort", "The port to seed and peer files from")
-  .option("miningCommand", "A global command used to start mining")
   .option("validatorId", "The validator node id in the morphware cluster")
   .option("privateKey", "Wallet Object", undefined, (value) => {
     return [value];

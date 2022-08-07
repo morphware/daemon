@@ -17,9 +17,6 @@ export const settingsDaemonResponseToSettingsResponseProps = (
   if (Object.keys(daemonResponse).includes("jupyterLabPort")) {
     response.jupyterLabPort = daemonResponse.jupyterLabPort;
   }
-  if (Object.keys(daemonResponse).includes("miningCommand")) {
-    response.miningCommand = daemonResponse.miningCommand;
-  }
   if (Object.keys(daemonResponse).includes("workerGPU")) {
     response.workerGPU = daemonResponse.workerGPU;
   }
@@ -28,6 +25,9 @@ export const settingsDaemonResponseToSettingsResponseProps = (
   }
   if (Object.keys(daemonResponse).includes("darkMode")) {
     response.darkMode = daemonResponse.darkMode;
+  }
+  if (Object.keys(daemonResponse).includes("trainModels")) {
+    response.trainModels = daemonResponse.trainModels;
   }
   return response;
 };

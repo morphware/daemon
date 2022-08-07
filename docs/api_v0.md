@@ -403,9 +403,6 @@ View and edit settings
 		"jupyterLabPort": {
 			"type":"number"
 		},
-		"miningCommand": {
-			"type":"string"
-		},
 		"workerGPU": {
 			"type":"string"
 		},

@@ -10,6 +10,7 @@ const {
   stopJupyterLabServer,
 } = require("../model/notebook");
 const { wallet } = require("../model/morphware");
+const { wait } = require("../helpers");
 
 /*
 JobPoster extends the common functions of Job class and is responsible for
@@ -65,6 +66,7 @@ class JobPoster extends Job {
     try {
       // Start a new instance
       let job = new this(wallet, postData);
+      console.log("Posting jobs");
       this.preConfirmedJobs.push(job);
 
       // Post the job
@@ -161,21 +163,36 @@ class JobPoster extends Job {
   // Create a new job
   async post() {
     try {
+      console.log("Sending approve TX");
       // Approve funds for the contract to hold in escrow
-      let approve = await this.wallet.approve(
+      let reciept = await this.wallet.approve(
         conf.auctionFactoryContractAddress,
         this.postData.workerReward
       );
+      console.log("Sent approve TX");
+
+      console.log(reciept);
+
+      await web3.eth.getTransactionReceiptMined(web3, reciept.transactionHash);
+
+      console.log("Confirmed approve TX");
 
       // Hold the transaction for history
-      this.transactions.push({ ...approve, event: "approve" });
+      this.transactions.push({ ...reciept, event: "approve" });
 
       // Seed files
       this.__parsePostFile(this.postData);
 
+      console.log("Generated Magnet URI's");
+
+      // Get Training Dataset file size
       let trainingDatasetSize = await this.__getFileSize(
         this.postData.trainingData
       );
+
+      console.log("File size of training dataset: ", trainingDatasetSize);
+
+      await wait();
 
       // Post the new job
       let action = this.jobContract.methods.postJobDescription(
@@ -190,6 +207,8 @@ class JobPoster extends Job {
       await action.send({
         gas: await action.estimateGas(),
       });
+
+      console.log("Sent postJobDescription TX");
     } catch (error) {
       console.error("posting job error", error);
       throw error;
@@ -257,9 +276,6 @@ class JobPoster extends Job {
         event: "shareUntrainedModelAndTrainingDataset",
       });
 
-      //Calling payout when approve job has been emmited
-      //this.payout();
-
       return receipt;
     } catch (error) {
       throw error;
@@ -269,7 +285,7 @@ class JobPoster extends Job {
   // Once the winner worker is done processing the data, we will share the
   // testing data.
   async shareTesting() {
-    console.log('🔥 poster sharing testing data')
+    console.log("🔥 poster sharing testing data");
     try {
       let action = this.jobContract.methods.shareTestingDataset(
         this.id,

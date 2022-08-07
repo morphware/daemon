@@ -1,5 +1,8 @@
 "use strict";
-const { fileExtensionExtractor, filenameExtractor } = require("./../utils/files")
+const {
+  fileExtensionExtractor,
+  filenameExtractor,
+} = require("./../utils/files");
 const fs = require("fs-extra");
 const checkDiskSpace = require("check-disk-space").default;
 
@@ -53,7 +56,7 @@ class JobValidator extends Job {
     try {
       super.removeFromJump();
       this.constructor.lock = false;
-    } catch (error) { }
+    } catch (error) {}
   }
 
   // Check to see if the client is ready and willing to take on jobs
@@ -65,7 +68,8 @@ class JobValidator extends Job {
       name === "TestingDatasetShared" &&
       conf.role === "Validator" &&
       !this.lock &&
-      shouldValidate
+      shouldValidate &&
+      this.canTrainOrValidate()
     );
   }
 
@@ -110,13 +114,12 @@ class JobValidator extends Job {
   */
 
   async downloadAndTestModel(event) {
-
     try {
       let job = event.returnValues;
 
       this.downloadPath = `${conf.appDownloadPath}${this.jobData.jobPoster}/${this.id}`;
 
-      console.log('download path:')
+      console.log("download path:");
       console.log(this.downloadPath);
 
       // Make sure download spot exists
@@ -147,7 +150,8 @@ class JobValidator extends Job {
           jupyterNotebookPathname = download.path + "/" + download.dn;
           //Convert .ipynb => .py
           await exec("jupyter nbconvert --to script", jupyterNotebookPathname);
-          pythonPathname = download.path + "/" + filenameExtractor(download.dn) + '.py';
+          pythonPathname =
+            download.path + "/" + filenameExtractor(download.dn) + ".py";
         } else if (fileExtensionExtractor(download.dn) == "py") {
           pythonPathname = download.path + "/" + download.dn;
         } else {
@@ -170,7 +174,7 @@ class JobValidator extends Job {
       console.log("Python STD: ", std);
       console.log("Python STDOUT: ", std.out);
 
-      const accuracy = parseInt(parseFloat(std.out[0]) * 100)
+      const accuracy = parseInt(parseFloat(std.out[0]) * 100);
 
       const minAllowableAccuracyRate = parseInt(
         event.returnValues.targetErrorRate // TODO change to targetAccuracyRate

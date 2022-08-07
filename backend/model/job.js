@@ -2,6 +2,7 @@
 
 const { conf } = require("../conf");
 const { web3 } = require("./contract");
+const { wait } = require("../helpers");
 
 const jobFactoryAbi = require(`./../abi/${conf.jobFactoryAbiPath}`);
 const auctionFactoryAbi = require(`./../abi/${conf.auctionFactoryABIPath}`);
@@ -62,6 +63,9 @@ class Job {
     return this.transactions.map((event) => event.event).slice(-1)[0];
   }
 
+  static canTrainOrValidate() {
+    return conf["trainModels"] ? conf["trainModels"] : false;
+  }
   /*
 	Helpers
 
@@ -170,11 +174,13 @@ class Job {
   // Perform logic for the incoming events, This is meant to overridden in
   // when an event is required to kick off the creation of a new local
   // instance.
-  static __process_event(name, instanceId, event) {
+  static async __process_event(name, instanceId, event) {
     // Check to see if we are tracking the job tied to this event
     if (Object.keys(this.jobs).includes(instanceId)) {
       // Get the correct job instance from the job jump table
       let job = this.jobs[instanceId];
+
+      await wait();
 
       // Call the relevant job method, if it exists
       if (job[name]) {

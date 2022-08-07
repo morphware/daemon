@@ -2,8 +2,8 @@ import React from "react";
 import NavBar from "./navigation/NavBar";
 import TrainModel from "./screens/TrainModel";
 import Settings from "./screens/Settings";
-import Torrents from "./screens/Torrents";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
+import Torrents from "./screens/Torrents";
 import Home from "./screens/Home";
 import { Route, Switch } from "react-router-dom";
 import ServiceProviders from "./providers/ServiceProviders";
@@ -13,6 +13,7 @@ import WalletInfo from "./components/WalletFooterInfo";
 import Auctions from "./screens/Auctions";
 import ScreenViewBox from "./screens/ScreenViewBox";
 import UtilsProvider from "./providers/UtilsProvider";
+import WorkerNode from "./screens/WorkerNode";
 
 const styles = makeStyles(() =>
   createStyles({
@@ -40,7 +41,7 @@ const App = () => {
                   <Route exact path="/" component={Auctions} />
                   <Route path="/Home" component={Home} />
                   <Route path="/train" component={TrainModel} />
-                  <Route path="/torrents" component={Torrents} />
+                  <Route path="/workerNode" component={WorkerNode} />
                   <Route path="/settings" component={Settings} />
                 </Switch>
                 <WalletInfo />

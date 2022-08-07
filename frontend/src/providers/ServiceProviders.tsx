@@ -51,6 +51,8 @@ interface daemonServiceProps {
   startJupyterLab(): Promise<any>;
   startMiner(): Promise<any>;
   stopMiner(): Promise<any>;
+  getMinerStats(): Promise<any>;
+  isMining(): Promise<boolean>;
   getRole(): Promise<void>;
   updateSnackbarProps: (snackBarProps: snackBarProps) => void;
 }
@@ -142,7 +144,13 @@ const ServiceProviders: React.FC = ({ children }) => {
   const updateSettings = async (request: SettingsRequestProps) => {
     let response = await daemonService.updateSettings(request);
     if (!response.error) {
+      console.log("RESPONSE");
+      console.log(response);
       response = settingsDaemonResponseToSettingsResponseProps(response);
+      console.log("RESPONSE AFTER");
+
+      console.log(response);
+
       setCurrentConfigs(response);
     }
     return response;
@@ -150,6 +158,8 @@ const ServiceProviders: React.FC = ({ children }) => {
 
   const getSettings = async () => {
     const response = await daemonService.getSettings();
+    console.log("Current Settings");
+    console.log(response);
     setConfigParams(response);
     const version = response.conf.version;
     setClientVersion(version);
@@ -180,6 +190,14 @@ const ServiceProviders: React.FC = ({ children }) => {
     setSnackBarProps(snackBarProps);
   };
 
+  const getMinerStats = async () => {
+    return await daemonService.getMinerStats();
+  };
+
+  const isMining = async () => {
+    return await daemonService.isMining();
+  };
+
   const daemonServicContext: daemonServiceProps = {
     MWTAddress: MWSBalance,
     daemonService: daemonService,
@@ -203,14 +221,16 @@ const ServiceProviders: React.FC = ({ children }) => {
     getCurrentSettings: getCurrentSettings,
     setActiveJobs: getActiveJobs,
     startJupyterLab: startJupyterLab,
-    startMiner: startMiner,
-    stopMiner: stopMiner,
     role: role,
     getRole: getRole,
     updateSnackbarProps: updateSnackbarProps,
     snackBarProps: snackBarProps,
     MWTPrice: MWTPrice,
     getMWTPrice: getMWTPrice,
+    startMiner: startMiner,
+    stopMiner: stopMiner,
+    getMinerStats: getMinerStats,
+    isMining: isMining,
   };
 
   useEffect(() => {
