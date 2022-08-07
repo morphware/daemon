@@ -14,10 +14,11 @@ interface utilsProps {
     miningStats: IMinerStats;
     setMiningStats: React.Dispatch<React.SetStateAction<IMinerStats>>;
     getMiningStatus: () => Promise<void>;
+    getMiningStats: () => Promise<void>;
   };
 }
 
-const defaultMiningStats: IMinerStats = {
+export const defaultMiningStats: IMinerStats = {
   activeMiningPool: "xxx.xxx.pool",
   id: 0,
   jsonrpc: "2.0",
@@ -54,6 +55,11 @@ const UtilsProvider: React.FC = ({ children }) => {
     setCurrentlyMining(isMining);
   };
 
+  const getMinerStats = async () => {
+    const miningStats = await daemonService.getMinerStats();
+    setMiningStats(miningStats);
+  };
+
   const utilsContext: utilsProps = useMemo(() => {
     return {
       darkTheme: darkTheme,
@@ -64,19 +70,15 @@ const UtilsProvider: React.FC = ({ children }) => {
         getMiningStatus: getMiningStatus,
         miningStats: miningStats,
         setMiningStats: setMiningStats,
+        getMiningStats: getMinerStats,
       },
     };
   }, [darkTheme, currentlyMining, miningStats]);
 
-  const getMinerStat = async () => {
-    const miningStats = await daemonService.getMinerStats();
-    setMiningStats(miningStats);
-  };
-
   useEffect(() => {
     const interval = setInterval(async () => {
       if (currentlyMining) {
-        await getMinerStat();
+        await getMinerStats();
       }
       await getMiningStatus();
     }, 20000);

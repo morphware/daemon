@@ -9,7 +9,7 @@ import {
 import React, { useContext } from "react";
 import { ThemeProps } from "../providers/MorphwareTheme";
 import { DaemonContext } from "../providers/ServiceProviders";
-import { UtilsContext } from "../providers/UtilsProvider";
+import { defaultMiningStats, UtilsContext } from "../providers/UtilsProvider";
 
 const Miner = () => {
   const daemonService = useContext(DaemonContext);
@@ -27,7 +27,7 @@ const Miner = () => {
   const stopMining = async () => {
     const resp = await daemonService.stopMiner();
     await mining.getMiningStatus();
-
+    mining.setMiningStats(defaultMiningStats);
     console.log(resp);
     // setCurrentlyMining(!currentlyMining);
   };

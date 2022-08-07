@@ -1,4 +1,4 @@
-import JsonRpcMinerStatsToIMinerStats from "../mappers/MiningStats";
+import JsonRpcMinerStatsToIMinerStats, { IMinerStats } from "../mappers/MiningStats";
 import { ITrainingModelValuesV2 } from "../mappers/TrainModelFormMappers";
 
 interface TorrentData {
@@ -463,10 +463,24 @@ export class DaemonService implements IDaemonService {
       return stopLocalMinerResponse;
 
     } catch (error) {
-      return  null;
+      const emptyStats: IMinerStats =  {
+        activeMiningPool: "",
+        eth: {
+          hashRateInKhS: "0",
+          invalidShares: "0",
+          poolSwitches: "0",
+          rejectedShares: "0",
+          submittedShares: "0"
+        },
+        id: 1,
+        jsonrpc: "0",
+        memoryTemp: "0",
+        nsfminerVersion: "1",
+        runningTime: "0",
+        tempAndFanSpeefPerGPU: []
+      };
+      return  emptyStats;
     }
-    
-
   };
 
   public isMining = async () => {
